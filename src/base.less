@@ -1,0 +1,73 @@
+// 基本颜色定义
+@primary-color: #c52005; // 红色
+@secondary-color: #fa5430; // 黄色
+@accent-color: #3388ff; // 蓝色
+
+@icon-color: #666;
+@background-color: #f9f9f9; // 背景颜色
+@border-color: #ddd; // 边框颜色
+
+@text-color: #333; // 文本颜色
+// 间距等样式定义
+@margin-base: 0.4rem;
+@padding-base: 0.4rem;
+@radius-base: 0.4rem;
+
+// 边框
+.shadow-none {
+    box-shadow: none;
+    -webkit-box-shadow: none;
+}
+
+.intro {
+    background-color: bisque;
+}
+
+.radius {
+    border-radius: 0.4rem;
+}
+
+/* 在线链接服务仅供平台体验和调试使用，平台不承诺服务的稳定性，企业客户需下载字体包自行发布使用并做好备份。 */
+@font-face {
+    font-family: 'zl';
+    /* Project id 2857647 */
+    src: url('//at.alicdn.com/t/c/font_2857647_rgg1b8oiz6.woff2?t=1737432395699') format('woff2'),
+        url('//at.alicdn.com/t/c/font_2857647_rgg1b8oiz6.ttf?t=1737432395699') format('truetype');
+}
+
+.zl-icon {
+    font-family: 'zl';
+    font-style: normal;
+}
+
+// 定义图标名称和对应的 Unicode
+@icons: {
+    analysis: '\e61f';
+    maintenance: '\e623';
+    sale: '\e614';
+    aircraft: '\e600';
+    airplane: '\e685';
+    airline: '\e60c';
+    person: '\e6e4';
+    sms: '\e631';
+    location: '\e673';
+    actype: '\e600';
+    weight: '\e762';
+    calendar: '\e632';
+    pilot: '\e62c';
+    no1: '\e60b';
+    no2: '\e61e';
+    no3: '\e620';
+    arr: '\e616';
+    dep: '\e617';
+    j5: '\e615';
+    j5duty: '\e606';
+    info: '\ed50';
+    user: '\e65d';
+} 
+
+each(@icons, {
+    .zl-icon-@{key}::before { 
+        content: @value;
+    }
+})
