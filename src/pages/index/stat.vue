@@ -94,7 +94,7 @@ const thisYear = computed(() => {
 });
 const lastYear = computed(() => {
     const value = lastYearRes.value;
-    console.log(value, +((value?.weight ?? 0) / 1e3).toFixed(2) | 0);
+    // console.log(value, +((value?.weight ?? 0) / 1e3).toFixed(2) | 0);
     return {
         counter: value?.counter ?? 0,
         weight: +((value?.weight ?? 0) / 1e3).toFixed(2) | 0,
