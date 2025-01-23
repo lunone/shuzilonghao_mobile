@@ -1,14 +1,15 @@
 <template>
     <div class="action-sheet-wrapper">
-        <uni-popup ref="popup" type="bottom" border-radius="10px 10px 0 0" background-color="#fff" class="popup">
+        <uni-popup ref="popup" type="bottom" border-radius="10px 10px 0 0" background-color="#fff" class="popup"
+            @change="change">
             <div class="title-wrapper">
                 <slot name="title">
                     <span class="text">{{ title }}</span>
-                    <i class="icon zl-icon zl-icon-close" @click="show = false" />
+                    <i class="icon zl-icon zl-icon-close" />
                 </slot>
             </div>
-            <div class="content-wrapper">
-                <slot> </slot>
+            <div class="content-wrapper" v-if="show">
+                <slot></slot>
             </div>
         </uni-popup>
     </div>
@@ -18,20 +19,25 @@ import { ref, watch } from 'vue';
 const props = defineProps({
     title: {
         type: String,
-        default: '标题',
+        default: '',
     },
 });
 const show = defineModel({ default: false });
 const popup = ref();
+const emits = defineEmits(['change']);
 
 watch(show, (newValue) => {
-    console.log('show--------', newValue);
+    // console.log('show--------', newValue);
     if (newValue) {
         popup.value.open();
-    } else {
-        popup.value.close();
     }
 });
+
+const change = (e) => {
+    console.log('你把我给干了', e);
+    show.value = e.show;
+    emits('change', e);
+};
 </script>
 <style lang="less" scoped>
 @import '@/base.less';
@@ -65,6 +71,9 @@ watch(show, (newValue) => {
             }
         }
 
+        .content-wrapper {
+            min-height: 20vh;
+        }
     }
 }
 </style>

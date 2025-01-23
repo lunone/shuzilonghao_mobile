@@ -9,39 +9,46 @@
                 <VanIcon name="user" />
             </div> -->
         <!-- </header> -->
-        <div class="section overview">
-            <StatVue class="day" :range="`day`" />
-            <StatVue class="year" />
-        </div>
-        <ShortcutVue class="shortcut" />
-        <!--      <van-skeleton>
-            <template #template> 
-                <div :style="{ display: 'flex', width: '100%' }">
-                    <van-skeleton-image />
-                    <div :style="{ flex: 1, marginLeft: '16px' }">
-                        <div style="color: #999;">商务系统上线后，这里放收入分析</div>
-                        <van-skeleton-paragraph row-width="60%" />
-                        <van-skeleton-paragraph />
+
+        <!-- <tabs>
+            <tab title="首页">ddd</tab>
+            <tab title="woo">sssss</tab>
+        </tabs> -->
+
+        <template v-if="true">
+            <div class="section overview">
+                <StatVue class="day" :range="`day`" />
+                <StatVue class="year" />
+            </div>
+            <ShortcutVue class="shortcut" />
+            <!-- <van-skeleton>
+                <template #template> 
+                    <div :style="{ display: 'flex', width: '100%' }">
+                        <van-skeleton-image />
+                        <div :style="{ flex: 1, marginLeft: '16px' }">
+                            <div style="color: #999;">商务系统上线后，这里放收入分析</div>
+                            <van-skeleton-paragraph row-width="60%" />
+                            <van-skeleton-paragraph />
+                        </div>
                     </div>
-                </div>
-            </template>
-</van-skeleton> -->
-        <div class="section asset">
-            <AircraftVue class="aircraft" />
-            <HrVue class="hr" />
-        </div>
+                </template>
+            </van-skeleton> -->
+            <div class="section asset">
+                <AircraftVue class="aircraft" />
+                <HrVue class="hr" />
+            </div>
 
-        <FlightVue class="section flight" />
-        <PlanVue class="section plan" />
-
-
-        <dividerVue class="more">其他值得放在首页的项</dividerVue>
+            <FlightVue class="section flight" />
+            <PlanVue class="section plan" />
 
 
-        <!-- <button @click="open">打开弹窗</button> -->
-        <!-- <uni-popup ref="popup" type="bottom">底部弹出 Popup 自定义圆角</uni-popup> -->
-     
+            <dividerVue class="more">其他值得放在首页的项</dividerVue>
 
+
+            <!-- <button @click="open">打开弹窗</button> -->
+            <!-- <uni-popup ref="popup" type="bottom">底部弹出 Popup 自定义圆角</uni-popup> -->
+
+        </template>
     </div>
 </template>
 
@@ -52,15 +59,14 @@ import FlightVue from '@/pages/index/flight.vue';
 import HrVue from '@/pages/index/hr.vue';
 import AircraftVue from '@/pages/index/aircraft.vue';
 import PlanVue from '@/pages/index/plan.vue';
-import dividerVue from '@/components/divider.vue';
-// import ucharts from '@/components/ucharts/ucharts.vue';
+import dividerVue from '@/components/zl/divider.vue';
+
 
 import { useStore } from '@/store';
 import { User } from '@/interface';
 import { onMounted, ref } from 'vue';
 // const searchText = ref('');
 // const store = useStore();
-
 
 onMounted(() => {
     // 获取code

@@ -6,22 +6,22 @@
         <view class="summary">
             最近一个月， {{ recentEventCount }} 事件报告 ， {{ selfs.length }} 自愿报告<br>
         </view>
-        <van-tabs v-model:active="activeTab">
-            <van-tab title="主动报告 列表">
-                <view  v-if="selfs.length === 0" >暂无主动报告</view>
+        <tabs v-model:active="activeTab">
+            <tab title="主动报告 列表">
+                <view v-if="selfs.length === 0">暂无主动报告</view>
                 <view class="report-list" v-else>
                     <SelfReportVue v-for="(self, index) in selfs" :key="index" :data="self" />
                 </view>
-            </van-tab>
-            <van-tab title="事件 列表">
+            </tab>
+            <tab title="事件 列表">
                 <van-list>
                     <EventVue :data="event" v-for="event in events" :key="event.id" />
                 </van-list>
-            </van-tab>
-        </van-tabs>
-        <van-back-top />
+            </tab>
+        </tabs>
+        <!-- <van-back-top />  v-model:active="activeTab"-->
     </view>
-</template> 
+</template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, Ref } from 'vue';
@@ -31,6 +31,9 @@ import dayjs from 'dayjs';
 import { EventItem } from '@/interface';
 import SelfReportVue from './card/selfReport.vue';
 import EventVue from './card/event.vue';
+import tabs from '@/components/zl/tabs.vue';
+import tab from '@/components/zl/tab.vue'
+import _ from 'lodash';
 
 // 定义 loading 和 error 状态
 const loading = ref(false);
@@ -62,9 +65,9 @@ const fetchData = async () => {
     try {
         const res = await api('/sms/event/list', { startDate, endDate }) as EventItem[];
         const resSelf = await api('/sms/self/list', { startDate, endDate }) as EventItem[];
-        // console.log(res, resSelf);
+        // console.log('#############',res, resSelf, _.slice(resSelf, 1));
         events.value = res;
-        selfs.value = resSelf;
+        selfs.value = resSelf;//_.slice(resSelf, -2);
     } catch (err) {
         error.value = '获取事件列表失败';
     } finally {

@@ -11,26 +11,19 @@
                 <text class="user-id">{{ userId }}</text>
             </slot>
         </view>
-        <!-- 	<view class="user-details" v-if="showInfo && showProfile">
-			<slot>
-				<van-action-sheet v-if="!isLink" v-model:show="" title="员工档案">
-					<Profile :userId="userId" />
-				</van-action-sheet>
-			</slot>
-		</view> -->
-        <actionSheet v-model="showProfile">
-            <Profile :userId="userId" v-if="showProfile" />
-        </actionSheet>
-
     </view>
+    <actionSheet v-model="showProfile" title="员工信息">
+        <!-- 加个 v-if="showProfile"防止暗戳戳的渲染一堆 -->
+        <Profile :userId="userId" v-if="showProfile" />
+    </actionSheet>
 </template>
-
+<!-- v-if="showProfile" -->
 <script lang="ts" setup>
 import { ref, computed, onMounted, Ref } from 'vue';
 import Profile from '@/pages/hr/profile.vue';
 import { User } from '@/interface';
 import { useStore } from '@/store';
-import actionSheet from '@/components/actionSheet.vue';
+import actionSheet from '@/components/zl/actionSheet.vue';
 const store = useStore();
 const props = defineProps({
     name: { type: String, default: '' },
@@ -44,7 +37,6 @@ const props = defineProps({
 
 const users: Ref<Record<string, User>> = ref({});
 const userName = ref(props.name);
-// const gender = ref(props.gender); 
 
 onMounted(() => {
     if (props.userId && users.value[props.userId]) {
@@ -53,7 +45,6 @@ onMounted(() => {
     }
 });
 
-// const userIcon = computed(() => `user-${gender.value}`);
 const genderClass = computed(() => {
     if (props.gender === 0) return 'woman';
     if (props.gender === 1) return 'man';
@@ -62,10 +53,8 @@ const genderClass = computed(() => {
 
 
 const showProfile = ref(false);
-// 从store获取信息
+// todo:从store获取信息
 const fetchUsers = async () => {
-    // loading.value = true;
-    // error.value = '';
     try {
         const res = await store.useUsers();
         users.value = res;
@@ -76,6 +65,7 @@ const fetchUsers = async () => {
     }
 };
 const toggleProfile = () => {
+    console.log('toggleProfile_____', showProfile.value);
     if (!props.isLink) {
         showProfile.value = !showProfile.value;
     } else {
@@ -93,19 +83,17 @@ onMounted(() => {
 <style lang="less" scoped>
 @import "@/base.less";
 
-
-
 .user-info {
     display: inline-block;
     white-space: nowrap;
     border-bottom: dotted 1px #ddd;
 
     .icon {
-        &.woman {
+        .woman {
             color: #ff69b4; // 粉色表示女性
         }
 
-        &.man {
+        .man {
             color: #00bfff; // 天蓝色表示男性
         }
     }

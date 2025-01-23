@@ -1,5 +1,4 @@
 <template>
-
     <view class="employee-profile">
         <van-notice-bar left-icon="info-o" wrapable :scrollable="false">
             该功能尚未完成，暂显示样例，非真实数据
@@ -27,8 +26,8 @@
         </view>
 
 
-        <van-tabs v-model:active="active">
-            <van-tab title="更多信息">
+        <tabs v-model:active="active">
+            <tab title="更多信息">
                 <view class="education">
                     <van-notice-bar wrapable :scrollable="false" left-icon="info-o">
                         这部分数据在 人力 未上网
@@ -69,8 +68,8 @@
                         <view class="contact-workplace">工作单位：{{ contact.workplace }}</view>
                     </view>
                 </view>
-            </van-tab>
-            <van-tab title="薪酬表现">
+            </tab>
+            <tab title="薪酬表现">
                 <van-notice-bar wrapable :scrollable="false" left-icon="info-o">
                     这部分数据在 人力 未上网
                 </van-notice-bar>
@@ -110,8 +109,8 @@
                         <view class="level-item">安家费：{{ employee.level.settlingFee }}</view>
                     </view>
                 </view>
-            </van-tab>
-            <van-tab title="工作记录">
+            </tab>
+            <tab title="工作记录">
                 <van-notice-bar wrapable :scrollable="false" left-icon="info-o">
                     这部分数据需要接入 航投人力资源系统,
                     <br>该功能为实现，仅为展示
@@ -168,14 +167,16 @@
                     </view>
                 </view>
 
-            </van-tab>
+            </tab>
 
-        </van-tabs>
+        </tabs>
     </view>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import tabs from '@/components/zl/tabs.vue';
+import tab from '@/components/zl/tab.vue';
 const props = defineProps({
     userId: { type: String, default: '' }
 });
@@ -258,6 +259,7 @@ const employee = ref({
     background-color: @background-color;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    min-height: 40vh;
     max-height: 60vh;
     overflow-y: scroll;
 
