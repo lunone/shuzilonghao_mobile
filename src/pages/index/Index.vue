@@ -1,11 +1,11 @@
 <template>
     <div class="main-container">
         <!-- <header class="section header"> -->
-            <!-- <div class="logo"> -->
-                <!-- <van-notice-bar left-icon="volume-o" text="点击第二行的按钮可进入各子模块。" /> -->
+        <!-- <div class="logo"> -->
+        <!-- <van-notice-bar left-icon="volume-o" text="点击第二行的按钮可进入各子模块。" /> -->
 
-            <!-- </div> -->
-            <!-- <div class="user"> 
+        <!-- </div> -->
+        <!-- <div class="user"> 
                 <VanIcon name="user" />
             </div> -->
         <!-- </header> -->
@@ -36,7 +36,12 @@
 
 
         <dividerVue class="more">其他值得放在首页的项</dividerVue>
-    
+
+
+        <!-- <button @click="open">打开弹窗</button> -->
+        <!-- <uni-popup ref="popup" type="bottom">底部弹出 Popup 自定义圆角</uni-popup> -->
+     
+
     </div>
 </template>
 

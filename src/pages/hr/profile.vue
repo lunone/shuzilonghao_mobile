@@ -119,8 +119,9 @@
                 如果是行政人员:<b>行政班</b><br>
 
                 如果是维修人员，显示倒班日期:
-                <van-calendar :first-day-of-week="1"  title="日历" :row-height="25" :poppable="false" :show-confirm="false" :show-mark="true"
-                    :show-title="false" :show-subtitle="false" :min-date="dateRange[0]" :max-date="dateRange[1]">
+                <van-calendar :first-day-of-week="1" title="日历" :row-height="25" :poppable="false" :show-confirm="false"
+                    :show-mark="true" :show-title="false" :show-subtitle="false" :min-date="dateRange[0]"
+                    :max-date="dateRange[1]">
                     <template #text="{ date, text, type, topInfo, bottomInfo, className }">
                         <view class="day">
                             <view class="mark" v-if="Math.random() > 0.7">
@@ -129,10 +130,11 @@
                             <view v-else class="">{{ text }}</view>
                         </view>
                     </template>
-                </van-calendar :first-day-of-week="1" >
+                </van-calendar :first-day-of-week="1">
                 如果是飞行员，显示航班日期:
-                <van-calendar :first-day-of-week="1"  title="日历" :row-height="25" :poppable="false" :show-confirm="false" :show-mark="true"
-                    :show-title="false" :show-subtitle="false" :min-date="dateRange[0]" :max-date="dateRange[1]">
+                <van-calendar :first-day-of-week="1" title="日历" :row-height="25" :poppable="false" :show-confirm="false"
+                    :show-mark="true" :show-title="false" :show-subtitle="false" :min-date="dateRange[0]"
+                    :max-date="dateRange[1]">
                     <template #text="{ date, text, type, topInfo, bottomInfo, className }">
                         <view class="day">
                             <view class="mark" v-if="Math.random() > 0.7">
@@ -141,7 +143,7 @@
                             <view v-else class="">{{ text }}</view>
                         </view>
                     </template>
-                </van-calendar :first-day-of-week="1" >
+                </van-calendar :first-day-of-week="1">
                 <van-divider>电子记录</van-divider>
                 <van-notice-bar wrapable :scrollable="false" left-icon="info-o">
                     这部分显示员工工作产生的电子记录
@@ -174,7 +176,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-// import NavVue from '@/components/Nav.vue';
+const props = defineProps({
+    userId: { type: String, default: '' }
+});
+
 const active = ref(0);
 const dateRange = ref([new Date(2024, 11, 1), new Date(2024, 11, 30)]);
 const employee = ref({
@@ -253,6 +258,8 @@ const employee = ref({
     background-color: @background-color;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-height: 60vh;
+    overflow-y: scroll;
 
     .profile-header {
         display: flex;

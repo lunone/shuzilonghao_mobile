@@ -1,0 +1,89 @@
+.shadow-none {
+  box-shadow: none;
+  -webkit-box-shadow: none;
+}
+.intro {
+  background-color: bisque;
+}
+.radius {
+  border-radius: 0.4rem;
+}
+/* 在线链接服务仅供平台体验和调试使用，平台不承诺服务的稳定性，企业客户需下载字体包自行发布使用并做好备份。 */
+@font-face {
+  font-family: 'zl';
+  /* Project id 2857647 */
+  src: url('//at.alicdn.com/t/c/font_2857647_ru0ps4q3dz7.woff2?t=1737597732311') format('woff2'), url('//at.alicdn.com/t/c/font_2857647_ru0ps4q3dz7.ttf?t=1737597732311') format('truetype');
+}
+.zl-icon {
+  font-family: 'zl';
+  font-style: normal;
+}
+.zl-icon-analysis::before {
+  content: '\e61f';
+}
+.zl-icon-maintenance::before {
+  content: '\e623';
+}
+.zl-icon-sale::before {
+  content: '\e614';
+}
+.zl-icon-aircraft::before {
+  content: '\e600';
+}
+.zl-icon-airplane::before {
+  content: '\e685';
+}
+.zl-icon-airline::before {
+  content: '\e60c';
+}
+.zl-icon-person::before {
+  content: '\e6e4';
+}
+.zl-icon-sms::before {
+  content: '\e631';
+}
+.zl-icon-location::before {
+  content: '\e673';
+}
+.zl-icon-actype::before {
+  content: '\e600';
+}
+.zl-icon-weight::before {
+  content: '\e762';
+}
+.zl-icon-calendar::before {
+  content: '\e632';
+}
+.zl-icon-pilot::before {
+  content: '\e62c';
+}
+.zl-icon-no1::before {
+  content: '\e60b';
+}
+.zl-icon-no2::before {
+  content: '\e61e';
+}
+.zl-icon-no3::before {
+  content: '\e620';
+}
+.zl-icon-arr::before {
+  content: '\e616';
+}
+.zl-icon-dep::before {
+  content: '\e617';
+}
+.zl-icon-j5::before {
+  content: '\e615';
+}
+.zl-icon-j5duty::before {
+  content: '\e606';
+}
+.zl-icon-info::before {
+  content: '\ed50';
+}
+.zl-icon-user::before {
+  content: '\e65d';
+}
+.zl-icon-close::before {
+  content: '\e7be';
+}
