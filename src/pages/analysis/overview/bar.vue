@@ -8,14 +8,14 @@ import dayjs from 'dayjs';
 import _ from 'lodash';
 import { watch, computed, ref, Ref } from 'vue';
 
-const props = defineProps<{ data: FlightItem[], dateRange: [Date, Date] }>();
+const props = defineProps<{ data: FlightItem[], dateRange: [string, string] }>();
 
 const dateFormatStr = 'YYYY-MM-DD';
 
 
 const flightsGroupByDate: Ref<Record<string, any[]>> = ref({});
 
-const option = ref({});
+const option = ref();
 watch(() => props.data, () => {
     console.log('data changed');
     const data: Record<string, number> = {};
@@ -39,7 +39,7 @@ watch(() => props.data, () => {
         categories: dates,
         series: [
             {
-                name: "目标值",
+                name: "货重",
                 data: yData,
                 //  _.map(yData, value => {
                 //     // 超过平均值20%的颜色红色，低于平均值20%的颜色暗绿色，其他的颜色为蓝色
@@ -52,14 +52,15 @@ watch(() => props.data, () => {
         animation: false,
         // background: "#FFFFFF",
         // padding: [2, 2, 2, 2],
-        // legend: {
-        //     show: false,
-        // },
+        legend: { show: false, },
         xAxis: {
             // labelCount: 8,// 这个确实会自动控制显示标签数量,但是不显示的标签的val就是''了,没办法formatter
-            // formatter: (val, index) => index % 3 != 1 ? '' : dayjs(val).format('M/D'),
+            formatter: (val, index) => index % 2 != 1 ? '' : dayjs(val).format('M/D'),
         },
-
+        yAxis: {
+            // disabled:true,
+            data: [{ min: 0 }]
+        }
     }
 }, { immediate: true });
 

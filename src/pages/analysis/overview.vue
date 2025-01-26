@@ -46,10 +46,10 @@ import dayjs from 'dayjs';
 // import { toFixed } from '@/utils/tool';
 import { FlightItem } from '@/interface';
 import { useStore } from '@/store';
-import bar from './chart/overviewBar.vue';
-import pie from './chart/weightPie.vue';
+import bar from './overview/bar.vue';
+import pie from './overview/pie.vue';
 // 定义props来接收外部传入的startDate和endDate属性
-const props = defineProps<{ data: FlightItem[], dateRange: [Date, Date] }>();
+const props = defineProps<{ data: FlightItem[], dateRange: [string, string] }>();
 
 const store = useStore();
 const pieData: Ref<any[]> = ref([]);
@@ -66,7 +66,7 @@ const summary = computed(() => {
         totalWeight: (totalWeight / 1e3).toFixed(2),
         totalHours: (totalHours / 60).toFixed(2),
         counter: props.data?.length || 0,
-        utilization: (totalHours / (props.dateRange[1].getTime() - props.dateRange[0].getTime()) * 24 * 365 * 100).toFixed(2),
+        // utilization: (totalHours / (dayjs(props.dateRange[1]).diff(props.dateRange[0],'minute') * 24 * 365 * 100).toFixed(2),
     }
 });
 

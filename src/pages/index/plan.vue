@@ -1,6 +1,5 @@
 <template>
     <div class="chart-wrpper">
-        <!-- <bar-chart :option="option" class="chart" />  -->
         <ucharts :option="option" @select="showTip" />
     </div>
 </template>
@@ -15,12 +14,14 @@ import ucharts from '@/components/ucharts/ucharts.vue';
 
 const dayLenth = 22;
 const flights: Ref<FlightItem[]> = ref([]);
+const option = ref();
 const fetchFlishgts = async () => {
     const startDate = dayjs().add(0, 'day').format('YYYY-MM-DD');
     const endDate = dayjs().add(dayLenth, 'day').format('YYYY-MM-DD');
     try {
         const res = await api('/flight/date/', { startDate, endDate }) as FlightItem[];
         flights.value = res;
+        option.value = setOption(res);
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -31,9 +32,11 @@ const fetchFlishgts = async () => {
 //     '#91c7ae', '#749f83', '#ca8622', '#bda29a',
 //     '#6e7074', '#546570', '#c4ccd3'
 // ];
-
-const option = computed(() => {
-    const groupedFlights = flights.value?.reduce((acc, flight) => {
+function setOption(flights) {
+    if (flights.length == 0) {
+        return
+    }
+    const groupedFlights = flights?.reduce((acc, flight) => {
         const date = dayjs(flight.date).format('YYYY-MM-DD');
         // 初始化日期对应的航班数量为0
         acc[date] = acc[date] ?? 0;
@@ -47,7 +50,7 @@ const option = computed(() => {
     const flightCounts = dates.map(date => groupedFlights[date]);
 
     return {
-        type:'column',
+        type: 'column',
         categories: dates,
         series: [
             {
@@ -63,16 +66,16 @@ const option = computed(() => {
         animation: false,
         // background: "#FFFFFF",
         // padding: [2, 2, 2, 2],
-        // legend: {
-        //     show: false,
-        // },
+        legend: { show: false, },
         xAxis: {
             // labelCount: 8,// 这个确实会自动控制显示标签数量,但是不显示的标签的val就是''了,没办法formatter
             formatter: (val, index) => index % 3 != 1 ? '' : dayjs(val).format('M/D'),
         },
-
+        yAxis:{
+            disabled:true,
+        }
     }
-});
+};
 const showTip = (chart: any, event) => {
     chart.touchLegend(event);
     chart.showToolTip(event, {

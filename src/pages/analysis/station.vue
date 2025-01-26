@@ -18,7 +18,7 @@
                             </span>
                             <!-- todo:这里有个报错airports[code4]不存在 -->
                             <span class="city arr">
-                                {{ !isDep[station.key] ? airports[code4].city || code4 : station.city }}
+                                <!-- {{ !isDep[station.key] ? airports[code4].city || code4 : station.city }} -->
                             </span>
                         </div>
                         <div class="summary">
@@ -62,7 +62,7 @@ import dayjs from 'dayjs';
 import { useStore } from '@/store';
 
 // 定义 props 来接收外部传入的航班数据数组
-const props = defineProps<{ data: FlightItem[], dateRange: [Date, Date] }>();
+const props = defineProps<{ data: FlightItem[], dateRange: [string, string] }>();
 // 折叠面板的 activeNames 数组，用于控制面板的展开和折叠
 const activeNames: Ref<string[]> = ref([]);
 // 定义 stations 数组，用于存储 dep 和 arr 的汇总,也是从watch接收props变更到computed触发页面刷写的中间变量

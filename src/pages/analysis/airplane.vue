@@ -66,7 +66,7 @@ import dayjs from 'dayjs';
 import _ from 'lodash';
 import { useStore } from '@/store';
 // 定义 props 来接收外部传入的航班数据数组
-const props = defineProps<{ data: FlightItem[], dateRange: [Date, Date] }>();
+const props = defineProps<{ data: FlightItem[], dateRange: [string, string] }>();
 
 // 折叠面板的 activeNames 数组，用于控制面板的展开和折叠
 const activeNames: Ref<string[]> = ref([]);

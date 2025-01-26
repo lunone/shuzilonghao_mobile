@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
 import api from '@/utils/api';
-import { showToast } from 'vant';
+// import { showToast } from 'vant';
 import _ from 'lodash';
 
 // 定义 props 来接收外部传入的航班数据数组
@@ -75,7 +75,7 @@ const fetchAirports = async () => {
 
 // 处理分组点击事件
 const handleGroupClick = (key: string) => {
-    showToast(`${key} 被点击了`);
+    // showToast(`${key} 被点击了`);
 };
 
 // 组件挂载时获取机场信息

@@ -15,7 +15,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, PropType, reactive, Ref, ref } from 'vue'
 import _ from 'lodash'
-// import PieChartVue from '@/components/chart/PieChart.vue'
 import ucharts from '@/components/ucharts/ucharts.vue';
 
 import api from '@/utils/api'
@@ -75,21 +74,28 @@ const getOption = () => {
     // 按出发/到达机场分组
     const flightsGroupByDep = _.groupBy(props.data, ['arr', 'dep'][+groupByField.value])
     const data: Record<string, any>[] = [];
+    // 计算货物净重总和
+    let total = 0;
     // 遍历分组数据
     _.forEach(flightsGroupByDep, (flights, dep) => {
-        const key = airports.value[dep]?.city
-        // 计算货物净重总和
-        data.push({ value: _.sumBy(flights, 'netWeightCargo'), name: key })
+        const name = dep;
+        const value = _.sumBy(flights, 'netWeightCargo');
+        const labelText = `${airports.value[dep]?.city} :${(value / 1e3).toFixed(1)}`
+        if (value > 0) {
+            data.push({ name, value, labelText });
+        }
+        total += value;
     })
+    console.log('-----------------', data)
     const tips = `${['进港', '出港'][+groupByField.value]}量`;
     return {
         type: "ring",
-        animation: true,
+        animation: false,
         rotate: false,
         rotateLock: false,
         // color: ["#1890FF", "#91CB74", "#FAC858", "#EE6666", "#73C0DE", "#3CA272", "#FC8452", "#9A60B4", "#ea7ccc"],
         // padding: [5, 5, 5, 5],
-        // dataLabel: true,
+        dataLabel: true,
         // enableScroll: false,
         series: [
             {
@@ -102,24 +108,24 @@ const getOption = () => {
         //     position: "right",
         //     lineHeight: 25
         // },
-        // title: {
-        //     name: "收益率",
-        //     fontSize: 15,
-        //     color: "#666666"
-        // },
-        // subtitle: {
-        //     name: "70%",
-        //     fontSize: 25,
-        //     color: "#7cb5ec"
-        // },
+        title: {
+            name: "总重",
+            fontSize: 15,
+            color: "#666666"
+        },
+        subtitle: {
+            name: (total / 1e3).toFixed(2),
+            fontSize: 14,
+            color: "#7cb5ec"
+        },
         extra: {
             ring: {
-                ringWidth: 260,
+                ringWidth: 60,
                 activeOpacity: 0.5,
                 activeRadius: 10,
                 offsetAngle: 0,
                 labelWidth: 15,
-                border: false,
+                border: true,
                 borderWidth: 3,
                 borderColor: "#FFFFFF"
             }
