@@ -48,7 +48,7 @@
         </view>
         <view class="remark" v-if="props.range == 'year'">
             <!-- <van-icon name="info" /> -->
-			<i class="icon zl-icon zl-icon-info" />
+			<i class="icon zl-icon-info" />
             今年:{{ dayjs(DateStr.firstDayOfYear).format('YYYY/M/D') }}-{{ dayjs(DateStr.now).format('YYYY/M/D') }},
             去年:{{ dayjs(DateStr.firstDayOfLastYear).format('YYYY/M/D') }}-{{
                 dayjs(DateStr.dayBeforeOneYear).format('YYYY/M/D') }}

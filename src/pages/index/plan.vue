@@ -47,6 +47,7 @@ const option = computed(() => {
     const flightCounts = dates.map(date => groupedFlights[date]);
 
     return {
+        type:'column',
         categories: dates,
         series: [
             {

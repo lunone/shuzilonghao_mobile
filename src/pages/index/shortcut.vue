@@ -15,7 +15,7 @@
 
 	const data = ref([
 		[
-			{ size: 12, link: '/analysis', class: 'analysis', text: '运行分析' },
+			{ size: 12, link: '/pages/analysis/Analysis', class: 'analysis', text: '运行分析' },
 			{ size: 6, link: '/airplane', class: 'airplane', text: '机队' },
 			{ size: 6, link: '/sale', class: 'sale', text: '销售' },
 			{ size: 6, link: '/hr', class: 'person', text: '人员' },

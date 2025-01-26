@@ -1,10 +1,11 @@
 <template>
     <view class="tabs-wrapper">
         <view class="titles">
-            <text v-for="item in tabs" :key="item.index" class="title" :class="active == item.index ? 'activite' : ''"
+            <span v-for="item in tabs" :key="item.index" class="title" :class="active == item.index ? 'activite' : ''"
                 @click="click(item.index)">
+                <i class="icon zl-icon" :class="`zl-icon-${item.icon}`"> </i>
                 {{ item.title }}
-            </text>
+            </span>
         </view>
         <view class="content">
             <slot></slot>
@@ -34,6 +35,8 @@ onMounted(() => {
 </script>
 
 <style scoped lang="less">
+@import "@/base.less";
+
 .tabs-wrapper {
     display: flex;
     flex-direction: column;

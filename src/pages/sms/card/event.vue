@@ -15,7 +15,7 @@
         <van-steps direction="vertical" :active="data.status.length">
             <van-step>
                 <h3>{{ data.reportDate }}：{{ data.reporter || `神秘人` }}
-                    <i class="icon zl-icon zl-icon-phone" :style="{ marginLeft: '10px' }" @click="call(data.reporterTel)" />
+                    <i class="icon zl-icon-phone" :style="{ marginLeft: '10px' }" @click="call(data.reporterTel)" />
                     <!-- 添加电话图标 -->
 
                 </h3>

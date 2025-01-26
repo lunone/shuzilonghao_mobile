@@ -2,7 +2,7 @@
     <view class="hr-summary">
         <view class="total">
             <!-- <van-icon class-prefix="zl-icon" name="person" class="icon" :size="40" /> -->
-			<i class="icon zl-icon zl-icon-person" />
+			<i class="icon zl-icon-person" />
             <view class="text">
                 <view class="title">XX人</view>
                 <!-- <view class="value"></view> -->

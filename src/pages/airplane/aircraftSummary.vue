@@ -1,20 +1,18 @@
 <template>
-    <view class="flight-wrapper">
-        <view class="total">
-			<i class="icon zl-icon-aircraft" />
-            <view class="text">
-                <text class="value">{{ _.sum(_.values(stat)) }}</text>
-                <text class="unit">架</text>
-            </view>
-        </view>
-        <view class="detail">
-            <view class="item" v-for="number, acType in stat" :key="acType">
-                <text class="title">{{ acTypeShortTranslate[acType] || acType }} </text>
-                <text class="value">{{ number }}</text>
-                <text class="unit">架</text>
-            </view>
-        </view>
-    </view>
+    <div class="wrapper">
+        <div class="total">
+            <van-icon class-prefix="zl-icon" name="aircraft" :size="50" color="#c52005"/>
+            <span class="value">{{ _.sum(_.values(stat)) }}</span>
+            <span class="unit">架</span>
+        </div>
+        <div class="detail">
+            <div class="item" v-for="number, acType in stat" :key="acType">
+                <span class="title">{{ acTypeShortTranslate[acType] || acType }} </span>
+                <span class="value">{{ number }}</span>
+                <span class="unit">架</span>
+            </div>
+        </div>
+    </div>
 </template>
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
@@ -79,7 +77,7 @@ onMounted(() => {
 <style lang="less" scoped>
 @import "@/base.less";
 
-.flight-wrapper {
+.wrapper {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -87,18 +85,13 @@ onMounted(() => {
     .total {
         display: flex;
         align-items: center;
-        flex-direction: column;
-        .icon {
-            size: 50px;
-            color: #3f3f3f;
-        }
 
         .title,
         .value,
         .unit {
             display: inline-block;
             vertical-align: middle;
-            // margin-right: 10px;
+            margin-right: 10px;
         }
 
         .title {
@@ -118,7 +111,7 @@ onMounted(() => {
 
     .detail {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         margin-left: 2rem;
 
         .item {

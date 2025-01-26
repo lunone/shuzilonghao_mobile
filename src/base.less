@@ -29,18 +29,23 @@
 
 /* 在线链接服务仅供平台体验和调试使用，平台不承诺服务的稳定性，企业客户需下载字体包自行发布使用并做好备份。 */
 @font-face {
-    font-family: 'zl';  /* Project id 2857647 */
-    src: url('//at.alicdn.com/t/c/font_2857647_ru0ps4q3dz7.woff2?t=1737597732311') format('woff2'),
-         url('//at.alicdn.com/t/c/font_2857647_ru0ps4q3dz7.ttf?t=1737597732311') format('truetype');
-  }
-
-.zl-icon {
     font-family: 'zl';
-    font-style: normal;
+    /* Project id 2857647 */
+    src: url('//at.alicdn.com/t/c/font_2857647_p4ks1kbi1rq.woff2?t=1737772113041') format('woff2'),
+        url('//at.alicdn.com/t/c/font_2857647_p4ks1kbi1rq.ttf?t=1737772113041') format('truetype');
 }
 
 // 定义图标名称和对应的 Unicode
 @icons: {
+    // 页面通用
+    calendar: '\e73b';
+    info: '\ed50';
+    user: '\e65d';
+    close: '\e7be';
+    no1: '\e60b';
+    no2: '\e61e';
+    no3: '\e620';
+    // 功能图标
     analysis: '\e61f';
     maintenance: '\e623';
     sale: '\e614';
@@ -52,22 +57,21 @@
     location: '\e673';
     actype: '\e600';
     weight: '\e762';
-    calendar: '\e632';
     pilot: '\e62c';
-    no1: '\e60b';
-    no2: '\e61e';
-    no3: '\e620';
     arr: '\e616';
     dep: '\e617';
     j5: '\e615';
     j5duty: '\e606';
-    info: '\ed50';
-    user: '\e65d';
-    close:'\e7be'
-} 
+}
+
+.zl-icon {
+    font-family: 'zl';
+    font-style: normal;
+}
 
 each(@icons, {
-    .zl-icon-@{key}::before { 
+    .zl-icon-@{key}::before {
+        .zl-icon;
         content: @value;
     }
 })

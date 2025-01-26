@@ -124,7 +124,7 @@
                     <template #text="{ date, text, type, topInfo, bottomInfo, className }">
                         <view class="day">
                             <view class="mark" v-if="Math.random() > 0.7">
-                                <i class="icon zl-icon zl-icon-j5duty" />
+                                <i class="icon zl-icon-j5duty" />
                             </view>
                             <view v-else class="">{{ text }}</view>
                         </view>
@@ -137,7 +137,7 @@
                     <template #text="{ date, text, type, topInfo, bottomInfo, className }">
                         <view class="day">
                             <view class="mark" v-if="Math.random() > 0.7">
-                                <i class="icon zl-icon zl-icon-dep" />
+                                <i class="icon zl-icon-dep" />
                             </view>
                             <view v-else class="">{{ text }}</view>
                         </view>

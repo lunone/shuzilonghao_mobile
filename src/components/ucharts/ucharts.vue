@@ -1,89 +1,88 @@
 <template>
-    <view class="chart-wrapper">
-        <canvas canvas-id="column" id="column" class="chart" @touchend="tap" :style="`height:${height}px`" />
+    <view class="wrapper">
+        <canvas :canvas-id="id" :id="id" type="2d" :canvas2d="true" class="chart" @touchend="tap"
+            :style="`height:${height}px`" />
     </view>
 </template>
 
-<script lang="ts">
-// !important 不要费心思改setup句式,uniapp的bug,兼容性问题,访问不到dom就老实了.
-import _ from 'lodash';
+<script lang="ts" setup>
+import { getCurrentInstance, ref, watch } from 'vue';
 import uCharts from './u-charts.min';
-
-
-const uChartsInstance = {};
-export default {
-    data() {
-        return {};
-    },
-    emits: ['select'],
-    props: {
-        option: { type: Object, default: () => { } },
-        height: { type: String, default: '150' }
-    },
-    // note:uniapp的bug,直接获取不到this.props.option,只能通过一次computed来获取
-    computed: {},
-    watch: {
-        option: {
-            handler(newVal, oldVal) {
-                this.drawCharts(newVal);
-            },
-            deep: true,
-        }
-    },
-    mounted() { },
-    methods: {
-        drawCharts(data) {
-            console.log('drawCharts--------', data);
-            const id = 'column';
-            const ctx = uni.createCanvasContext(id, this);
-            const info = uni.getSystemInfoSync();
-            const height = 150;
-            const width = Math.floor(info.screenWidth - 30);
-            const opt = _.merge({
-                canvas2d: true,
-                // canvas的宽度，单位为px
-                width: width,
-                height: height, animation: true,
-                background: "#FFFFFF",
-                padding: [2, 2, 2, 2],
-                legend: {
-                    show: false,
-                },
-                xAxis: {
-                    disableGrid: true,
-                    // gridEval: 22,
-                    // labelCount: 8,
-                },
-                yAxis: {
-                    disabled: true,
-                    // data: [{ min: 0 }]
-                },
-                extra: {
-                    column: {// 柱状图分组样式
-                        type: "group",
-                        width: 16,
-                    }
-                },
-            }, data, {
+import _ from 'lodash';
+let chart;
+const id = "canvas" //"exjLSzTaRXxTPxXoOISiSyKXwIjfdWQk";
+const emits = defineEmits(['select'])
+const props = defineProps({
+    option: { type: Object, default: () => { } },
+    height: { type: String, default: '250' }
+});
+// 获取当前实例,不能放在再深层次,会导致获取不到
+const _this = getCurrentInstance();
+watch(() => props.option, val => {
+    // console.log('[uCharts]:option changed$$$$$', val)
+    setTimeout(() => {// 延时执行，防止getCurrentInstance获取到的高度宽度为0
+        // console.log('[uCharts]:option changed', val)
+        draw(val)
+    }, 3e2);
+}, { deep: true, immediate: true })
+function draw(data) {
+    const { pixelRatio } = uni.getSystemInfoSync();
+    // 将选择器的选取范围更改为自定义组件(使用getCurrentInstance获取)内，返回一个 SelectorQuery 对象实例
+    uni.createSelectorQuery().in(_this)
+        // 在当前页面下选择第一个匹配选择器 selector 的节点，返回一个 NodesRef 对象实例，可以用于获取节点信息。
+        .select('#' + id)
+        // 获取节点的相关信息。第一个参数是节点相关信息配置（必选）；第二参数可选是方法的回调函数，参数是指定的相关节点信息。
+        .fields({ node: true, size: true })
+        // 执行所有的请求。请求结果按请求次序构成数组，在 callback 的第一个参数中返回。
+        .exec(res => {
+            let { node, width, height } = res[0] || {};
+            console.log('[uCharts]:准备绘图', res[0], width, height)
+            if (!res[0]) { return };
+            console.log('[uCharts]:绘图中', res[0])
+            const context = node.getContext('2d');
+            width = width ? width * 1 : 150;
+            height = height ? height * 0.8 : 200;
+            // 防止变模糊
+            node.width = width * pixelRatio;
+            node.height = height * pixelRatio;
+            chart = new uCharts(_.merge({
                 type: "column",
-                context: ctx,
-            })
-            uChartsInstance[id] = new uCharts(opt);
-        },
-        tap(e) {
-            this.$emit('select', uChartsInstance[e.target.id], e);
-        }
-    }
-};
+                animation: true,
+                background: "#333333",
+                // color: ["#1890FF", "#91CB74", "#FAC858", "#EE6666", "#73C0DE", "#3CA272", "#FC8452", "#9A60B4", "#ea7ccc"],
+                padding: [2, 2, 20, 2],
+                // legend: { show: false, },
+                extra: {
+                    column: {
+                        type: "group",
+                        width: 30,
+                        activeBgColor: "#000000",
+                        activeBgOpacity: 0.08
+                    }
+                }
+            }, data, {
+                canvas2d: true, context, pixelRatio,
+                // canvas的宽度高度，单位为px
+                width: width * pixelRatio,
+                height: height * pixelRatio,
+            }))
+        });
+}
+function tap(e) {
+    // chart.touchLegend(e);
+    // chart.showToolTip(e);
+    emits('select', chart, e);
+}
 </script>
 
 <style scoped lang="less">
-.chart-wrapper {
+.wrapper {
     display: flex;
     justify-content: center;
 
     .chart {
         width: 100%;
+        border: red 1px solid;
     }
 }
 </style>

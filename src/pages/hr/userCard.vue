@@ -2,7 +2,7 @@
     <view class="user-card" @click="toggleProfile">
         <view class="user-info">
             <slot name="icon" v-if="showIcon">
-                <i class="icon zl-icon zl-icon-user" :class="genderClass" />
+                <i class="icon zl-icon-user" :class="genderClass" />
             </slot>
             <slot name="name">
                 <text class="name">{{ userName }}</text>

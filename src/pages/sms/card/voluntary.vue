@@ -2,7 +2,7 @@
 	<div class="item">
 		<div class="ask">
 			<div class="user">
-				<i class="icon zl-icon zl-icon-user" />
+				<i class="icon zl-icon-user" />
 				<UserCardVue :userId="data.userId" :name="data.userName" class="name" v-if="data.userId"
 					:show-icon="false" />
 				<div class="name anonymous" v-else>
@@ -23,7 +23,7 @@
 					<div class="date">{{ dayjs(answer.date).format('M月D日') }}</div>
 				</div>
 				<div class="user">
-					<i class="icon zl-icon zl-icon-user" />
+					<i class="icon zl-icon-user" />
 					<div class="name">{{ answer.userName }}</div>
 				</div>
 			</div>

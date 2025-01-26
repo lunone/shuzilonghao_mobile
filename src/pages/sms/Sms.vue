@@ -6,19 +6,19 @@
         <view class="summary">
             最近一个月， {{ recentEventCount }} 事件报告 ， {{ selfs.length }} 自愿报告<br>
         </view>
-        <tabs v-model:active="activeTab">
-            <tab title="主动报告 列表">
+        <zl-tabs v-model:active="activeTab" >
+            <zl-tab title="主动报告 列表">
                 <view v-if="selfs.length === 0">暂无主动报告</view>
                 <view class="report-list" v-else>
-                    <SelfReportVue v-for="(self, index) in selfs" :key="index" :data="self" />
+                    <voluntary v-for="(self, index) in selfs" :key="index" :data="self" />
                 </view>
-            </tab>
-            <tab title="事件 列表">
+            </zl-tab>
+            <zl-tab title="事件 列表">
                 <van-list>
                     <EventVue :data="event" v-for="event in events" :key="event.id" />
                 </van-list>
-            </tab>
-        </tabs>
+            </zl-tab>
+        </zl-tabs>
         <back-top />
     </view>
 </template>
@@ -29,10 +29,8 @@ import { ref, computed, onMounted, Ref } from 'vue';
 import api from '@/utils/api';
 import dayjs from 'dayjs';
 import { EventItem } from '@/interface';
-import SelfReportVue from './card/selfReport.vue';
+import voluntary from './card/voluntary.vue';
 import EventVue from './card/event.vue';
-import tabs from '@/components/zl/tabs.vue';
-import tab from '@/components/zl/tab.vue'
 import _ from 'lodash';
 import backTop from '@/components/zl/backTop.vue';
 

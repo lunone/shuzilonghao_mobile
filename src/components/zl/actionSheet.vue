@@ -5,7 +5,7 @@
             <div class="title-wrapper">
                 <slot name="title">
                     <span class="text">{{ title }}</span>
-                    <i class="icon zl-icon zl-icon-close" />
+                    <i class="icon zl-icon-close" />
                 </slot>
             </div>
             <div class="content-wrapper" v-if="show">
