@@ -19,7 +19,7 @@
                 </van-list>
             </tab>
         </tabs>
-        <!-- <van-back-top />  v-model:active="activeTab"-->
+        <back-top />
     </view>
 </template>
 
@@ -34,6 +34,7 @@ import EventVue from './card/event.vue';
 import tabs from '@/components/zl/tabs.vue';
 import tab from '@/components/zl/tab.vue'
 import _ from 'lodash';
+import backTop from '@/components/zl/backTop.vue';
 
 // 定义 loading 和 error 状态
 const loading = ref(false);
