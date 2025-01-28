@@ -8,7 +8,7 @@
     </van-cell>
     <!-- 饼图组件 -->
     <!-- <PieChartVue class="line-chart" :option="pieData" :height="`40vh`" /> @select="showTip"  -->
-    <ucharts :option="pieData" @select="showTip" />
+    <ucharts :option="pieData" @select="showTip" :height="250"/>
 
 </template>
 
@@ -87,7 +87,7 @@ function getOption() {
         }
         total += value;
     })
-    console.log('-----------------', data)
+    // console.log('-----------------', data)
     const tips = `${['进港', '出港'][+groupByField.value]}量`;
     return {
         type: "ring",
@@ -95,7 +95,7 @@ function getOption() {
         rotate: false,
         rotateLock: false,
         // color: ["#1890FF", "#91CB74", "#FAC858", "#EE6666", "#73C0DE", "#3CA272", "#FC8452", "#9A60B4", "#ea7ccc"],
-        // padding: [5, 5, 5, 5],
+        padding: [20, 0, 0, 20],
         dataLabel: true,
         // enableScroll: false,
         series: [

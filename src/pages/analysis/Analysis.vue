@@ -58,13 +58,8 @@ const minDate = dayjs().subtract(3, 'year').startOf('day').format(dateformatStr)
 // 今天的日期
 const maxDate = dayjs().add(-1, 'day').startOf('day').format(dateformatStr);
 
-// 初始化dateRange为过去的一周
-// const dateRange = ref<[Date, Date]>([
-//     dayjs().subtract(8, 'day').startOf('day').toDate(),
-//     dayjs().subtract(1, 'day').startOf('day').toDate()
-// ]);
 const range = ref<[string, string]>([
-    dayjs().subtract(8, 'day').startOf('day').format(dateformatStr),
+    dayjs().subtract(20, 'day').startOf('day').format(dateformatStr),
     dayjs().subtract(1, 'day').startOf('day').format(dateformatStr)
 ]);
 // const show = ref(false);
@@ -91,15 +86,15 @@ watch(() => range, async () => {
     error.value = '';
     try {
         const res = await api('/flight/atd/', { startDate, endDate }) as any[];
-        console.log('#####', startDate, endDate, res);
+        // console.log('#####', startDate, endDate, res);
         // 过滤掉备降和取消航班
-        _.forEach(res, (flight) => {
-           if(flight.dep =='ZGSZ' || flight.arr =='ZGSZ'){
-            console.log('#####', flight);
-           }
-
-        });
-        flights.value = _.filter(res, flight => !flight.flagPatch && !flight.flagCs);
+        // _.forEach(res, (flight) => {
+        //     if (flight.dep == 'ZGSZ' || flight.arr == 'ZGSZ') {
+        //         console.log('#####', flight);
+        //     }
+        // });
+        // 
+        flights.value = _.filter(res, flight => !flight.flagPatch && !flight.flagCs && !flight.flagVr);
     } catch (err) {
         error.value = '获取机场信息失败';
     } finally {

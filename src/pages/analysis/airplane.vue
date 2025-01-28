@@ -133,7 +133,7 @@ const airplanesWithDetail = computed(() => {
         }
 
         const weightRate = (totalNetWeightCargo / counter / aircrafts.value[acReg]?.maxPayload * 100).toFixed(2)
-        console.log()
+        // console.log()
         // 更新统计信息
         airplaneData[acReg].stat = {
             totalFlightTime: (totalFlightTime / 60).toFixed(2),
@@ -170,7 +170,7 @@ const fetchAircrafts = async () => {
     try {
         const res = await store.useAircrafts();
         aircrafts.value = res;
-        console.log('飞机', res);
+        // console.log('飞机', res);
     } catch (err) {
         error.value = '获取飞机信息失败';
     } finally {
