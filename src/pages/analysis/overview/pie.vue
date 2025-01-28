@@ -8,7 +8,7 @@
     </van-cell>
     <!-- 饼图组件 -->
     <!-- <PieChartVue class="line-chart" :option="pieData" :height="`40vh`" /> @select="showTip"  -->
-    <ucharts :option="pieData" />
+    <ucharts :option="pieData" @select="showTip" />
 
 </template>
 
@@ -21,6 +21,7 @@ import api from '@/utils/api'
 import { useStore } from '@/store';
 import { AirportItem } from '@/interface';
 import dayjs from 'dayjs';
+import { offsetCorrect } from '@/utils/ucharts';
 
 // 定义组件props
 const props = defineProps({
@@ -68,7 +69,7 @@ onMounted(() => {
 // 计算饼图数据
 const pieData = ref({})
 // : Ref<Record<string, any>> = computed(
-const getOption = () => {
+function getOption() {
     // 设置饼图标题
     pieGroupTitle.value = `${['进港', '出港'][+groupByField.value]}量`
     // 按出发/到达机场分组
@@ -170,7 +171,21 @@ const getOption = () => {
     //     ],
     // };
 }
-
+function showTip(chart, event) {
+    console.log('showTip', event);
+    // page screen client
+    // offsetCorrect(event, 0, 149+94);
+    chart.touchLegend(event);
+    chart.showToolTip(event, {
+        // index: 2,
+        // offset: { x, y },//不传offset显示位置为点击的坐标
+        textList: [
+            { text: "2022年销量", color: null },
+            { text: "大米：100万斤", color: "#1890FF" },
+            { text: "豆油：10吨", color: "#91CB74" }
+        ]
+    });
+}
 </script>
 
 <style lang="less" scoped>

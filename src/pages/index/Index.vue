@@ -1,4 +1,5 @@
 <template>
+
     <div class="main-container">
         <!-- <header class="section header"> -->
         <!-- <div class="logo"> -->
@@ -32,7 +33,7 @@
                         </div>
                     </div>
                 </template>
-            </van-skeleton> -->
+</van-skeleton> -->
             <div class="section asset">
                 <AircraftVue class="aircraft" />
                 <HrVue class="hr" />
@@ -173,6 +174,12 @@ onMounted(() => {
         .hr {
             width: 50%;
         }
+    }
+
+    &>.plan {
+        // margin: 0 ;
+        // 目前来看是不能有padding的,要不然ucharts点击事件会偏移,margin好像无所谓
+        // padding:100px;
     }
 
     .more {

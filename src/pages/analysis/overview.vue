@@ -1,6 +1,6 @@
 <template>
     <div class="wrapper">
-        <div class="summary">
+        <!-- <div class="summary">
             <div class="section">
                 <div class="title">
                     总吨数
@@ -28,10 +28,10 @@
                 </div>
                 <div class="unit">班</div>
             </div>
-        </div>
+        </div> -->
         <div class="chart">
             <bar :data="data" :date-range="dateRange" class="bar" />
-            <pie :data="data" :date-range="dateRange" />
+            <pie :data="data" :date-range="dateRange" class="pie"/>
         </div>
     </div>
 </template>
@@ -112,8 +112,8 @@ const dayChange = (args?: any) => {
 
 .chart {
     .bar {
-        width: 200px;
-        height: 300px;
+        // width: 200px;
+        // height: 300px;
     }
 }
 </style>

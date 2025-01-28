@@ -9,13 +9,15 @@
 import { getCurrentInstance, ref, watch } from 'vue';
 import uCharts from './u-charts.min';
 import _ from 'lodash';
+// import { offsetCorrect } from '@/utils/ucharts';
 let chart;
 const id = "canvas" //"exjLSzTaRXxTPxXoOISiSyKXwIjfdWQk";
 const emits = defineEmits(['select'])
 const props = defineProps({
     option: { type: Object, default: () => { } },
-    height: { type: String, default: '250' }
+    height: { type: Number, default: 250 }
 });
+const margin = { left: 0, right: 0, top: 0, bottom: 0 };
 // 获取当前实例,不能放在再深层次,会导致获取不到
 const _this = getCurrentInstance();
 watch(() => props.option, (val, oldVal) => {
@@ -24,25 +26,26 @@ watch(() => props.option, (val, oldVal) => {
         if (val && Object.keys(val).length) {
             draw(val)
         }
-    }, 1e2);
+    }, 5e2);
 }, { deep: true, immediate: true })
 function draw(data) {
-    const { pixelRatio } = uni.getSystemInfoSync();
+    const { pixelRatio, screenWidth } = uni.getSystemInfoSync();
     // 将选择器的选取范围更改为自定义组件(使用getCurrentInstance获取)内，返回一个 SelectorQuery 对象实例
     uni.createSelectorQuery().in(_this)
         // 在当前页面下选择第一个匹配选择器 selector 的节点，返回一个 NodesRef 对象实例，可以用于获取节点信息。
         .select('#' + id)
         // 获取节点的相关信息。第一个参数是节点相关信息配置（必选）；第二参数可选是方法的回调函数，参数是指定的相关节点信息。
-        .fields({ node: true, size: true })// * 此处报错是uni的ts写的有问题,把第二个回调函数搞成必须的了.实际不影响
+        .fields({ node: true, size: true, rect: true, scrollOffset: true })// * 此处报错是uni的ts写的有问题,把第二个回调函数搞成必须的了.实际不影响
         // 执行所有的请求。请求结果按请求次序构成数组，在 callback 的第一个参数中返回。
         .exec(res => {
-            let { node, width, height } = res[0] || {};
+            let { node, width, height, left, right, top, bottom } = res[0] || {};
+            margin.left = left, margin.right = right, margin.top = top, margin.bottom = bottom;
             // console.log('[uCharts]:准备绘图', res[0], res[0].node.id, data.type, width, height)
             if (!res[0]) return console.warn('[uCharts]:未找到节点', _this);
-            console.log('[uCharts]:绘图中', res[0].node.id, res[0], data)
+            console.log('[uCharts]:绘图中', screenWidth, res[0].node.id, res[0], data)
             const context = node.getContext('2d');
-            width = (width ? width : 640) * pixelRatio;
-            height = (height ? height : 360) * pixelRatio;
+            width = (width ? width : 320) * pixelRatio;
+            height = (height ? height : 180) * pixelRatio;
             // 防止变模糊
             node.width = width;
             node.height = height;
@@ -51,10 +54,10 @@ function draw(data) {
                 animation: true,
                 background: "#333333",
                 // color: ["#1890FF", "#91CB74", "#FAC858", "#EE6666", "#73C0DE", "#3CA272", "#FC8452", "#9A60B4", "#ea7ccc"],
-                padding: [15, 4, 4, 10],
+                padding: [0, 0, 0, 0],
                 legend: { show: false },
-                xAxis: { disableGrid: true },
-                yAxis: { disableGrid: true },
+                xAxis: {},
+                yAxis: {},
                 extra: {
                     column: {
                         type: "group",
@@ -64,25 +67,43 @@ function draw(data) {
                     }
                 }
             }, data, {
-                canvas2d: true, context, pixelRatio,
+                canvas2d: true,
+                context, pixelRatio,
                 // canvas的宽度高度，单位为px
                 width, height,
             }))
         });
 }
 function tap(e) {
+    console.log('[uCharts]:tap', e);
+    // - (opts.height / opts.pix / 2) * (opts.pix - 1)
+    const opts = chart.opts;
+    console.log('[uCharts]:tap', chart, uni.getSystemInfoSync())
+    // 似乎ucharts的bug,在判断触摸点是否在图表范围内时的算法:pageY - e.currentTarget.offsetTop 这个我理解的已经是正常的0到图高了.
+    // 但是它又减去了一个- (opts.height / opts.pix / 2) * (opts.pix - 1),opts.height / opts.pix / 2这部分是半张图高,opts.pix - 1,就是被扩张的部分.
+    // 相当于比如原来150高,3倍分辨率,实际上就是被扩高了2倍图高.其实这块我也没有看懂为什么这么处理
+    // 但是导致的结果是实际获得的getTouches取到的值是以中心轴对称的正负值,而看后的代码得知,判断是否点击再图标内部的函数是isInExactChartArea,这里是0到图高
+    // 所以初步判定为uchart的bug.
+    // 为了保持兼容性,这里不修改ucharts,把它错误的在这里修正.
+    // 根据ucharts y = (touches.pageY - e.currentTarget.offsetTop - (opts.height / opts.pix / 2) * (opts.pix - 1)) * opts.pix;
+    // 所以只需要给pageY加上opts.height / opts.pix / 2 * (opts.pix - 1) 即可
+    // offsetCorrect(e, -margin.left, (opts.height / opts.pix / 2) * (opts.pix - 1));
+    e.changedTouches[0].clientX -= margin.left;
+    e.changedTouches[0].pageY += (opts.height / opts.pix / 2) * (opts.pix - 1);
+    // 后面的margin矫正留给offsetCorrect处理.
     emits('select', chart, e);
 }
 </script>
 
 <style scoped lang="less">
 .wrapper {
-    // display: flex;
-    // justify-content: center;
+    margin: 0;
+    padding: 0;
 
     .chart {
         width: 100%;
-        // border: red 1px solid;
+        border: red 1px solid;
+        box-sizing: border-box;
     }
 }
 </style>

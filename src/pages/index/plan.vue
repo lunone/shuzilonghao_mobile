@@ -1,6 +1,6 @@
 <template>
     <div class="chart-wrpper">
-        <ucharts :option="option" @select="showTip" />
+        <ucharts :option="option" @select="showTip" :height="150" />
     </div>
 </template>
 
@@ -11,6 +11,7 @@ import api from '@/utils/api';
 import _ from 'lodash';
 import { FlightItem } from '@/interface';
 import ucharts from '@/components/ucharts/ucharts.vue';
+import { offsetCorrect } from '@/utils/ucharts';
 
 const dayLenth = 22;
 const flights: Ref<FlightItem[]> = ref([]);
@@ -32,6 +33,8 @@ const fetchFlishgts = async () => {
 //     '#91c7ae', '#749f83', '#ca8622', '#bda29a',
 //     '#6e7074', '#546570', '#c4ccd3'
 // ];
+let dates;
+let flightCounts;
 function setOption(flights) {
     if (flights.length == 0) {
         return
@@ -46,8 +49,8 @@ function setOption(flights) {
         return acc;
     }, {} as Record<string, number>) ?? {};
     const avgDay = _.mean(Object.values(groupedFlights));
-    const dates = Object.keys(groupedFlights).sort();
-    const flightCounts = dates.map(date => groupedFlights[date]);
+    dates = Object.keys(groupedFlights).sort();
+    flightCounts = dates.map(date => groupedFlights[date]);
 
     return {
         type: 'column',
@@ -71,19 +74,23 @@ function setOption(flights) {
             // labelCount: 8,// 这个确实会自动控制显示标签数量,但是不显示的标签的val就是''了,没办法formatter
             formatter: (val, index) => index % 3 != 1 ? '' : dayjs(val).format('M/D'),
         },
-        yAxis:{
-            disabled:true,
+        yAxis: {
+            disabled: true,
+        },
+        extra: {
+            column: { width: 16 }
         }
     }
 };
 const showTip = (chart: any, event) => {
-    chart.touchLegend(event);
+    // const event2 = _.cloneDeep(event);
+    // offsetCorrect(event, 16, 0);
+    // const textList = _.reduce(flightCounts, (all, v, k) => [...all, { text: v, color: '#000' }],
+    //     [{ text: dayjs(dates[index]).format('M月D'), color: '#000' }]);
     chart.showToolTip(event, {
         formatter: ({ color, value }, date) => {
             const flighs = _.filter(flights.value, (flight) => flight.date == date);
-            // console.log('flighs', flights.value, flighs, date);
             const groupedFlights = _.groupBy(flighs, 'acType');
-            // console.log('groupedFlights', groupedFlights);
             return dayjs(date).format('M月D') + ":" + _.reduce(groupedFlights, (result, flights, key) => result + "\n" + `${key}(${flights.length})`, '');
         }
     });
