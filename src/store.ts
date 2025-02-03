@@ -4,8 +4,8 @@ import { AircraftItem, AirportItem, User } from '@/interface';
 import _ from 'lodash';
 import dayjs from 'dayjs';
 
-export const useStore = defineStore('test',{//需要注意的是，defineStore返回的是一个回调方法
-     // id:test是该状态管理的唯一标志也可以使用defineStore(id,{});的形式
+export const useStore = defineStore('test', {//需要注意的是，defineStore返回的是一个回调方法
+    // id:test是该状态管理的唯一标志也可以使用defineStore(id,{});的形式
     state: () => ({
         name: 'hello pinia',
         age: 20,
@@ -62,21 +62,19 @@ export const useStore = defineStore('test',{//需要注意的是，defineStore�
             return this.airportsCode4;
         },
         async useAircrafts() {
-            if (!_.keys(this.aircrafts).length) {
+            if (!Object.keys(this.aircrafts).length) {
                 // const res = await api('/aircraft/list') as Record<string, AircraftItem>;
                 const res = await api('/aircraft/list/') as AircraftItem[];
-                _.map(res, (aircraft) => {
+                res.map(aircraft => {
                     aircraft.startDate = dayjs(aircraft.startDate).format('YYYY-MM-DD');
-                    // console.log(aircraft.endDate)
                     aircraft.endDate = aircraft.endDate ? dayjs(aircraft.endDate).format('YYYY-MM-DD') : undefined;
-                    // console.log(2, aircraft.endDate)
                 })
                 this.aircrafts = _.keyBy(res, 'acReg');
             }
             return this.aircrafts;
         },
         async useUsers() {
-            if (!_.keys(this.users).length) {
+            if (!Object.keys(this.users).length) {
                 const res = {}//await api('/user/list/') as Record<string, User>;
                 this.users = res;
             }

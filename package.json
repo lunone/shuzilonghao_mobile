@@ -57,7 +57,8 @@
     "less-loader": "^12.2.0",
     "lodash": "^4.17.21",
     "pinia": "^2.1.7",
-    "vue": "^3.4.21",
+    "radash": "^12.1.0",
+    "vue": "^3.4.31",
     "vue-i18n": "^9.1.9"
   },
   "devDependencies": {

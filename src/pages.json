@@ -17,6 +17,18 @@
             "style": {
                 "navigationBarTitleText": "运行分析"
             }
+        },
+        {
+            "path": "pages/airplane/Airplane",
+            "style": {
+                "navigationBarTitleText": "机队分析"
+            }
+        },
+        {
+            "path": "pages/pilot/Pilot",
+            "style": {
+                "navigationBarTitleText": "飞行员"
+            }
         }
     ],
     "globalStyle": {

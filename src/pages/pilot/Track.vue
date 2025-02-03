@@ -5,8 +5,9 @@
                 点击 <van-icon class-prefix="zl-icon" :name="`dep`" /> 显示当日航班
             </template>
         </van-notice-bar>
-        <van-calendar :first-day-of-week="1"  :row-height="30" :poppable="false" :show-confirm="false" :show-mark="true" :show-title="false"
-            :show-subtitle="false" :min-date="dateRange[0]" :max-date="dateRange[1]" @select="showDate">
+        <van-calendar :first-day-of-week="1" :row-height="30" :poppable="false" :show-confirm="false" :show-mark="true"
+            :show-title="false" :show-subtitle="false" :min-date="dateRange[0]" :max-date="dateRange[1]"
+            @select="showDate">
             <template #text="{ date, text, type, topInfo, bottomInfo, className }">
                 <div class="day">
                     <div class="mark" v-if="flights[dayjs(date).format('YYYY-MM-DD')]">
@@ -15,7 +16,7 @@
                     <div v-else class="">{{ text }}</div>
                 </div>
             </template>
-        </van-calendar :first-day-of-week="1" >
+        </van-calendar :first-day-of-week="1">
         <div v-if="dateFlights.length">
             <div class="flight" v-for="flight in dateFlights" :key="flight.id">
                 <span class="no">{{ flight.flightNo }}</span>
@@ -60,11 +61,9 @@ const fetchFlightTracks = async (startDate: string, endDate: string, userId: str
     try {
         const res = await api('/crew/list/', { startDate, endDate, userId }) as FlightItem[];
         // 这里给res加上arrName,depName;
-        _.map(res, (flight: FlightItem) => {
+        res.map((flight: FlightItem) => {
             flight.arrName = airports.value[flight.arr!]?.city;
             flight.depName = airports.value[flight.dep!]?.city;
-            // const arrCode = airports.value[arr]?.code;
-            // const depCode = airports.value[dep]?.code;
         })
         flights.value = _.groupBy(res, (flight: FlightItem) => dayjs(flight.atd).format('YYYY-MM-DD'));
         console.log('轨迹', res);

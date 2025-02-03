@@ -46,18 +46,21 @@ const fetchMels = async () => {
         const res = await api('/me/mel/', { date: dayjs().format('YYYY-MM-DD') }) as any[];
         mels.value = _.groupBy(res, 'acReg');
 
-        console.log('mels', mels.value);
+        // console.log('mels', mels.value);
     } catch (err) {
         error.value = '获取 MEL 数据失败';
     }
 };
-watchEffect(() => {
+
+watch(() => props.acReg, (newVal, oldVal) => {
+    console.warn('mel acReg changed', oldVal, newVal)
     if (props.acReg) {
-        console.log('props.acReg', props.acReg, mels.value);
+        console.log('props.acReg', mels.value[props.acReg]);
         emits('getMel', mels.value[props.acReg])
     }
     // emits('getMel', mels.value);
 });
+
 onMounted(() => {
     fetchMels();
 })

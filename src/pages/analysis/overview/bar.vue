@@ -51,7 +51,7 @@ watch(() => props.data, () => {
         series: [
             {
                 name: "货重",
-                data: _.map(yData, value => {
+                data: yData.map(value => {
                     // 超过平均值20%的颜色红色，低于平均值20%的颜色暗绿色，其他的颜色为蓝色
                     const diff = (value - avgDay) / avgDay;
                     const color = diff > 0.2 ? '#d48264' : (diff < -0.2) ? '#c4ccd3' : "#91c7ae";

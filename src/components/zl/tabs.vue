@@ -1,7 +1,7 @@
 <template>
     <view class="tabs-wrapper">
         <view class="titles">
-            <span v-for="item in tabs" :key="item.index" class="title" :class="active == item.index ? 'activite' : ''"
+            <span v-for="item in tabs" :key="item.index" class="title" :class="isActive(item) ? 'activite' : ''"
                 @click="click(item.index)">
                 <i class="icon zl-icon" :class="`zl-icon-${item.icon}`"> </i>
                 {{ item.title }}
@@ -14,6 +14,7 @@
 </template>
 
 <script setup lang="ts">
+import _ from 'lodash';
 import { onMounted, provide, ref, nextTick } from 'vue';
 
 const active = defineModel<number | string>('active', { default: 0 });
@@ -26,10 +27,19 @@ const click = (index = 0) => {
     // console.log('active tabs____', index);
 }
 
+const isActive = (index: { name: string, index: number, title: string }) => {
+    let flag = false;
+    if (_.isNumber(active.value)) {
+        return active.value === index.index;
+    } else if (_.isString(active.value)) {
+        return active.value === index.name;
+    }
+};
+
 onMounted(() => {
     nextTick(() => {
         // console.log('下一个将第一个设置为显示', tabs.value)
-        click(tabs.value[0].index);
+        // click(tabs.value[0].index);
     })
 })
 </script>

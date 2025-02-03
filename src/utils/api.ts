@@ -1,7 +1,7 @@
 // 全局请求封装
 const base_url = 'https://app.airlonghao.com/sz'
 // 请求超出时间
-const timeout = 5000
+const timeout = 15e3;//15秒
 
 // 需要修改token，和根据实际修改请求头
 export default (url : string, data? : any) => {

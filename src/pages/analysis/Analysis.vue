@@ -7,13 +7,13 @@
         <div v-else-if="error" class="error">{{ error }}</div>
         <div v-else>
             <zl-tabs v-model:active="activeTab">
-                <zl-tab title="总览" icon="calendar">
+                <zl-tab name="overview" title="总览" icon="calendar">
                     <overview-vue :data="flights" :dateRange="range" />
                 </zl-tab>
-                <zl-tab title="站点分析" icon="location">
+                <zl-tab name="stations" title="站点分析" icon="location">
                     <stations-vue :data="flights" :dateRange="range" />
                 </zl-tab>
-                <zl-tab title="飞机分析" icon="airplane">
+                <zl-tab name="aircrafts" title="飞机分析" icon="airplane">
                     <airplane-vue :data="flights" :dateRange="range" />
                 </zl-tab>
             </zl-tabs>
@@ -39,20 +39,11 @@ import calendar from '@/components/zl/calendar.vue';
 const loading = ref(false);
 const error = ref('');
 // 定义当前激活的 Tab，默认为 'weight'
-const activeTab = ref('');
+const activeTab = ref('overview');
 
 const dateformatStr = 'YYYY-MM-DD';
 // 定义 Tab 配置数组
-// const tabs = [
-//     { title: '总览', icon: 'calendar', name: 'weight', component: OverviewVue },
-//     { title: '站点分析', icon: 'location', name: 'station', component: stationsVue },
-//     { title: '飞机分析', icon: 'airplane', name: 'aircraft', component: airplaneVue },
-// ];
-const tabs = {
-    overview: { title: "总览", icon: "calendar" },
-    station: { title: "站点分析", icon: "location" },
-    aircraft: { title: "飞机分析", icon: "airplane" }
-};
+
 // 计算3年前的日期
 const minDate = dayjs().subtract(3, 'year').startOf('day').format(dateformatStr);
 // 今天的日期

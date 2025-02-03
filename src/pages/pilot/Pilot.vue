@@ -3,17 +3,17 @@
         <div v-if="loading" class="loading">加载中...</div>
         <div v-else-if="error" class="error">{{ error }}</div>
         <div v-else>
-            <zl-nav title="飞行员数据" text="主页" url='/home' />
-            <van-cell title="点击选择时间段" :value="dateRangeText" @click="showCalendar = true" />
+            <!-- <zl-nav title="飞行员数据" text="主页" url='/home' /> -->
+            <!-- <van-cell title="点击选择时间段" :value="dateRangeText" @click="showCalendar = true" />
             <van-calendar :first-day-of-week="1"  v-model:show="showCalendar" :min-date="minDate" :max-date="maxDate" type="range"
-                :max-range="62" @confirm="dateRangeChange" />
+                :max-range="62" @confirm="dateRangeChange" /> -->
 
             <div class="summary">
                 <span class="counter">{{ summary.participantCount }}</span>人飞了
                 <span class="hour">{{ summary.totalFlightHours }}</span>小时
             </div>
 
-            <VanNoticeBar left-icon="info-o" text="点击下方条目可查看飞行员轨迹" />
+            <!-- <VanNoticeBar left-icon="info-o" text="点击下方条目可查看飞行员轨迹" /> -->
             <rank-list-vue :data="pilotsStat" @select="showPilotDetails" />
 
             <van-dialog v-model:show="showTrack" :title="`${selectedPilot?.name}(${selectedPilot?.userId})`"
@@ -28,14 +28,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import zlNav from '@/components/Nav.vue';
+// import zlNav from '@/components/Nav.vue';
 import api from '@/utils/api';
 import dayjs from 'dayjs';
 import _ from 'lodash';
 import { AirportItem, FlightItem } from '@/interface';
 import { useStore } from '@/store';
-import RankListVue from './RankList.vue';
-import TrackVue from './Track.vue';
+import RankListVue from './rank.vue';
+import TrackVue from './track.vue';
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');

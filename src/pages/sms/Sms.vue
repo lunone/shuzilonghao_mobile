@@ -64,9 +64,8 @@ const fetchData = async () => {
     try {
         const res = await api('/sms/event/list', { startDate, endDate }) as EventItem[];
         const resSelf = await api('/sms/self/list', { startDate, endDate }) as EventItem[];
-        // console.log('#############',res, resSelf, _.slice(resSelf, 1));
         events.value = res;
-        selfs.value = resSelf;//_.slice(resSelf, -2);
+        selfs.value = resSelf;
     } catch (err) {
         error.value = '获取事件列表失败';
     } finally {
