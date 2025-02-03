@@ -8,7 +8,7 @@
 import { ref, onMounted, Ref, computed } from 'vue';
 import dayjs from 'dayjs';
 import api from '@/utils/api';
-import _ from 'lodash';
+import * as _ from 'radash';
 import { FlightItem } from '@/interface';
 import ucharts from '@/components/ucharts/ucharts.vue';
 import { offsetCorrect } from '@/utils/ucharts';
@@ -35,20 +35,24 @@ const fetchFlishgts = async () => {
 // ];
 let dates;
 let flightCounts;
-function setOption(flights) {
+function setOption(flights: FlightItem[]) {
     if (flights.length == 0) {
         return
     }
+    let totalCount = 0;
     const groupedFlights = flights?.reduce((acc, flight) => {
         const date = dayjs(flight.date).format('YYYY-MM-DD');
         // 初始化日期对应的航班数量为0
         acc[date] = acc[date] ?? 0;
         // 如果没有取消的，则将航班数量加1
-        if (!flight.flagCs && !flight.flagPatch)
+        if (!flight.flagCs && !flight.flagPatch) {
+            totalCount++;
             acc[date]++;
+        }
         return acc;
-    }, {} as Record<string, number>) ?? {};
-    const avgDay = _.mean(Object.values(groupedFlights));
+    }, {}) ?? {};
+
+    const avgDay = totalCount / Object.keys(groupedFlights).length || 0;
     dates = Object.keys(groupedFlights).sort();
     flightCounts = dates.map(date => groupedFlights[date]);
 
@@ -89,9 +93,10 @@ const showTip = (chart: any, event) => {
     //     [{ text: dayjs(dates[index]).format('M月D'), color: '#000' }]);
     chart.showToolTip(event, {
         formatter: ({ color, value }, date) => {
-            const flighs = _.filter(flights.value, (flight) => flight.date == date);
-            const groupedFlights = _.groupBy(flighs, 'acType');
-            return dayjs(date).format('M月D') + ":" + _.reduce(groupedFlights, (result, flights, key) => result + "\n" + `${key}(${flights.length})`, '');
+            const flighs = flights.value.filter(flight => flight.date == date);
+            const groupedFlights = _.group(flighs, f => f.acType);
+            return dayjs(date).format('M月D') + ":" + Object.entries(groupedFlights).reduce((result, [key, flights]) =>
+                result + "\n" + `${key}(${flights.length})`, '');
         }
     });
 }

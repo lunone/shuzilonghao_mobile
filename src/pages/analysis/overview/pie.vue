@@ -8,13 +8,13 @@
     </van-cell>
     <!-- 饼图组件 -->
     <!-- <PieChartVue class="line-chart" :option="pieData" :height="`40vh`" /> @select="showTip"  -->
-    <ucharts :option="pieData" @select="showTip" :height="250"/>
+    <ucharts :option="pieData" @select="showTip" :height="250" />
 
 </template>
 
 <script lang="ts" setup>
 import { computed, onMounted, PropType, reactive, Ref, ref } from 'vue'
-import _ from 'lodash'
+import * as _ from 'radash';
 import ucharts from '@/components/ucharts/ucharts.vue';
 
 import api from '@/utils/api'
@@ -26,7 +26,7 @@ import { offsetCorrect } from '@/utils/ucharts';
 // 定义组件props
 const props = defineProps({
     // 数据源
-    data: { type: Object as PropType<Record<string, any>>, default: () => ({}) },
+    data: { type: Object as PropType<any[]>, default: () => ({}) },
     date: { type: String, default: '' },
 });
 // 定义 airports 数据，用于存储机场信息
@@ -71,44 +71,33 @@ const pieData = ref({})
 // : Ref<Record<string, any>> = computed(
 function getOption() {
     // 设置饼图标题
-    pieGroupTitle.value = `${['进港', '出港'][+groupByField.value]}量`
+    pieGroupTitle.value = `${['进港', '出港'][+groupByField.value]}量`;
+
     // 按出发/到达机场分组
-    const flightsGroupByDep = _.groupBy(props.data, ['arr', 'dep'][+groupByField.value])
+    const flightsGroupByDep = _.group(props.data, f => f[['arr', 'dep'][+groupByField.value]]);
     const data: Record<string, any>[] = [];
-    // 计算货物净重总和
     let total = 0;
-    // 遍历分组数据
-    _.forEach(flightsGroupByDep, (flights, dep) => {
+
+    // 使用 Object.entries 遍历对象
+    Object.entries(flightsGroupByDep).forEach(([dep, flights]) => {
         const name = dep;
-        const value = _.sumBy(flights, 'netWeightCargo');
-        const labelText = `${airports.value[dep]?.city} :${(value / 1e3).toFixed(1)}`
+        const value = _.sum(flights, f => f.netWeightCargo);
+        const labelText = `${airports.value[dep]?.city} :${(value / 1e3).toFixed(1)}`;
         if (value > 0) {
             data.push({ name, value, labelText });
         }
         total += value;
-    })
-    // console.log('-----------------', data)
+    });
+
     const tips = `${['进港', '出港'][+groupByField.value]}量`;
     return {
         type: "ring",
         animation: false,
         rotate: false,
         rotateLock: false,
-        // color: ["#1890FF", "#91CB74", "#FAC858", "#EE6666", "#73C0DE", "#3CA272", "#FC8452", "#9A60B4", "#ea7ccc"],
         padding: [20, 0, 0, 20],
         dataLabel: true,
-        // enableScroll: false,
-        series: [
-            {
-                // data: [{ "name": "一班", "value": 50 }, { "name": "二班", "value": 30 }, { "name": "三班", "value": 20 }, { "name": "四班", "value": 18 }, { "name": "五班", "value": 8 }]
-                data
-            }
-        ],
-        // legend: {
-        //     show: true,
-        //     position: "right",
-        //     lineHeight: 25
-        // },
+        series: [{ data }],
         title: {
             name: "总重",
             fontSize: 15,
@@ -131,45 +120,7 @@ function getOption() {
                 borderColor: "#FFFFFF"
             }
         }
-    }
-    // return {
-    //     title: {
-    //         text: dayjs(props.date).format('YYYY-MM-DD') + ' ' + tips,
-    //         left: 'right',
-    //     },
-    //     tooltip: {
-    //         trigger: 'item',
-    //         formatter: '{a} <br/>{b} : {c} ({d}%)',
-    //     },
-    //     grid: {
-    //         top: '20px',    // 顶部刻度消失
-    //         left: '-25px',// 让y轴不显示刻度的空白消失
-    //         right: '-3px',// 让y轴最后不显示多的那一点
-    //         bottom: '0',
-    //         containLabel: true
-    //     },
-    //     series: [
-    //         {
-    //             name: tips,
-    //             type: 'pie',
-    //             radius: ['40%', '70%'],
-    //             avoidLabelOverlap: false,
-    //             itemStyle: {
-    //                 borderRadius: 10,
-    //                 borderColor: '#fff',
-    //                 borderWidth: 2
-    //             },
-    //             data,
-    //             emphasis: {
-    //                 itemStyle: {
-    //                     shadowBlur: 10,
-    //                     shadowOffsetX: 0,
-    //                     shadowColor: 'rgba(0, 0, 0, 0.5)',
-    //                 },
-    //             },
-    //         },
-    //     ],
-    // };
+    };
 }
 function showTip(chart, event) {
     console.log('showTip', event);

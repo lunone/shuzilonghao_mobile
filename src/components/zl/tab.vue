@@ -6,7 +6,8 @@
     </view>
 </template>
 <script lang="ts" setup>
-import _ from 'lodash';
+import * as _ from 'radash';
+
 import { watch, onMounted, inject, Ref, ref } from 'vue';
 const props = defineProps({
     name: { type: String, default: '' },// 接收一个title传给父组件

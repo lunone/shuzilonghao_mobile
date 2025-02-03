@@ -3,7 +3,7 @@
         <view class="total">
 			<i class="icon zl-icon-aircraft" />
             <view class="text">
-                <text class="value">{{ _.sum(_.values(stat)) }}</text>
+                <text class="value">{{ _.sum(Object.values(stat)) }}</text>
                 <text class="unit">架</text>
             </view>
         </view>
@@ -19,7 +19,8 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
 import { useStore } from '@/store';
-import _ from 'lodash';
+import * as _ from 'radash';
+
 import { AircraftItem } from '@/interface';
 import dayjs from 'dayjs';
 
@@ -62,7 +63,7 @@ const fetchAircrafts = async () => {
     error.value = '';
     try {
         const res = await store.useAircrafts();
-        aircrafts.value = _.values(res);
+        aircrafts.value = Object.values(res);
     } catch (err) {
         error.value = '获取飞机信息失败';
     } finally {

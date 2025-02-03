@@ -14,7 +14,8 @@
 </template>
 
 <script setup lang="ts">
-import _ from 'lodash';
+import * as _ from 'radash';
+
 import { onMounted, provide, ref, nextTick } from 'vue';
 
 const active = defineModel<number | string>('active', { default: 0 });

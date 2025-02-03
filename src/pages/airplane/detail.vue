@@ -15,8 +15,8 @@
                 <div class="item">
                     <span class="key">{{ showOBj.name }}</span>
                     <span class="value">
-                        {{ _.attempt(showOBj.func || (_ => _),
-                            aircraft[showOBj.key]) }}
+                        <!-- {{ _.attempt(showOBj.func || (_ => _),  aircraft[showOBj.key]) }} -->
+                        {{ _.try(showOBj.func || (_ => _))(aircraft[showOBj.key]) }}
                         {{ showOBj.unit || '' }}
                     </span>
                 </div>
@@ -26,7 +26,8 @@
     </div>
 </template>
 <script lang="ts" setup>
-import _ from 'lodash';
+import * as _ from 'radash';
+
 import { AircraftItem } from '@/interface';
 import { PropType, ref } from 'vue';
 

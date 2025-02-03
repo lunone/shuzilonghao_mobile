@@ -28,7 +28,8 @@
 import { useStore } from '@/store'
 import api from '@/utils/api'
 import dayjs from 'dayjs'
-import _ from 'lodash'
+import * as _ from 'radash';
+
 import { ref, computed, watch, onMounted, PropType, Ref, watchEffect } from 'vue'
 
 // 定义 loading 和 error 状态
@@ -44,7 +45,7 @@ const emits = defineEmits(['getMel'])
 const fetchMels = async () => {
     try {
         const res = await api('/me/mel/', { date: dayjs().format('YYYY-MM-DD') }) as any[];
-        mels.value = _.groupBy(res, 'acReg');
+        mels.value = _.group(res, m=>m.acReg);
 
         // console.log('mels', mels.value);
     } catch (err) {

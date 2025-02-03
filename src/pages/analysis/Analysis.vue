@@ -31,7 +31,8 @@ import airplaneVue from '@/pages/analysis/airplane.vue';
 // import zlNav from '@/components/Nav.vue';
 import dayjs from 'dayjs';
 import api from '@/utils/api';
-import _ from 'lodash';
+import * as _ from 'radash';
+
 import { title } from 'process';
 import calendar from '@/components/zl/calendar.vue';
 
@@ -79,13 +80,13 @@ watch(() => range, async () => {
         const res = await api('/flight/atd/', { startDate, endDate }) as any[];
         // console.log('#####', startDate, endDate, res);
         // 过滤掉备降和取消航班
-        // _.forEach(res, (flight) => {
+        // res.forEach(flight => {
         //     if (flight.dep == 'ZGSZ' || flight.arr == 'ZGSZ') {
         //         console.log('#####', flight);
         //     }
         // });
         // 
-        flights.value = _.filter(res, flight => !flight.flagPatch && !flight.flagCs && !flight.flagVr);
+        flights.value = res.filter(flight => !flight.flagPatch && !flight.flagCs && !flight.flagVr);
     } catch (err) {
         error.value = '获取机场信息失败';
     } finally {

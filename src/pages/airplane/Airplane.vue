@@ -31,7 +31,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive, Ref } from 'vue';
 import dayjs from 'dayjs';
-import _ from 'lodash';
+import * as _ from 'radash';
+
 import { AircraftItem } from '@/interface';
 import { useStore } from '@/store';
 import AcSummaryVue from './aircraftSummary.vue';
@@ -84,7 +85,7 @@ const fetchAircrafts = async () => {
     error.value = '';
     try {
         const res = await store.useAircrafts();
-        aircrafts.value = _.values(res);
+        aircrafts.value = Object.values(res);
         console.log('飞机', res);
     } catch (err) {
         error.value = '获取飞机信息失败';

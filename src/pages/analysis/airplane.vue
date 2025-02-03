@@ -63,7 +63,8 @@ import { ref, computed, onMounted, Ref } from 'vue';
 import api from '@/utils/api';
 import { AircraftItem, AirportItem, FlightItem } from '@/interface';
 import dayjs from 'dayjs';
-import _ from 'lodash';
+import * as _ from 'radash';
+
 import { useStore } from '@/store';
 // 定义 props 来接收外部传入的航班数据数组
 const props = defineProps<{ data: FlightItem[], dateRange: [string, string] }>();

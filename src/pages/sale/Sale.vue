@@ -55,7 +55,8 @@ import {
     TransformComponent
 } from 'echarts/components';
 import VChart, { THEME_KEY } from 'vue-echarts';
-import _ from 'lodash';
+import * as _ from 'radash';
+
 
 const show = ref(false);
 

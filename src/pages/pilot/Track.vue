@@ -33,8 +33,8 @@ import { AirportItem, FlightItem } from '@/interface';
 import { useStore } from '@/store';
 import api from '@/utils/api';
 import dayjs from 'dayjs';
+import * as _ from 'radash';
 
-import _ from 'lodash';
 import { onMounted, PropType, ref, watch } from 'vue';
 const props = defineProps({
     dateRange: {
@@ -65,7 +65,7 @@ const fetchFlightTracks = async (startDate: string, endDate: string, userId: str
             flight.arrName = airports.value[flight.arr!]?.city;
             flight.depName = airports.value[flight.dep!]?.city;
         })
-        flights.value = _.groupBy(res, (flight: FlightItem) => dayjs(flight.atd).format('YYYY-MM-DD'));
+        flights.value = _.group(res, (flight: FlightItem) => dayjs(flight.atd).format('YYYY-MM-DD'));
         console.log('轨迹', res);
     } catch (err) {
         error.value = '获取飞行员轨迹失败';

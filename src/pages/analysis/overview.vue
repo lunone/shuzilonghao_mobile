@@ -26,7 +26,8 @@
 
 <script lang="ts" setup>
 import { Ref, ref, computed } from 'vue';
-import _ from 'lodash';
+import * as _ from 'radash';
+
 import dayjs from 'dayjs';
 import { FlightItem } from '@/interface';
 import bar from './overview/bar.vue';

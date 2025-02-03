@@ -42,7 +42,7 @@
             </view>
         </view>
         <view class="intro">
-            <van-notice-bar left-icon="info-o"  wrapable :scrollable="false">
+            <van-notice-bar left-icon="info-o" wrapable :scrollable="false">
                 使用提醒，点击名字查看详情，例如
                 <UserCardVue userId="A00725" name="李志伦" />
             </van-notice-bar>
@@ -61,7 +61,8 @@ import { Ref, ref, watch } from 'vue';
 // import NavVue from '@/components/Nav.vue';
 import ProfileVue from './profile.vue';
 import { User } from '@/interface';
-import _ from 'lodash';
+import * as _ from 'radash';
+
 // import router from '@/router';
 import UserCardVue from './userCard.vue';
 const show = ref(false);
@@ -115,7 +116,7 @@ watch(users, () => {
 
     stat.value = {
         totalCount: thisUsers.length,
-        departments: _.groupBy(thisUsers, 'departmentName'),
+        departments: _.group(thisUsers, item => item.departmentName),
     };
 
 });

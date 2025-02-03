@@ -31,7 +31,8 @@ import dayjs from 'dayjs';
 import { EventItem } from '@/interface';
 import voluntary from './card/voluntary.vue';
 import EventVue from './card/event.vue';
-import _ from 'lodash';
+import * as _ from 'radash';
+
 import backTop from '@/components/zl/backTop.vue';
 
 // 定义 loading 和 error 状态

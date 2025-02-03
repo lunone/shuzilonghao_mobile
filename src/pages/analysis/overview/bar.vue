@@ -5,7 +5,7 @@
 import ucharts from '@/components/ucharts/ucharts.vue';
 import { FlightItem } from '@/interface';
 import dayjs from 'dayjs';
-import _ from 'lodash';
+import * as _ from 'radash';
 import { watch, computed, ref, Ref } from 'vue';
 
 const props = defineProps<{ data: FlightItem[], dateRange: [string, string] }>();
@@ -21,7 +21,7 @@ watch(() => props.data, () => {
     const data: Record<string, number> = {};
     // 默认选中最后一个的日期
     let endDate = '';
-    const flightsGroupByDateTemp = _.groupBy(props.data, f => dayjs(f.atd).format(dateFormatStr));
+    const flightsGroupByDateTemp = _.group(props.data, f => dayjs(f.atd).format(dateFormatStr));
     for (let date in flightsGroupByDateTemp) {
         endDate = date;
         const flights = flightsGroupByDateTemp[date];
@@ -32,7 +32,7 @@ watch(() => props.data, () => {
     // dayChange({ name: dayjs(endDate).format(dateFormatStr) });
     const dates = Object.keys(data);
     const yData = Object.values(data);
-    const avgDay = _.reduce(yData, (acc, cur) => +cur + acc, 0) / yData.length;
+    const avgDay = yData.reduce((acc, cur) => +cur + acc, 0) / yData.length;
     // console.log(data, dates, yData, avgDay);
     const maxLength = 11;
     let step = 1

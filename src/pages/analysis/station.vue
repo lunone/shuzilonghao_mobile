@@ -57,7 +57,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, Ref } from 'vue';
 import { FlightItem } from '@/interface';
-import _ from 'lodash';
+import * as _ from 'radash';
 import dayjs from 'dayjs';
 import { useStore } from '@/store';
 
@@ -125,7 +125,7 @@ const stationsWithDetail = computed(() => {
             // 获取当前机场的所有航班
             const flights = flightData[type].flights[station];
             // 按照到达或出发机场分组
-            const groupedFlights = _.groupBy(flights, flight => flight[type === 'arr' ? 'dep' : 'arr']);
+            const groupedFlights = _.group(flights, flight => flight[type === 'arr' ? 'dep' : 'arr']);
 
             // 遍历每个分组的航班
             for (let otherStation in groupedFlights) {
@@ -155,11 +155,17 @@ const stationsWithDetail = computed(() => {
         key: station, // 站点键
         city: airports.value[station]?.city || station, // 站点城市名称或机场代码
         arr: {
-            flights: _(flightData.arr.flights[station]).groupBy(flight => flight.dep).keys().value(), // 到达航班的出发机场列表
+            flights: Object.keys(flightData.arr.flights[station].reduce((acc, flight) => {
+                acc[flight.dep] = [...(acc[flight.dep] || []), flight];
+                return acc;
+            }, {})), // 到达航班的出发机场列表
             stat: flightData.arr.stat[station], // 到达航班的统计信息
         },
         dep: {
-            flights: _(flightData.dep.flights[station]).groupBy(flight => flight.arr).keys().value(), // 出发航班的到达机场列表
+            flights: Object.keys(flightData.dep.flights[station].reduce((acc, flight) => {
+                acc[flight.arr] = [...(acc[flight.arr] || []), flight];
+                return acc;
+            }, {})), // 出发航班的到达机场列表
             stat: flightData.dep.stat[station] // 出发航班的统计信息
         },
 

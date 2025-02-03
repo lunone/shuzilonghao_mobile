@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import api from '@/utils/api';
 import { AircraftItem, AirportItem, User } from '@/interface';
-import _ from 'lodash';
+import * as _ from 'radash';
 import dayjs from 'dayjs';
 
 export const useStore = defineStore('test', {//需要注意的是，defineStore返回的是一个回调方法
@@ -69,7 +69,7 @@ export const useStore = defineStore('test', {//需要注意的是，defineStore�
                     aircraft.startDate = dayjs(aircraft.startDate).format('YYYY-MM-DD');
                     aircraft.endDate = aircraft.endDate ? dayjs(aircraft.endDate).format('YYYY-MM-DD') : undefined;
                 })
-                this.aircrafts = _.keyBy(res, 'acReg');
+                this.aircrafts = res.reduce((acc, cur) => ({ ...acc, [cur.acReg]: cur }), {})
             }
             return this.aircrafts;
         },

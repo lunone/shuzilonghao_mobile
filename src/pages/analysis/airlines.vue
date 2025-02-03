@@ -14,7 +14,7 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import api from '@/utils/api';
 // import { showToast } from 'vant';
-import _ from 'lodash';
+import * as _ from 'radash';
 
 // 定义 props 来接收外部传入的航班数据数组
 const props = defineProps<{ data: { dep: string; arr: string }[] }>();
@@ -28,7 +28,7 @@ const error = ref('');
 
 // 定义 groupedFlights 对象，用于存储分组后的航班信息
 const groupedFlights = computed(() => {
-    const flightsGroupByDepArr = _.groupBy(props.data, flight => `${flight.arr}-${flight.dep}`);
+    const flightsGroupByDepArr = _.group(props.data, flight => `${flight.arr}-${flight.dep}`);
     console.log(flightsGroupByDepArr);
     const data: Record<string, any> = {}
     for (const key in flightsGroupByDepArr) {
