@@ -45,9 +45,7 @@ const emits = defineEmits(['getMel'])
 const fetchMels = async () => {
     try {
         const res = await api('/me/mel/', { date: dayjs().format('YYYY-MM-DD') }) as any[];
-        mels.value = _.group(res, m=>m.acReg);
-
-        // console.log('mels', mels.value);
+        mels.value = res.reduce((acc, cur) => ({ ...acc, [cur.acReg]: [...(acc[cur.acReg] || []), cur] }), {});
     } catch (err) {
         error.value = '获取 MEL 数据失败';
     }

@@ -21,7 +21,10 @@ watch(() => props.data, () => {
     const data: Record<string, number> = {};
     // 默认选中最后一个的日期
     let endDate = '';
-    const flightsGroupByDateTemp = _.group(props.data, f => dayjs(f.atd).format(dateFormatStr));
+    const flightsGroupByDateTemp = props.data.reduce((acc, f) => {
+        const key = dayjs(f.atd).format(dateFormatStr);
+        return { ...acc, [key]: [...(acc[key] || []), f] };
+    }, {});
     for (let date in flightsGroupByDateTemp) {
         endDate = date;
         const flights = flightsGroupByDateTemp[date];

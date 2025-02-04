@@ -1,5 +1,4 @@
 <template>
-    <nav-vue title="销售情况" text="主页" url='/home' />
     <van-notice-bar wrapable :scrollable="false" left-icon="info-o">
         由于商务系统尚未建设，内容仅为演示，非真实数据
         <br>建议商务系统建设方式选择自研，预计能为公司节省200万元左右。
@@ -38,23 +37,9 @@
 </template>
 
 <script setup lang="ts">
-import NavVue from '@/components/Nav.vue';
 import { ref, onMounted, Ref, computed } from 'vue';
-import { use } from 'echarts/core';
-import { CanvasRenderer } from 'echarts/renderers';
-import { BarChart, PieChart } from 'echarts/charts';
 import dayjs from 'dayjs';
 import api from '@/utils/api';
-
-import {
-    TitleComponent,
-    TooltipComponent,
-    LegendComponent,
-    GridComponent,
-    DatasetComponent,
-    TransformComponent
-} from 'echarts/components';
-import VChart, { THEME_KEY } from 'vue-echarts';
 import * as _ from 'radash';
 
 
@@ -71,21 +56,6 @@ const dateRangeText = computed(() => {
 });
 
 
-use([
-    CanvasRenderer,
-    BarChart,
-    TitleComponent,
-    TooltipComponent,
-    LegendComponent,
-    GridComponent,
-    DatasetComponent,
-    TransformComponent,
-    CanvasRenderer,
-    PieChart,
-    TitleComponent,
-    TooltipComponent,
-    LegendComponent,
-]);
 
 // 示例数据
 const suppliers = ref([

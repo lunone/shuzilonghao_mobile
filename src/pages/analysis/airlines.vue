@@ -28,7 +28,9 @@ const error = ref('');
 
 // 定义 groupedFlights 对象，用于存储分组后的航班信息
 const groupedFlights = computed(() => {
-    const flightsGroupByDepArr = _.group(props.data, flight => `${flight.arr}-${flight.dep}`);
+    const flightsGroupByDepArr = props.data.reduce((acc, flight) => ({
+        ...acc, [`${flight.arr}-${flight.dep}`]: [...(acc[`${flight.arr}-${flight.dep}`] || []), flight]
+    }), {});
     console.log(flightsGroupByDepArr);
     const data: Record<string, any> = {}
     for (const key in flightsGroupByDepArr) {

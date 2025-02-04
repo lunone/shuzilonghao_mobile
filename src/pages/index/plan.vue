@@ -87,14 +87,16 @@ function setOption(flights: FlightItem[]) {
     }
 };
 const showTip = (chart: any, event) => {
-    // const event2 = _.cloneDeep(event);
-    // offsetCorrect(event, 16, 0);
-    // const textList = _.reduce(flightCounts, (all, v, k) => [...all, { text: v, color: '#000' }],
-    //     [{ text: dayjs(dates[index]).format('M月D'), color: '#000' }]);
     chart.showToolTip(event, {
         formatter: ({ color, value }, date) => {
-            const flighs = flights.value.filter(flight => flight.date == date);
-            const groupedFlights = _.group(flighs, f => f.acType);
+            const groupedFlights: Record<string, FlightItem[]> = {};
+
+            flights.value.forEach(flight => {
+                if (flight.date === date) {
+                    groupedFlights[flight.acType] = [...(groupedFlights[flight.acType] || []), flight];
+                }
+            });
+
             return dayjs(date).format('M月D') + ":" + Object.entries(groupedFlights).reduce((result, [key, flights]) =>
                 result + "\n" + `${key}(${flights.length})`, '');
         }

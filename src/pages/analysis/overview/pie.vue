@@ -73,21 +73,26 @@ function getOption() {
     // 设置饼图标题
     pieGroupTitle.value = `${['进港', '出港'][+groupByField.value]}量`;
 
-    // 按出发/到达机场分组
-    const flightsGroupByDep = _.group(props.data, f => f[['arr', 'dep'][+groupByField.value]]);
     const data: Record<string, any>[] = [];
     let total = 0;
+    const flightsGroupByDep: Record<string, { name: string, value: number, labelText: string }> = {};
 
-    // 使用 Object.entries 遍历对象
-    Object.entries(flightsGroupByDep).forEach(([dep, flights]) => {
-        const name = dep;
-        const value = _.sum(flights, f => f.netWeightCargo);
-        const labelText = `${airports.value[dep]?.city} :${(value / 1e3).toFixed(1)}`;
-        if (value > 0) {
-            data.push({ name, value, labelText });
+    // 使用一个循环同时进行分组和数据处理
+    props.data.forEach(f => {
+        const key = f[['arr', 'dep'][+groupByField.value]];
+        const name = key;
+        const value = f.netWeightCargo;
+        const labelText = `${airports.value[key]?.city} :${(value / 1e3).toFixed(1)}`;
+
+        if (!flightsGroupByDep[name]) {
+            flightsGroupByDep[name] = { name, value: 0, labelText };
         }
+        flightsGroupByDep[name].value += value;
         total += value;
     });
+
+    // 将分组后的数据转换为数组
+    Object.values(flightsGroupByDep).forEach(item => item.value > 0 && data.push(item));
 
     const tips = `${['进港', '出港'][+groupByField.value]}量`;
     return {

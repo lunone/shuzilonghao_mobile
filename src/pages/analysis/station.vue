@@ -125,8 +125,10 @@ const stationsWithDetail = computed(() => {
             // 获取当前机场的所有航班
             const flights = flightData[type].flights[station];
             // 按照到达或出发机场分组
-            const groupedFlights = _.group(flights, flight => flight[type === 'arr' ? 'dep' : 'arr']);
-
+            const groupedFlights = flights.reduce((acc, flight) => {
+                const key = flight[type === 'arr' ? 'dep' : 'arr'];
+                return { ...acc, [key]: [...(acc[key] || []), flight] };
+            }, {});
             // 遍历每个分组的航班
             for (let otherStation in groupedFlights) {
                 // 获取分组后的航班

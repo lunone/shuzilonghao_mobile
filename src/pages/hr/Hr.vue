@@ -116,7 +116,8 @@ watch(users, () => {
 
     stat.value = {
         totalCount: thisUsers.length,
-        departments: _.group(thisUsers, item => item.departmentName),
+        departments: thisUsers.reduce((acc, item) =>
+            ({ ...acc, [item.departmentName]: [...(acc[item.departmentName] || []), item] }), {}),
     };
 
 });
