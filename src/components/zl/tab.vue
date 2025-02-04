@@ -6,8 +6,6 @@
     </view>
 </template>
 <script lang="ts" setup>
-import * as _ from 'radash';
-
 import { watch, onMounted, inject, Ref, ref } from 'vue';
 const props = defineProps({
     name: { type: String, default: '' },// 接收一个title传给父组件
@@ -24,7 +22,7 @@ watch(() => props.title, () => {
     tabs[index.value].title = props.title;
 })
 
-const isActive = () => active.value === (_.isNumber(active.value) ? index.value : props.name)
+const isActive = () => active.value === (typeof (active.value) === 'number' ? index.value : props.name)
 
 
 onMounted(() => {

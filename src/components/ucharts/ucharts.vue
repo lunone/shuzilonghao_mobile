@@ -24,9 +24,9 @@ const margin = { left: 0, right: 0, top: 0, bottom: 0 };
 const _this = getCurrentInstance();
 watch(() => props.option, (val, oldVal) => {
     setTimeout(() => {// 延时执行，防止getCurrentInstance获取到的高度宽度为0
-        // console.log('[uCharts]:option changed', val, oldVal)
         if (val && Object.keys(val).length) {
-            draw(val)
+            // 深拷贝防止重复触发
+            draw(JSON.parse(JSON.stringify(val)))
         }
     }, 1e3);
 }, { deep: true, immediate: true })
@@ -53,29 +53,19 @@ function draw(data) {
             // 防止变模糊
             node.width = width;
             node.height = height;
-            chart = new uCharts(_.merge({
+            const chartOption = {
                 type: "column",
                 animation: true,
                 background: "#333333",
                 // color: ["#1890FF", "#91CB74", "#FAC858", "#EE6666", "#73C0DE", "#3CA272", "#FC8452", "#9A60B4", "#ea7ccc"],
                 padding: [0, 0, 0, 0],
                 legend: { show: false },
-                xAxis: {},
-                yAxis: {},
-                extra: {
-                    column: {
-                        type: "group",
-                        width: 30,
-                        activeBgColor: "#000000",
-                        activeBgOpacity: 0.08
-                    }
-                }
-            }, data, {
+                ...data,
                 canvas2d: true,
                 context, pixelRatio,
-                // canvas的宽度高度，单位为px
-                width, height,
-            }))
+                width, height,// canvas的宽度高度，单位为px
+            }
+            chart = new uCharts(chartOption)
         });
 }
 function tap(e) {

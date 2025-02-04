@@ -16,7 +16,7 @@
                     <span class="key">{{ showOBj.name }}</span>
                     <span class="value">
                         <!-- {{ _.attempt(showOBj.func || (_ => _),  aircraft[showOBj.key]) }} -->
-                        {{ _.try(showOBj.func || (_ => _))(aircraft[showOBj.key]) }}
+                        {{ _.try(showOBj.func)(aircraft[showOBj.key]) }}
                         {{ showOBj.unit || '' }}
                     </span>
                 </div>
