@@ -38,10 +38,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted, Ref, computed } from 'vue';
-import dayjs from 'dayjs';
-import api from '@/utils/api';
-import * as _ from 'radash';
-
 
 const show = ref(false);
 

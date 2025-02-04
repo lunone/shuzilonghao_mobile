@@ -13,8 +13,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
 import api from '@/utils/api';
-// import { showToast } from 'vant';
-import * as _ from 'radash';
 
 // 定义 props 来接收外部传入的航班数据数组
 const props = defineProps<{ data: { dep: string; arr: string }[] }>();

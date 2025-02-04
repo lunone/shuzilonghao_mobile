@@ -1,8 +1,8 @@
 <template>
     <div class="wrapper">
         <div class="total">
-            <van-icon class-prefix="zl-icon" name="aircraft" :size="50" color="#c52005"/>
-            <span class="value">{{ _.sum(Object.values(stat)) }}</span>
+            <van-icon class-prefix="zl-icon" name="aircraft" :size="50" color="#c52005" />
+            <span class="value">{{ Object.values(stat).reduce((acc, value) => acc + value, 0) }}</span>
             <span class="unit">架</span>
         </div>
         <div class="detail">
@@ -17,8 +17,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
 import { useStore } from '@/store';
-import * as _ from 'radash';
-
 import { AircraftItem } from '@/interface';
 import dayjs from 'dayjs';
 

@@ -28,7 +28,6 @@
 import { useStore } from '@/store'
 import api from '@/utils/api'
 import dayjs from 'dayjs'
-import * as _ from 'radash';
 
 import { ref, computed, watch, onMounted, PropType, Ref, watchEffect } from 'vue'
 

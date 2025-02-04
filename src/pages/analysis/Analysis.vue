@@ -28,13 +28,9 @@ import { ref, computed, watch, Ref } from 'vue';
 import overviewVue from '@/pages/analysis/overview.vue';
 import stationsVue from '@/pages/analysis/station.vue';
 import airplaneVue from '@/pages/analysis/airplane.vue';
-// import zlNav from '@/components/Nav.vue';
 import dayjs from 'dayjs';
 import api from '@/utils/api';
-import * as _ from 'radash';
 
-import { title } from 'process';
-import calendar from '@/components/zl/calendar.vue';
 
 // 定义 loading 和 error 状态
 const loading = ref(false);

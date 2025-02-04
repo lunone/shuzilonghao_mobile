@@ -27,7 +27,6 @@
 </template>
 <script lang="ts" setup>
 import * as _ from 'radash';
-
 import { AircraftItem } from '@/interface';
 import { PropType, ref } from 'vue';
 

@@ -8,7 +8,6 @@
 import { ref, onMounted, Ref, computed } from 'vue';
 import dayjs from 'dayjs';
 import api from '@/utils/api';
-import * as _ from 'radash';
 import { FlightItem } from '@/interface';
 import ucharts from '@/components/ucharts/ucharts.vue';
 import { offsetCorrect } from '@/utils/ucharts';

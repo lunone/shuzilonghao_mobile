@@ -31,7 +31,6 @@ import dayjs from 'dayjs';
 import { EventItem } from '@/interface';
 import voluntary from './card/voluntary.vue';
 import EventVue from './card/event.vue';
-import * as _ from 'radash';
 
 import backTop from '@/components/zl/backTop.vue';
 

@@ -31,7 +31,6 @@ import { ref, computed, onMounted, watch } from 'vue';
 // import zlNav from '@/components/Nav.vue';
 import api from '@/utils/api';
 import dayjs from 'dayjs';
-import * as _ from 'radash';
 
 import { AirportItem, FlightItem } from '@/interface';
 import { useStore } from '@/store';
@@ -85,7 +84,6 @@ const fetchStatsAndRankings = async (startDate: string, endDate: string) => {
             avgFlightHours: +(pilot.avgMinutes / 60).toFixed(2),
         }));
 
-        // const sortStat = _.orderBy(stat, ['totalFlightHours'], ['desc']);
         const sortStat = stat.sort((a, b) => b.totalFlightHours - a.totalFlightHours);
         sortStat.map((pilot, index) => {
             pilot.rank = index + 1;

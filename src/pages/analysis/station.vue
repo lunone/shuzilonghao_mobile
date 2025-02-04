@@ -57,7 +57,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, Ref } from 'vue';
 import { FlightItem } from '@/interface';
-import * as _ from 'radash';
 import dayjs from 'dayjs';
 import { useStore } from '@/store';
 

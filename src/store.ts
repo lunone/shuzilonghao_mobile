@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import api from '@/utils/api';
 import { AircraftItem, AirportItem, User } from '@/interface';
-import * as _ from 'radash';
 import dayjs from 'dayjs';
 
 export const useStore = defineStore('test', {//需要注意的是，defineStore返回的是一个回调方法

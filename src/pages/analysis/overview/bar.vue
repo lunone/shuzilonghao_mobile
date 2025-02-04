@@ -5,7 +5,6 @@
 import ucharts from '@/components/ucharts/ucharts.vue';
 import { FlightItem } from '@/interface';
 import dayjs from 'dayjs';
-import * as _ from 'radash';
 import { watch, computed, ref, Ref } from 'vue';
 
 const props = defineProps<{ data: FlightItem[], dateRange: [string, string] }>();

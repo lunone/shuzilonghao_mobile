@@ -61,7 +61,6 @@ import { Ref, ref, watch } from 'vue';
 // import NavVue from '@/components/Nav.vue';
 import ProfileVue from './profile.vue';
 import { User } from '@/interface';
-import * as _ from 'radash';
 
 // import router from '@/router';
 import UserCardVue from './userCard.vue';

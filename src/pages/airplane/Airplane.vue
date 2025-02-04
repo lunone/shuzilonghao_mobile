@@ -31,7 +31,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive, Ref } from 'vue';
 import dayjs from 'dayjs';
-import * as _ from 'radash';
 
 import { AircraftItem } from '@/interface';
 import { useStore } from '@/store';

@@ -14,8 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import * as _ from 'radash';
-
 import { onMounted, provide, ref, nextTick } from 'vue';
 
 const active = defineModel<number | string>('active', { default: 0 });
@@ -25,14 +23,13 @@ provide('TABS', tabs.value);
 provide('ACTIVE', active);
 const click = (index = 0) => {
     active.value = index;
-    // console.log('active tabs____', index);
 }
 
 const isActive = (index: { name: string, index: number, title: string }) => {
     let flag = false;
-    if (_.isNumber(active.value)) {
+    if (typeof active.value === 'number') {
         return active.value === index.index;
-    } else if (_.isString(active.value)) {
+    } else if (typeof active.value === 'string') {
         return active.value === index.name;
     }
 };

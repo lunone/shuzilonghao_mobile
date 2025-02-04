@@ -33,7 +33,6 @@ import { AirportItem, FlightItem } from '@/interface';
 import { useStore } from '@/store';
 import api from '@/utils/api';
 import dayjs from 'dayjs';
-import * as _ from 'radash';
 
 import { onMounted, PropType, ref, watch } from 'vue';
 const props = defineProps({

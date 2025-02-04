@@ -14,7 +14,6 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, PropType, reactive, Ref, ref } from 'vue'
-import * as _ from 'radash';
 import ucharts from '@/components/ucharts/ucharts.vue';
 
 import api from '@/utils/api'

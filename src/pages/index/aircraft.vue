@@ -1,9 +1,9 @@
 <template>
     <view class="flight-wrapper">
         <view class="total">
-			<i class="icon zl-icon-aircraft" />
+            <i class="icon zl-icon-aircraft" />
             <view class="text">
-                <text class="value">{{ _.sum(Object.values(stat)) }}</text>
+                <text class="value">{{ Object.values(stat).reduce((acc, cur) => acc + cur, 0) }}</text>
                 <text class="unit">架</text>
             </view>
         </view>
@@ -19,7 +19,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
 import { useStore } from '@/store';
-import * as _ from 'radash';
 
 import { AircraftItem } from '@/interface';
 import dayjs from 'dayjs';
@@ -89,6 +88,7 @@ onMounted(() => {
         display: flex;
         align-items: center;
         flex-direction: column;
+
         .icon {
             size: 50px;
             color: #3f3f3f;
