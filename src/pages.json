@@ -29,6 +29,12 @@
             "style": {
                 "navigationBarTitleText": "飞行员"
             }
+        },
+        {
+            "path": "pages/hr/Hr",
+            "style": {
+                "navigationBarTitleText": "人力资源"
+            }
         }
     ],
     "globalStyle": {

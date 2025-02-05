@@ -76,9 +76,7 @@ watch(() => props.data, () => {
         hourMax = Math.max(hourMax, hour);
         hourMin = Math.min(hourMin, hour);
     }
-    console.log('@@@@@@@@@@@@@', dates, weights, hours.map(val => {
-        return 10+(+val - hourMin) / (hourMax - hourMin) * 500;
-    }), counters);
+
     option.value = {
         type: "mix",
         categories: dates,
@@ -96,6 +94,7 @@ watch(() => props.data, () => {
             }, {
                 name: '小时', type: "line",
                 // data 过于接近,起伏不明显.假设最小值为10吧,最大值是200.然后val按比例转换.
+                // 这里面的10是最小值对应的位置,500最大值,应该是货重的500决定了高低
                 data: hours.map(val => {
                     return 10+(+val - hourMin) / (hourMax - hourMin) * 500;
                 })

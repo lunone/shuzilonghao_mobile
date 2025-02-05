@@ -18,7 +18,7 @@
 			{ size: 12, link: '/pages/analysis/Analysis', class: 'analysis', text: '运行分析' },
 			{ size: 6, link: '/pages/airplane/Airplane', class: 'airplane', text: '机队' },
 			{ size: 6, link: '/sale', class: 'sale', text: '销售' },
-			{ size: 6, link: '/hr', class: 'person', text: '人员' },
+			{ size: 6, link: '/pages/hr/Hr', class: 'person', text: '人员' },
 		],
 		[
 			{ size: 8, link: '/pages/sms/Sms', class: 'sms', text: '安全' },

@@ -1,10 +1,5 @@
 <template>
     <!-- <nav-vue title="人员统计" text="主页" url='/home' /> -->
-    <van-notice-bar left-icon="info-o" wrapable :scrollable="false">
-        该页面尚未完成<br />
-        原因：1.时间原因,年后和身份认证一块做<br />
-        2.详情数据还在各部门手里，未上网。
-    </van-notice-bar>
 
 
     <view class="wrapper">
@@ -42,17 +37,12 @@
             </view>
         </view>
         <view class="intro">
-            <van-notice-bar left-icon="info-o" wrapable :scrollable="false">
-                使用提醒，点击名字查看详情，例如
-                <UserCardVue userId="A00725" name="李志伦" />
-            </van-notice-bar>
-
         </view>
 
     </view>
-    <van-action-sheet v-model:show="show" title="员工信息">
+    <!-- <van-action-sheet v-model:show="show" title="员工信息">
         <profile-vue></profile-vue>
-    </van-action-sheet>
+    </van-action-sheet> -->
     <!-- <profile-vue></profile-vue> -->
 </template>
 
