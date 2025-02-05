@@ -131,27 +131,27 @@ const jump = (url: string) => {
 
 .wrapper {
     padding: 20px;
-    // background-color: @background-color;
+    // background-color: @color-background;
     // border-radius: 8px;
     // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
     .title {
-        color: @primary-color;
+        color: @color-primary;
         font-size: 20px;
         font-weight: normal;
         margin-bottom: 10px;
     }
 
     .subtitle {
-        color: @secondary-color;
+        color: @color-secondary;
         font-size: 18px;
         font-weight: normal;
         margin-bottom: 5px;
-    }
+    } 
 
     .total-count {
         font-size: 16px;
-        color: @text-color;
+        color: @color-text;
         margin-bottom: 10px;
 
         span {
@@ -162,7 +162,7 @@ const jump = (url: string) => {
     .departments {
         .item {
             font-size: 14px;
-            color: @text-color;
+            color: @color-text;
             margin-bottom: 5px;
 
             span {
@@ -183,7 +183,7 @@ const jump = (url: string) => {
 
                 li {
                     font-size: 14px;
-                    color: @text-color;
+                    color: @color-text;
                     margin-bottom: 5px;
 
                     span {
@@ -196,7 +196,7 @@ const jump = (url: string) => {
 
     .sample-info {
         font-size: 16px;
-        color: @text-color;
+        color: @color-text;
         margin-bottom: 20px;
     }
 }

@@ -158,7 +158,7 @@ const barOption = computed(() => {
 
 .maintenance-container {
     padding: 20px;
-    background-color: @background-color;
+    background-color: @color-background;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
@@ -167,7 +167,7 @@ const barOption = computed(() => {
         font-size: 20px;
         font-weight: normal;
         margin-bottom: 10px;
-        border-bottom: 2px solid @border-color;
+        border-bottom: 2px solid @color-border;
         padding-bottom: 5px;
     }
 
@@ -176,13 +176,13 @@ const barOption = computed(() => {
         font-size: 18px;
         font-weight: normal;
         margin-bottom: 5px;
-        border-bottom: 1px solid @border-color;
+        border-bottom: 1px solid @color-border;
         padding-bottom: 3px;
     }
 
     .stat-item {
         font-size: 14px;
-        color: @text-color;
+        color: @color-text;
         margin-bottom: 5px;
         display: flex;
         justify-content: space-between;
@@ -199,7 +199,7 @@ const barOption = computed(() => {
 
     .activity-item {
         font-size: 14px;
-        color: @text-color;
+        color: @color-text;
         margin-bottom: 5px;
         display: flex;
         justify-content: space-between;
@@ -235,7 +235,7 @@ const barOption = computed(() => {
 
             .warehouse-item {
                 font-size: 14px;
-                color: @text-color;
+                color: @color-text;
                 margin-bottom: 5px;
                 display: flex;
                 justify-content: space-between;

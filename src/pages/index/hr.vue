@@ -99,7 +99,7 @@ const sections = ref([
             }
 
             .unit {
-                color: @text-color;
+                color: @color-text;
             }
         }
     }

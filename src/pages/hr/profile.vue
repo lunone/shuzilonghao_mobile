@@ -256,7 +256,7 @@ const employee = ref({
 
 .employee-profile {
     padding: 20px;
-    background-color: @background-color;
+    background-color: @color-background;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     min-height: 40vh;
@@ -272,13 +272,13 @@ const employee = ref({
             height: 100px;
             border-radius: 3px;
             margin-right: 20px;
-            border: solid 1px @border-color;
+            border: solid 1px @color-border;
         }
 
         .profile-info {
             .userId {
                 font-size: 14px;
-                color: @text-color;
+                color: @color-text;
             }
 
             .name {
@@ -289,14 +289,14 @@ const employee = ref({
 
             .department {
                 margin-top: 5px;
-                color: @text-color;
+                color: @color-text;
             }
         }
     }
 
     .profile-details {
         margin-top: 20px;
-        border-top: 1px solid @border-color;
+        border-top: 1px solid @color-border;
         padding-top: 10px;
 
         .id-number,
@@ -305,26 +305,26 @@ const employee = ref({
         .contract-expiry,
         .district {
             margin-bottom: 10px;
-            color: @text-color;
+            color: @color-text;
         }
     }
 
     .basic-info {
         margin-top: 20px;
-        border-top: 1px solid @border-color;
+        border-top: 1px solid @color-border;
         padding-top: 10px;
 
         .phone,
         .address,
         .district {
             margin-bottom: 10px;
-            color: @text-color;
+            color: @color-text;
         }
     }
 
     .emergency-contacts {
         margin-top: 20px;
-        border-top: 1px solid @border-color;
+        border-top: 1px solid @color-border;
         padding-top: 10px;
 
         .emergency-title {
@@ -341,14 +341,14 @@ const employee = ref({
             .contact-address,
             .contact-workplace {
                 margin-bottom: 5px;
-                color: @text-color;
+                color: @color-text;
             }
         }
     }
 
     .education {
         margin-top: 20px;
-        border-top: 1px solid @border-color;
+        border-top: 1px solid @color-border;
         padding-top: 10px;
 
         .education-title {
@@ -359,7 +359,7 @@ const employee = ref({
 
         .graduation-school {
             margin-bottom: 10px;
-            color: @text-color;
+            color: @color-text;
         }
 
         .education-experience {
@@ -370,7 +370,7 @@ const employee = ref({
                 .education-school,
                 .education-nature {
                     margin-bottom: 5px;
-                    color: @text-color;
+                    color: @color-text;
                 }
             }
         }
@@ -378,7 +378,7 @@ const employee = ref({
 
     .level {
         margin-top: 20px;
-        border-top: 1px solid @border-color;
+        border-top: 1px solid @color-border;
         padding-top: 10px;
 
         .level-title {
@@ -390,14 +390,14 @@ const employee = ref({
         .level-details {
             .level-item {
                 margin-bottom: 5px;
-                color: @text-color;
+                color: @color-text;
             }
         }
     }
 
     .experience {
         margin-top: 20px;
-        border-top: 1px solid @border-color;
+        border-top: 1px solid @color-border;
         padding-top: 10px;
 
         .experience-title {
@@ -410,7 +410,7 @@ const employee = ref({
         .job-title,
         .job-company {
             margin-bottom: 5px;
-            color: @text-color;
+            color: @color-text;
         }
 
         .job-period {

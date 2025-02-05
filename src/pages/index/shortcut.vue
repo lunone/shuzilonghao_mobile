@@ -33,7 +33,7 @@
 <style lang="less" scoped>
 	@import "@/css/base.less";
 
-	@background-color: #fafafa;
+	@color-background: #fafafa;
 	@active-background-color: #e0e0e0; // 激活时的背景颜色
 	@active-border-color: #bbb; // 激活时的边框颜色
 
@@ -57,7 +57,7 @@
 
 				margin: 2px;
 				border-radius: 8px;
-				background-color: @background-color;
+				background-color: @color-background;
 				/* 浅色背景 */
 				border: 1px solid #ddd;
 				height: 100%;

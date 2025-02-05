@@ -1,29 +1,56 @@
 @import "icon.less";
+
+@color-background: #f9f9f9; // 背景颜色
 // 基本颜色定义
-@primary-color: #c52005; // 红色
-@secondary-color: #fa5430; // 黄色
-@accent-color: #3388ff; // 蓝色
+@color-primary: #c52005; // 红色
+@color-secondary: #f87557; // 黄色
+@color-accent: #3388ff; // 蓝色
+// 默认内容块背景色
+@color-block: #fff;
 
-@icon-color: #666;
-@background-color: #f9f9f9; // 背景颜色
-@border-color: #ddd; // 边框颜色
+@color-icon: #666;
+@color-text: #333; // 文本颜色
 
-@text-color: #333; // 文本颜色
+@color-border: #ddd; // 边框颜色
+
+
 // 间距等样式定义
-@margin-base: 0.4rem;
-@padding-base: 0.4rem; 
-@radius-base: 0.4rem;
+@margin-base: 10px;
+// 默认的元素留空
+@margin-page: 4px;
 
-// 边框
-.shadow-none {
-    box-shadow: none;
-    -webkit-box-shadow: none;
+
+
+@padding-large: 14px;
+@padding-base: 10px;
+@padding-middle: 8px;
+@padding-small: 4px;
+@padding-mini: 2px;
+@padding-page: 10px;
+
+
+// 边框圆角
+@radius-base: 8px;
+@radius-sm: 4px;
+
+
+// @box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+@shadow-base: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+// 行显示
+.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.intro {
-    background-color: bisque;
-}
-
-.radius {
-    border-radius: 0.4rem;
+// 列显示
+.column {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
 }
