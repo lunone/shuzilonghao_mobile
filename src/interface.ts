@@ -26,32 +26,6 @@ export type User = {
     district?: string,
     address?: string,
 }
-// 健康申报的
-export type Tdeclaration = User & {
-    date: string
-    name: string
-    address: string
-    time: string,
-    temperature: number,
-    cough: boolean,
-    diarrhoea: boolean,
-    symptom: string
-    code: string,
-    quarantine: string,
-    acid: string,
-}
-export type TdeclarationSrc = {
-    userId: string,
-    shijian: string,
-    tiwen: string,
-    kesou: string,
-    fuxie: string,
-    qita: string,
-    jiankangma: string,
-    geli: string,
-    hesuan: string,
-    recordDate: string,
-}
 
 export type TableColumnItem = {
     key?: string, name: string, width?: string | number, component?: string,
@@ -114,26 +88,7 @@ export type AirportItem = {
 }
 
 
-// 所有人的疫苗信息
-export type Inoculate = {
-    id?: number,
-    userId: string
-    sequence: number
-    date: string
-    vaccine: string
-    remark: string
-};
 
-export type Note = {
-    content: string
-    createdAt: string
-    date: string
-    id: number,
-    inputBy: string
-    level: number,
-    updatedAt: string
-    userId: string
-}
 
 export type TreeNode = Record<string, any> & {
     id: number,

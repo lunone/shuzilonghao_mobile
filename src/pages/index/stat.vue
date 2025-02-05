@@ -153,10 +153,11 @@ onMounted(async () => {
 
         .title {
             text-align: left;
-            color: #ffffff;
+            color: #fcb6b6;
             /* 使用白色文字以适应渐变背景 */
             flex: 1;
             align-items: center;
+            font-size: .9rem;
         }
 
         .counter,

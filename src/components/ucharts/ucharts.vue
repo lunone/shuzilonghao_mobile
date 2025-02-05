@@ -9,12 +9,11 @@
 <script lang="ts" setup>
 import { getCurrentInstance, ref, watch } from 'vue';
 import uCharts from './u-charts.min';
-import _ from 'lodash';
-// import { offsetCorrect } from '@/utils/ucharts';
+import { merge } from 'lodash-es';
 let chart;
 const id = "canvas" //"exjLSzTaRXxTPxXoOISiSyKXwIjfdWQk";
 const emits = defineEmits(['select']);
-const ele = ref<Record<string, any>>({});
+// const ele = ref<Record<string, any>>({});
 const props = defineProps({
     option: { type: Object, default: () => { } },
     height: { type: Number, default: 200 }
@@ -26,7 +25,7 @@ watch(() => props.option, (val, oldVal) => {
     setTimeout(() => {// 延时执行，防止getCurrentInstance获取到的高度宽度为0
         if (val && Object.keys(val).length) {
             // 深拷贝防止重复触发
-            draw(JSON.parse(JSON.stringify(val)))
+            draw(val)
         }
     }, 1e3);
 }, { deep: true, immediate: true })
@@ -53,27 +52,28 @@ function draw(data) {
             // 防止变模糊
             node.width = width;
             node.height = height;
-            const chartOption = {
+            const chartOption = merge({
                 type: "column",
                 animation: true,
                 background: "#333333",
                 // color: ["#1890FF", "#91CB74", "#FAC858", "#EE6666", "#73C0DE", "#3CA272", "#FC8452", "#9A60B4", "#ea7ccc"],
                 padding: [0, 0, 0, 0],
                 legend: { show: false },
-                ...data,
+                xAxis: {}
+            }, data, {
                 canvas2d: true,
                 context, pixelRatio,
                 width, height,// canvas的宽度高度，单位为px
-            }
+            });
             chart = new uCharts(chartOption)
         });
 }
 function tap(e) {
-    console.log('[uCharts]:tap', e);
+    // console.log('[uCharts]:tap', e);
     // - (opts.height / opts.pix / 2) * (opts.pix - 1)
     const opts = chart.opts;
-    const info = uni.getSystemInfoSync();
-    console.log('[uCharts]:tap', chart, info)
+    // const info = uni.getSystemInfoSync();
+    // console.log('[uCharts]:tap', chart, info)
     // 似乎ucharts的bug,在判断触摸点是否在图表范围内时的算法:pageY - e.currentTarget.offsetTop 这个我理解的已经是正常的0到图高了.
     // 但是它又减去了一个- (opts.height / opts.pix / 2) * (opts.pix - 1),opts.height / opts.pix / 2这部分是半张图高,opts.pix - 1,就是被扩张的部分.
     // 相当于比如原来150高,3倍分辨率,实际上就是被扩高了2倍图高.其实这块我也没有看懂为什么这么处理
@@ -83,11 +83,11 @@ function tap(e) {
     // 根据ucharts y = (touches.pageY - e.currentTarget.offsetTop - (opts.height / opts.pix / 2) * (opts.pix - 1)) * opts.pix;
     // 所以只需要给pageY加上opts.height / opts.pix / 2 * (opts.pix - 1) 即可
     // offsetCorrect(e, -margin.left, (opts.height / opts.pix / 2) * (opts.pix - 1));
-    console.log('offsetCorrect---------------------', chart)
+    // console.log('offsetCorrect---------------------', chart)
     e.changedTouches[0].clientX -= margin.left;
     e.changedTouches[0].pageY += (opts.height / opts.pix / 2) * (opts.pix - 1);
-    // 后面的margin矫正留给offsetCorrect处理.
-    emits('select', chart, e, info);
+    // 后面的margin矫正留给offsetCorrect处理., info
+    emits('select', chart, e);
 }
 </script>
 

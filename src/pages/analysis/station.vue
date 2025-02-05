@@ -156,17 +156,17 @@ const stationsWithDetail = computed(() => {
         key: station, // 站点键
         city: airports.value[station]?.city || station, // 站点城市名称或机场代码
         arr: {
-            flights: Object.keys(flightData.arr.flights[station].reduce((acc, flight) => {
+            flights: Object.keys(flightData.arr.flights[station]?.reduce((acc, flight) => {
                 acc[flight.dep] = [...(acc[flight.dep] || []), flight];
                 return acc;
-            }, {})), // 到达航班的出发机场列表
+            }, {}) || {}), // 到达航班的出发机场列表
             stat: flightData.arr.stat[station], // 到达航班的统计信息
         },
         dep: {
-            flights: Object.keys(flightData.dep.flights[station].reduce((acc, flight) => {
+            flights: Object.keys(flightData.dep.flights[station]?.reduce((acc, flight) => {
                 acc[flight.arr] = [...(acc[flight.arr] || []), flight];
                 return acc;
-            }, {})), // 出发航班的到达机场列表
+            }, {}) || {}), // 出发航班的到达机场列表
             stat: flightData.dep.stat[station] // 出发航班的统计信息
         },
 

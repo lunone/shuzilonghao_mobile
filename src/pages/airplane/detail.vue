@@ -16,7 +16,7 @@
                     <span class="key">{{ showOBj.name }}</span>
                     <span class="value">
                         <!-- {{ _.attempt(showOBj.func || (_ => _),  aircraft[showOBj.key]) }} -->
-                        {{ _.try(showOBj.func)(aircraft[showOBj.key]) }}
+                        {{ calac(showOBj.func, aircraft[showOBj.key]) }}
                         {{ showOBj.unit || '' }}
                     </span>
                 </div>
@@ -26,7 +26,6 @@
     </div>
 </template>
 <script lang="ts" setup>
-import * as _ from 'radash';
 import { AircraftItem } from '@/interface';
 import { PropType, ref } from 'vue';
 
@@ -36,7 +35,16 @@ const props = defineProps({
 })
 
 const showMore = ref(false);
-
+function calac(func, val) {
+    if (typeof func === 'function') {
+        try {
+            return func(val)
+        } catch (error) {
+            return 'error';
+        }
+    }
+    return val;
+}
 const aircraftKeysArray: { key: keyof AircraftItem, name: string, unit?: string, default: boolean, func?: (...args: any[]) => unknown }[] = [
     { key: 'totalLength', name: '长度', default: true, unit: '米' },
     { key: 'totalHeight', name: '高度', default: true, unit: '米' },
