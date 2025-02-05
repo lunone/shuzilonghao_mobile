@@ -133,7 +133,7 @@ onMounted(async () => {
 
 <style lang="less" scoped>
 /* 这里是样式部分，用于定义组件的样式 */
-@import "@/base.less";
+@import "@/css/base.less";
 .wrapper {
     display: flex;
     flex-direction: column;

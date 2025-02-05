@@ -31,7 +31,7 @@
 </script>
 
 <style lang="less" scoped>
-	@import "@/base.less";
+	@import "@/css/base.less";
 
 	@background-color: #fafafa;
 	@active-background-color: #e0e0e0; // 激活时的背景颜色

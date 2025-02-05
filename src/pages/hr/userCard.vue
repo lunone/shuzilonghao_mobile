@@ -81,7 +81,7 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
-@import "@/base.less";
+@import "@/css/base.less";
 
 .user-info {
     display: inline-block;

@@ -40,7 +40,7 @@ const change = (e) => {
 };
 </script>
 <style lang="less" scoped>
-@import '@/base.less';
+@import '@/css/base.less';
 @gap: 10px;
 
 .action-sheet-wrapper {

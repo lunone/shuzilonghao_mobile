@@ -43,7 +43,7 @@ onMounted(() => {
 </script>
 
 <style scoped lang="less">
-@import "@/base.less";
+@import "@/css/base.less";
 
 .tabs-wrapper {
     display: flex;

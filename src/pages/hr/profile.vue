@@ -252,7 +252,7 @@ const employee = ref({
 </script>
 
 <style lang="less" scoped>
-@import "@/base.less";
+@import "@/css/base.less";
 
 .employee-profile {
     padding: 20px;

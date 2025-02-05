@@ -154,7 +154,7 @@ const barOption = computed(() => {
 </script>
 
 <style lang="less">
-@import "@/base.less";
+@import "@/css/base.less";
 
 .maintenance-container {
     padding: 20px;

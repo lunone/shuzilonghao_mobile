@@ -36,7 +36,7 @@
 	const props = defineProps<{ data : Record<string, any> }>();
 </script>
 <style lang="less" scoped>
-	@import '@/base.less';
+	@import '@/css/base.less';
 	@gap: 10px;
 	@color-background: #fefefe;
 	@color-ask: #c2e7b0;

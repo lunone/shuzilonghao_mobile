@@ -83,7 +83,7 @@ onMounted(() => {
 
 
 <style lang="less" scoped>
-@import "@/base.less";
+@import "@/css/base.less";
 
 .main-container {
     background-color: #f3f3f3;

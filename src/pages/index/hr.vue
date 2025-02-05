@@ -34,7 +34,7 @@ const sections = ref([
 </script>
 
 <style lang="less" scoped>
-@import "@/base.less";
+@import "@/css/base.less";
 
 .hr-summary {
     display: flex;

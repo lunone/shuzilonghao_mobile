@@ -101,5 +101,5 @@ const onConfirm = (values: [Date, Date]) => {
 
 <style lang="less" scoped>
 /* 添加样式 */
-@import "@/base.less";
+@import "@/css/base.less";
 </style>

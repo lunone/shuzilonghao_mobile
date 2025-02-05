@@ -74,7 +74,7 @@ onMounted(() => {
 
 </script>
 <style lang="less" scoped>
-@import "@/base.less";
+@import "@/css/base.less";
 
 .wrapper {
     display: flex;
