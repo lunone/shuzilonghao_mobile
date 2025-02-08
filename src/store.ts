@@ -13,6 +13,7 @@ export const useStore = defineStore('test', {//需要注意的是，defineStore�
         airports: [] as AirportItem[],
         airportsCode4: {} as Record<string, AirportItem>,
         aircrafts: {} as Record<string, AircraftItem>,
+        token: '' as string,
     }),
     getters: {
         testGetters(): string {
@@ -78,6 +79,12 @@ export const useStore = defineStore('test', {//需要注意的是，defineStore�
                 this.users = res;
             }
             return this.users;
+        },
+        useToken(token?: string) {
+            if (token) {
+                this.token = token;
+            }
+            return this.token;
         },
     }
 })

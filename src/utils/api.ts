@@ -1,123 +1,130 @@
 import axios from "axios";
-import UniAdapter from "./adapter";
+import { useStore } from "@/store";
 
-// const baseURL = 'https://app.airlonghao.com/sz'
-const baseURL = 'http://127.0.0.1:7004'
-const loginURL = '/login';
+const store = useStore();
+
+const baseURL = 'http://127.0.0.1:7004';//'https://app.airlonghao.com/sz'
+const loginURL = '/login/wx';
+const registerPage = '/pages/public/Public';
 const tokenKey = 'Authorization';
 
-// 是否正在刷新的标记
-let isRefreshing = false
-// 重试队列，每一项将是一个待执行的函数形式
-let requestQweue = []
 
- 
-async function refreshToken() {
-    // 获取code
-    const code = await new Promise((r) => uni.login({
-        provider: 'weixin',
-        success: async res => r(res.code)
-    }));
-    console.log('微信登录', code);
-    // instance是当前request.js中已创建的axios实例
-    // return instance.post(loginURL, { code }).then(res => {
-    //     console.log('refreshToken', res);
-    //     return res.data
-    // })'Basic ' + 
-    return {
-        data: {
-            token: 'caicaiwoshishui2',
-        }
-    }
-}
+let isRefreshing = false// 是否正在刷新的flag
+let qweue = []// 请求队列
+
 
 const option = {
     baseURL, method: 'POST', timeout: 30e3,
-    adapter: UniAdapter as any, // 指定uniapp适配器
-    headers: { 'Content-Type': 'application/json;charset=UTF-8', [tokenKey]: 'Authorization', },
+    adapter: uniAdapter as any, // 指定uniapp适配器
+    headers: { 'Content-Type': 'application/json;charset=UTF-8', },
 }
 // 创建axios实例
 const instance = axios.create(option);
 // 这个实例并不经过拦截器,虽然很丑,但是这样逻辑最简单
 const instanceWithoutInterceptors = axios.create(option);
 
-// 请求拦截器
-instance.interceptors.request.use(config => {
-    // todo:判断白名单,持久化token获取
-    const token = 'Basic ' + 'caicaiwoshishui';
+const beforeRequest = async (config) => {// todo:判断白名单
+    const token = await store.useToken();
+    // todo:是否从storage中获取token
     config.headers[tokenKey] = token;
     return config
-}, e => Promise.reject(e))
+}
+// 请求拦截器
+instance.interceptors.request.use(beforeRequest)
+instanceWithoutInterceptors.interceptors.request.use(beforeRequest)
 
 // 响应-处理token竞争问题
 instance.interceptors.response.use(response => {
-    console.log('token竞争器', response);
-    if (response.status === 401) {
-        console.log('token已过期,此时isRef', isRefreshing);
-        const config = response.config;
-        if (!isRefreshing) {
-            isRefreshing = true
-            return refreshToken().then(res => {
-                const { token } = res.data;
-                instance.defaults.headers[tokenKey] = token;
-                // todo:持久化token
-                config.headers[tokenKey] = token;
-
-                // config.baseURL = '';
-                // console.log('refreshToken_____', res, token, config);
-                // 已经刷新了token，将所有队列中的请求进行重试
-                requestQweue.forEach(cb => cb(token))
-                // 清空队列
-                requestQweue = []
-                return instanceWithoutInterceptors(config)
-            }).catch(res => {
-                console.error('refreshtoken error =>', res)
-                // todo:window.location.href = '/'
-            }).finally(() => {
-                isRefreshing = false
-            })
-        } else { // 正在刷新token，将返回一个未执行resolve的promise
-            // console.log(config,)
-            return new Promise((resolve) => {
-                // 将resolve放进队列，用一个函数形式来保存，等token刷新后直接执行
-                requestQweue.push((token) => {
-                    // config.baseURL = ''
-                    config.headers[tokenKey] = token
-                    // console.log('队列调用__', config);
-                    resolve(instanceWithoutInterceptors(config))
-                })
-            })
-        }
+    if (response.status !== 401) {// 非401进入下一段拦截器
+        return response as any // todo:原样返回为啥ts会报错?
     }
-    return response as any // todo:原样返回为啥ts会报错?
-}, e => Promise.reject(e))
+    if (isRefreshing) {// 刷新token时,将resolve放进队列，用一个函数形式来保存，等token刷新后直接执行
+        return new Promise(resolve => qweue.push(() => resolve(instanceWithoutInterceptors(response.config))))
+    }
+    isRefreshing = true;
+    return new Promise((resolve) => uni.login({ provider: 'weixin', success: res => resolve(res.code) }))
+        .then(code => instanceWithoutInterceptors({ url: loginURL, data: { code } }))
+        .then(resp => {// todo:是否storage固化token 持久化token
+            if (resp.status == 200 && resp.data.data) {// 这里不使用可选链就是等报错
+                store.useToken(resp.data.data)
+            } else {// 因为没有任何拦截器,所以要自己处理异常
+                throw new Error('refreshtokenError');
+            }
+        }).then(() => {
+            qweue.forEach(f => f());// 新token重试积压请求
+            qweue = []; // 清空队列
+            return instanceWithoutInterceptors(response.config);// 重试本次请求
+        }).catch(err => {
+            if (err.message == 'refreshtokenError') {// 如果是刷新token失败,直接跳转登录页
+                uni.redirectTo({ url: registerPage+`?redir=true` })
+            } else {// 不在这里处理,继续抛出错误,让下一层捕获
+                throw new Error('requestError', err);
+            }
+            console.error('refreshtoken error =>', err)
+            // todo:window.location.href = '/'
+        }).finally(() => {
+            isRefreshing = false;
+        })
+})
 
 // 响应-处理状态码
 instance.interceptors.response.use(response => {
-    const { status, data } = response;
-    console.log('响应拦截器###', response);
+    const status = response?.status;
     if (status == 200) {
-        return data || {};
-    } else
-        if (status == 403) {
-            // 权限不足
-            throw new Error('权限不足');
-        } else if (status == 404) {
-            // 禁止访问
-        } else if (status == 500) {
-            // 服务器错误
-        } else if (status == 501) {
+        return response.data || {};
+    } else if (status == 402) {
+        // 需要注册
+    } else if (status == 403) {
+        // 权限不足
+        throw new Error('权限不足');
+    } else if (status == 404) {
+        // 禁止访问
+    } else if (status == 500) {
+        // 服务器错误
+    } else if (status == 501) {
 
-        } else {
-        }
-    // return response.data
+    } 
 })
 
 // 响应-处理内容部分
 instance.interceptors.response.use(json => {
-    console.log('页面解析器', json);
-    return json.data;
+    return json?.data;
 });
 
-
 export default (url: string, data?: any) => instance({ url, data }) as Promise<any>;
+
+/**
+ * 下面代码原作者:https://gitee.com/black-key/uniapp-axios-adapter
+ * 用途:让uniapp适配axios,单独引入为了调试方便,有改动
+ */
+
+function uniAdapter(config) {
+    if (!uni) {
+        throw new Error("please use this in uni-app project!");
+    }
+    return new Promise((resolve, reject) => {
+        const { baseURL, url, headers, data, params } = config;
+        const uniConfig = {
+            ...config, url: baseURL + url,
+            // * 此处使用析构,猜测axios的headers在使用后会删除,所以直接引用就为空
+            header: { ...headers },
+        };
+
+        if (data || params) {
+            try {
+                uniConfig.data = JSON.parse(data || params);
+            } catch (e) {
+                uniConfig.data = data || params;
+            }
+        }
+        uni.request({
+            ...uniConfig,
+            success(res) {
+                resolve({ ...res, status: res.statusCode, statusText: res.errMsg, config, request: null });
+            },
+            fail(res) {
+                reject({ ...res, status: res.statusCode, statusText: res.errMsg, config, request: null });
+            },
+        });
+    });
+};

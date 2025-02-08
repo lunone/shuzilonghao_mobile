@@ -21,4 +21,5 @@
 
 * 到目前为止,旧hbuildX在cli里面就愉快的跑起来了.但是npm run wx运行报错interface里面的type没有export某个type,但是在某个文件里面却import了.尝试修复无果.但是重新开了vscode没有再报错,不知道具体原因.
 
-
+## 低级错误
+* setup里面,也就是<script setup>里面不能使用异步,会报错或者使用那个<Suspense> ,没啥必要的话写到onMounted里面呗.

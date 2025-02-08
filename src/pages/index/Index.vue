@@ -10,19 +10,19 @@
             </div> -->
         <!-- </header> -->
 
-        <!-- <div class="section overview">
+        <div class="section overview">
             <StatVue class="day" :range="`day`" />
             <StatVue class="year" />
-        </div> -->
-        <!-- <ShortcutVue class="shortcut" /> -->
+        </div>
+        <ShortcutVue class="shortcut" />
 
         <div class="section asset">
             <AircraftVue class="aircraft" />
             <HrVue class="hr" />
         </div>
 
-        <!-- <FlightVue class="section flight" /> -->
-        <!-- <PlanVue class="section plan" /> -->
+        <FlightVue class="section flight" />
+        <PlanVue class="section plan" />
 
 
         <dividerVue class="more">其他值得放在首页的项</dividerVue>
@@ -116,8 +116,7 @@ onMounted(async () => {
             width: 50%;
         }
     }
-
-    &>.plan {}
+ 
 
     &>.more {
         box-shadow: none;
