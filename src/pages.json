@@ -1,21 +1,10 @@
 {
     "pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
-        {
-            "path": "pages/public/Public",
-            "style": {
-                "navigationBarTitleText": "中原龙浩"
-            }
-        },
+        
         {
             "path": "pages/index/Index",
             "style": {
                 "navigationBarTitleText": "数字龙浩"
-            }
-        },
-        {
-            "path": "pages/public/Login",
-            "style": {
-                "navigationBarTitleText": "身份激活"
             }
         },
         {

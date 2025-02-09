@@ -9,24 +9,26 @@
                 <VanIcon name="user" />
             </div> -->
         <!-- </header> -->
+        <splashVue v-if="user == 'init'" />
+        <template v-else-if="user == 'employee'">
+            <div class="section overview">
+                <StatVue class="day" :range="`day`" />
+                <StatVue class="year" />
+            </div>
+            <ShortcutVue class="shortcut" />
 
-        <div class="section overview">
-            <StatVue class="day" :range="`day`" />
-            <StatVue class="year" />
-        </div>
-        <ShortcutVue class="shortcut" />
+            <div class="section asset">
+                <AircraftVue class="aircraft" />
+                <HrVue class="hr" />
+            </div>
 
-        <div class="section asset">
-            <AircraftVue class="aircraft" />
-            <HrVue class="hr" />
-        </div>
-
-        <FlightVue class="section flight" />
-        <PlanVue class="section plan" />
+            <FlightVue class="section flight" />
+            <PlanVue class="section plan" />
 
 
-        <dividerVue class="more">其他值得放在首页的项</dividerVue>
-
+            <dividerVue class="more">其他值得放在首页的项</dividerVue>
+        </template>
+        <publicVue v-else />
 
     </div>
 </template>
@@ -35,16 +37,29 @@
 import StatVue from '@/pages/index/stat.vue';
 import ShortcutVue from '@/pages/index/shortcut.vue';
 import FlightVue from '@/pages/index/flight.vue';
-import HrVue from '@/pages/index/hr.vue';
+import HrVue from '@/pages/index/hr.vue'; 
 import AircraftVue from '@/pages/index/aircraft.vue';
 import PlanVue from '@/pages/index/plan.vue';
 import dividerVue from '@/components/zl/divider.vue';
-import { onMounted, ref } from 'vue';
+import splashVue from '../public/splash.vue';
+import publicVue from '../public/public.vue';
+import { ref } from 'vue';
 import api from '@/utils/api';
+import { onLoad } from '@dcloudio/uni-app';
 
-onMounted(async () => {
- 
-});
+const user = ref('init');
+onLoad(async (e) => {
+    if (!e.redir) {// 防止玩意死循环跳转
+        const res = await api('/user/init');
+        console.log('获取到的user', res);
+        if (res) {// 存在用户登录到内容页
+            user.value = 'employee';
+        } else {// 不存在的用户显示注册页面.
+            user.value = 'guest';
+        }
+    }
+})
+
 </script>
 
 
@@ -116,7 +131,7 @@ onMounted(async () => {
             width: 50%;
         }
     }
- 
+
 
     &>.more {
         box-shadow: none;

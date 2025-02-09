@@ -3,9 +3,14 @@ import { useStore } from "@/store";
 
 const store = useStore();
 
-const baseURL = 'http://127.0.0.1:7004';//'https://app.airlonghao.com/sz'
-const loginURL = '/login/wx';
-const registerPage = '/pages/public/Public';
+const url = {
+    api: 'http://127.0.0.1:7004',//'https://app.airlonghao.com/sz'
+    login: '/login/wx',
+    init: '/user/init',
+}
+const page = {
+    register: '/pages/public/Public',
+}
 const tokenKey = 'Authorization';
 
 
@@ -14,7 +19,7 @@ let qweue = []// 请求队列
 
 
 const option = {
-    baseURL, method: 'POST', timeout: 30e3,
+    baseURL: url.api, method: 'POST', timeout: 30e3,
     adapter: uniAdapter as any, // 指定uniapp适配器
     headers: { 'Content-Type': 'application/json;charset=UTF-8', },
 }
@@ -43,25 +48,21 @@ instance.interceptors.response.use(response => {
     }
     isRefreshing = true;
     return new Promise((resolve) => uni.login({ provider: 'weixin', success: res => resolve(res.code) }))
-        .then(code => instanceWithoutInterceptors({ url: loginURL, data: { code } }))
+        .then(code => instanceWithoutInterceptors({ url: url.login, data: { code } }))
         .then(resp => {// todo:是否storage固化token 持久化token
             if (resp.status == 200 && resp.data.data) {// 这里不使用可选链就是等报错
                 store.useToken(resp.data.data)
             } else {// 因为没有任何拦截器,所以要自己处理异常
-                throw new Error('refreshtokenError');
+                throw new Error('refreshTokenError');
             }
         }).then(() => {
             qweue.forEach(f => f());// 新token重试积压请求
             qweue = []; // 清空队列
             return instanceWithoutInterceptors(response.config);// 重试本次请求
-        }).catch(err => {
-            if (err.message == 'refreshtokenError') {// 如果是刷新token失败,直接跳转登录页
-                uni.redirectTo({ url: registerPage+`?redir=true` })
-            } else {// 不在这里处理,继续抛出错误,让下一层捕获
-                throw new Error('requestError', err);
+        }).catch(err => {// 拦截刷新token失败error,直接跳转登录页
+            if (err.message == 'refreshTokenError' && response.config.url !== url.init) {
+                uni.redirectTo({ url: `${page.register}?redir=true` })
             }
-            console.error('refreshtoken error =>', err)
-            // todo:window.location.href = '/'
         }).finally(() => {
             isRefreshing = false;
         })
@@ -83,7 +84,7 @@ instance.interceptors.response.use(response => {
         // 服务器错误
     } else if (status == 501) {
 
-    } 
+    }
 })
 
 // 响应-处理内容部分

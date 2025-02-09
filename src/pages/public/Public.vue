@@ -11,33 +11,15 @@
                 国际、国内（含港澳台）航空货邮运输业务：飞机维护、飞机供给、机场候机厅管理服务、航空运输货物打包服务、装卸搬运、道路货物运输代理、国际货运代理、货物检验代理服务等。
             </div>
         </div>
-        <userVue />
+        <activateVue  />
     </div>
 </template>
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
-import { onLoad } from '@dcloudio/uni-app';
-import api from '@/utils/api';
-onMounted(async (e) => {
-    // const pages = getCurrentPages();
-    console.log('onMounted', e);
+import activateVue from './activate.vue';
 
-})
-onLoad(async (e) => {
-    console.log('Public.vue loaded', e);
-    if (!e.redir) {
-        const user = await api('/user/self');
-        console.log('获取到的user', user);
-        if (user) {
-            // uni.redirectTo({
-            //     url: '/pages/index/Index'
-            // });
-        }
-    }else{
-        console.log('Puti跳转过来的oaded', e)
-    }
+// const unRegisted = ref(false);
 
-})
+
 </script>
 
 <style lang="less" scoped>
