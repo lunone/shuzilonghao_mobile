@@ -1,26 +1,15 @@
 import axios from "axios";
 import { useStore } from "@/store";
+import CONFIG from '@/config';
 
 const store = useStore();
-
-const url = {
-    api: 'http://127.0.0.1:7004',//'https://app.airlonghao.com/sz'
-    login: '/login/wx',
-    init: '/user/init',
-}
-const page = {
-    register: '/pages/public/Public',
-}
-const tokenKey = 'Authorization';
-
 
 let isRefreshing = false// 是否正在刷新的flag
 let qweue = []// 请求队列
 
-
+console.log('config#############', CONFIG);
 const option = {
-    baseURL: url.api, method: 'POST', timeout: 30e3,
-    adapter: uniAdapter as any, // 指定uniapp适配器
+    baseURL: CONFIG.url.api, method: 'POST', timeout: CONFIG.url.timeout, adapter, // 指定uniapp适配器
     headers: { 'Content-Type': 'application/json;charset=UTF-8', },
 }
 // 创建axios实例
@@ -28,10 +17,11 @@ const instance = axios.create(option);
 // 这个实例并不经过拦截器,虽然很丑,但是这样逻辑最简单
 const instanceWithoutInterceptors = axios.create(option);
 
-const beforeRequest = async (config) => {// todo:判断白名单
+const beforeRequest = async (config) => {
+    // todo:判断白名单
     const token = await store.useToken();
     // todo:是否从storage中获取token
-    config.headers[tokenKey] = token;
+    config.headers[CONFIG.key.token] = token;
     return config
 }
 // 请求拦截器
@@ -48,7 +38,7 @@ instance.interceptors.response.use(response => {
     }
     isRefreshing = true;
     return new Promise((resolve) => uni.login({ provider: 'weixin', success: res => resolve(res.code) }))
-        .then(code => instanceWithoutInterceptors({ url: url.login, data: { code } }))
+        .then(code => instanceWithoutInterceptors({ url: CONFIG.url.login, data: { code } }))
         .then(resp => {// todo:是否storage固化token 持久化token
             if (resp.status == 200 && resp.data.data) {// 这里不使用可选链就是等报错
                 store.useToken(resp.data.data)
@@ -60,8 +50,8 @@ instance.interceptors.response.use(response => {
             qweue = []; // 清空队列
             return instanceWithoutInterceptors(response.config);// 重试本次请求
         }).catch(err => {// 拦截刷新token失败error,直接跳转登录页
-            if (err.message == 'refreshTokenError' && response.config.url !== url.init) {
-                uni.redirectTo({ url: `${page.register}?redir=true` })
+            if (err.message == 'refreshTokenError' && response.config.url !== CONFIG.url.init) {
+                uni.redirectTo({ url: `${CONFIG.page.register}?redir=true` })
             }
         }).finally(() => {
             isRefreshing = false;
@@ -99,7 +89,7 @@ export default (url: string, data?: any) => instance({ url, data }) as Promise<a
  * 用途:让uniapp适配axios,单独引入为了调试方便,有改动
  */
 
-function uniAdapter(config) {
+function adapter(config): any {
     if (!uni) {
         throw new Error("please use this in uni-app project!");
     }
@@ -107,8 +97,7 @@ function uniAdapter(config) {
         const { baseURL, url, headers, data, params } = config;
         const uniConfig = {
             ...config, url: baseURL + url,
-            // * 此处使用析构,猜测axios的headers在使用后会删除,所以直接引用就为空
-            header: { ...headers },
+            header: { ...headers },// * 此处使用析构,猜测axios的headers在使用后会删除,所以直接引用就为空
         };
 
         if (data || params) {
