@@ -7,7 +7,7 @@ export const useStore = defineStore('main', {//需要注意的是，defineStore�
     // id:test是该状态管理的唯一标志也可以使用defineStore(id,{});的形式
     state: () => ({
         users: {},
-        self: { ini: false } as User & { ini?: boolean },
+        self: { isInit: true } as User & { isInit?: boolean },
         airports: [] as AirportItem[],
         airportsCode4: {} as Record<string, AirportItem>,
         aircrafts: {} as Record<string, AircraftItem>,
@@ -26,14 +26,14 @@ export const useStore = defineStore('main', {//需要注意的是，defineStore�
             // this.users = { 'A00725': { name: '李志伦' } }
         },
         async useSelf() {
-            if (!this.self.ini) {
-                console.log('获取self');
-                let self = await api('/user/profile') as User;
-                if (self?.userId) {
-                    console.log(self);
+            if (this.self.isInit) {
+                let self = await api('/user/init') as User;
+                console.log('初始化请求user资源',self);
+                if (self?.id) {
+                    // console.log(self);
                     this.self = self;
                 }
-                this.self.ini = true;
+                this.self.isInit = false;
             }
             return this.self;
         },

@@ -9,5 +9,5 @@ export default {
         register: '/pages/public/Public',
     },
     key: { token: 'Authorization', },
-    css: { splash: { duration: 5e3, } }
+    css: { splash: { duration: 3e3, } }
 }

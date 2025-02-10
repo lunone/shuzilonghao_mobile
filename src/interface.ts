@@ -11,6 +11,7 @@ export type WatchUser = {
 }
 // 
 export type User = {
+    id:string,
     userId: string,
     name?: string,
     gender?: number,
