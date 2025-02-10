@@ -1,12 +1,12 @@
 <script>
 export default {
-  onLaunch: function () {
+  onLaunch: function (e) {
     console.log('[uniapp]:App Launch')
   },
-  onShow: function () {
+  onShow: function (e) {
     console.log('[uniapp]:App Show')
   },
-  onHide: function () {
+  onHide: function (e) {
     console.log('[uniapp]:App Hide')
   }
 }

@@ -1,46 +1,37 @@
 <template>
     <div class="main-container">
-        
-            <!-- <header class="section header"> -->
-            <!-- <div class="logo"> -->
-            <!-- <van-notice-bar left-icon="volume-o" text="点击第二行的按钮可进入各子模块。" /> -->
-
-            <!-- </div> -->
-            <!-- <div class="user"> 
-                <VanIcon name="user" />
-            </div> -->
-            <!-- </header> -->
-            <div class="section overview">
-                <StatVue class="day" :range="`day`" />
-                <StatVue class="year" />
-            </div>
-            <ShortcutVue class="shortcut" />
-
-            <div class="section asset">
-                <AircraftVue class="aircraft" />
-                <HrVue class="hr" />
-            </div>
-
-            <FlightVue class="section flight" />
-            <PlanVue class="section plan" />
-
-
-            <dividerVue class="more">其他值得放在首页的项</dividerVue>
+        <splashVue v-if="user == 'init'" />
+        <indexVue v-else-if="user == 'employee'" />
+        <publicVue v-else />
     </div>
 </template>
 
 <script lang="ts" setup>
-import StatVue from '@/pages/index/stat.vue';
-import ShortcutVue from '@/pages/index/shortcut.vue';
-import FlightVue from '@/pages/index/flight.vue';
-import HrVue from '@/pages/index/hr.vue';
-import AircraftVue from '@/pages/index/aircraft.vue';
-import PlanVue from '@/pages/index/plan.vue';
-import dividerVue from '@/components/zl/divider.vue';
-import splashVue from '../public/splash.vue';
-import publicVue from '../public/public.vue';
+import { onLoad } from '@dcloudio/uni-app';
+import { ref } from 'vue';
+import api from '@/utils/api';
+import config from '@/config';
 
+import splashVue from '@/pages/public/splash.vue';
+import publicVue from '@/pages/public/public.vue';
+import indexVue from '@/pages/index/index.vue';
 
+const user = ref('init');
+onLoad(async (e) => {
+    // todo:跳转页逻辑
+    if (!e.redir) {// 防止玩意死循环跳转
+        const res = await api('/user/init');
+        console.log('获取到的user', res);
+        setTimeout(() => {
+            if (res) {// 存在用户登录到内容页
+                user.value = 'employee';
+            } else {// 不存在的用户显示注册页面.
+                user.value = 'guest';
+            }
+        }, config.css.splash.duration);
+
+    }
+})
 
 </script>
 

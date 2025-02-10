@@ -2,37 +2,37 @@
     "pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
         
         {
-            "path": "pages/index/Index",
+            "path": "pages/Index",
             "style": {
                 "navigationBarTitleText": "数字龙浩"
             }
         },
         {
-            "path": "pages/sms/Sms",
+            "path": "pages/sms/sms",
             "style": {
                 "navigationBarTitleText": "安全数据"
             }
         },
         {
-            "path": "pages/analysis/Analysis",
+            "path": "pages/analysis/analysis",
             "style": {
                 "navigationBarTitleText": "运行分析"
             }
         },
         {
-            "path": "pages/airplane/Airplane",
+            "path": "pages/airplane/airplane",
             "style": {
                 "navigationBarTitleText": "机队分析"
             }
         },
         {
-            "path": "pages/pilot/Pilot",
+            "path": "pages/pilot/pilot",
             "style": {
                 "navigationBarTitleText": "飞行员"
             }
         },
         {
-            "path": "pages/hr/Hr",
+            "path": "pages/hr/hr",
             "style": {
                 "navigationBarTitleText": "人力资源"
             }

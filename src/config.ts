@@ -7,6 +7,7 @@ export default {
     },
     page: {
         register: '/pages/public/Public',
-    }, 
-    key: { token: 'Authorization', }
+    },
+    key: { token: 'Authorization', },
+    css: { splash: { duration: 5e3, } }
 }

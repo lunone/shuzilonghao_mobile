@@ -3,11 +3,9 @@ import api from '@/utils/api';
 import { AircraftItem, AirportItem, User } from '@/interface';
 import dayjs from 'dayjs';
 
-export const useStore = defineStore('test', {//需要注意的是，defineStore返回的是一个回调方法
+export const useStore = defineStore('main', {//需要注意的是，defineStore返回的是一个回调方法
     // id:test是该状态管理的唯一标志也可以使用defineStore(id,{});的形式
     state: () => ({
-        name: 'hello pinia',
-        age: 20,
         users: {},
         self: { ini: false } as User & { ini?: boolean },
         airports: [] as AirportItem[],
@@ -24,17 +22,8 @@ export const useStore = defineStore('test', {//需要注意的是，defineStore�
         }
     },
     actions: {
-        autoIncrease() {
-            setInterval(() => {
-                this.age++;
-            }, 1000)
-        },
-        addAge(gap: number) {
-            this.age += gap;
-        },
-        setAge(age: number) { this.age = age },
         setUsers() {
-            this.users = { 'A00725': { name: '李志伦' } }
+            // this.users = { 'A00725': { name: '李志伦' } }
         },
         async useSelf() {
             if (!this.self.ini) {
