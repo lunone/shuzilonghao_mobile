@@ -37,7 +37,7 @@
 import StatVue from '@/pages/index/stat.vue';
 import ShortcutVue from '@/pages/index/shortcut.vue';
 import FlightVue from '@/pages/index/flight.vue';
-import HrVue from '@/pages/index/hr.vue'; 
+import HrVue from '@/pages/index/hr.vue';
 import AircraftVue from '@/pages/index/aircraft.vue';
 import PlanVue from '@/pages/index/plan.vue';
 import dividerVue from '@/components/zl/divider.vue';
@@ -49,6 +49,7 @@ import { onLoad } from '@dcloudio/uni-app';
 
 const user = ref('init');
 onLoad(async (e) => {
+    // todo:跳转页逻辑
     if (!e.redir) {// 防止玩意死循环跳转
         const res = await api('/user/init');
         console.log('获取到的user', res);

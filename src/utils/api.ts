@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import { useStore } from "@/store";
 import CONFIG from '@/config';
 
@@ -7,11 +7,35 @@ const store = useStore();
 let isRefreshing = false// 是否正在刷新的flag
 let qweue = []// 请求队列
 
-console.log('config#############', CONFIG);
 const option = {
-    baseURL: CONFIG.url.api, method: 'POST', timeout: CONFIG.url.timeout, adapter, // 指定uniapp适配器
+    baseURL: CONFIG.url.api, method: 'POST', timeout: CONFIG.url.timeout,
     headers: { 'Content-Type': 'application/json;charset=UTF-8', },
-}
+    adapter: (config: any) => uni && new Promise((resolve, reject) => {
+        const { baseURL, url, headers, data, params } = config;
+        const uniConfig = {
+            ...config, url: baseURL + url,
+            header: { ...headers },// * 此处使用析构新建,猜测axios的headers在使用后会删除,所以直接引用就为空
+        };
+
+        if (data || params) {
+            try {
+                uniConfig.data = JSON.parse(data || params);
+            } catch (e) {
+                uniConfig.data = data || params;
+            }
+        }
+        uni.request({
+            ...uniConfig,
+            success(res) {
+                resolve({ ...res, status: res.statusCode, statusText: res.errMsg, config, request: null });
+            },
+            fail(res) {
+                reject({ ...res, status: res.statusCode, statusText: res.errMsg, config, request: null });
+            },
+        });
+    }) as any, // 指定uniapp适配器
+};
+
 // 创建axios实例
 const instance = axios.create(option);
 // 这个实例并不经过拦截器,虽然很丑,但是这样逻辑最简单
@@ -83,38 +107,3 @@ instance.interceptors.response.use(json => {
 });
 
 export default (url: string, data?: any) => instance({ url, data }) as Promise<any>;
-
-/**
- * 下面代码原作者:https://gitee.com/black-key/uniapp-axios-adapter
- * 用途:让uniapp适配axios,单独引入为了调试方便,有改动
- */
-
-function adapter(config): any {
-    if (!uni) {
-        throw new Error("please use this in uni-app project!");
-    }
-    return new Promise((resolve, reject) => {
-        const { baseURL, url, headers, data, params } = config;
-        const uniConfig = {
-            ...config, url: baseURL + url,
-            header: { ...headers },// * 此处使用析构,猜测axios的headers在使用后会删除,所以直接引用就为空
-        };
-
-        if (data || params) {
-            try {
-                uniConfig.data = JSON.parse(data || params);
-            } catch (e) {
-                uniConfig.data = data || params;
-            }
-        }
-        uni.request({
-            ...uniConfig,
-            success(res) {
-                resolve({ ...res, status: res.statusCode, statusText: res.errMsg, config, request: null });
-            },
-            fail(res) {
-                reject({ ...res, status: res.statusCode, statusText: res.errMsg, config, request: null });
-            },
-        });
-    });
-};
