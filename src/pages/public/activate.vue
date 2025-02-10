@@ -112,9 +112,7 @@ const activate = async () => {
         display: inline-block; // 确保按钮和输入框在同一行
         vertical-align: middle; // 垂直居中对齐
 
-        &:hover {
-            // background-color: darken(@primary-color, 10%);
-        }
+
     }
 }
 </style>
