@@ -3,11 +3,10 @@
         <splashVue v-if="user == 'init'" />
         <leaderVue v-else-if="user == 'leader'" />
         <employeeVue v-else-if="user == 'employee'" />
-        <guestVue v-else-if="user == 'agent'" />
+        <agentVue v-else-if="user == 'agent'" />
         <publicVue v-else />
     </div>
 </template>
-
 <script lang="ts" setup>
 import { onLoad } from '@dcloudio/uni-app';
 import { ref } from 'vue';
@@ -17,7 +16,7 @@ import splashVue from '@/pages/public/splash.vue';
 import publicVue from '@/pages/public/public.vue';
 import leaderVue from '@/pages/staff/leader.vue';
 import employeeVue from '@/pages/staff/employee.vue';
-import guestVue from '@/pages/public/guest.vue';
+import agentVue from '@/pages/agent/agent.vue';
 import { useStore } from '@/store';
 
 const store = useStore();
@@ -31,86 +30,8 @@ onLoad(async (e) => {
         // 因为现在本页面已经成了入口级别页面了.所以不一定要初始化了
         // 如果是初始化就要加载封面页,如果不是就立即跳转了
         const duration = res.isInit ? config.css.splash.duration : 0;
-        setTimeout(() => user.value = res.type || 'public', duration);
+        setTimeout(() => user.value = res.type || '谁知道发生了肾么事啊', duration);
     }
 })
 
 </script>
-
-
-<style lang="less" scoped>
-@import "@/css/base.less";
-
-.main-container {
-    background-color: #f3f3f3;
-    display: flex;
-    flex-direction: column;
-
-    &>.section {
-        padding: @padding-page;
-        border-radius: @radius-base;
-        background-color: @color-block;
-        margin: @margin-page @margin-page;
-        border-top-left-radius: @radius-sm;
-        border-top-right-radius: @radius-sm;
-        box-sizing: border-box;
-        box-shadow: @shadow-base;
-    }
-
-    &>.overview {
-        background-color: #f9f9f9;
-        border-radius: @radius-base;
-        margin: 0 @margin-page;
-        // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        /* 添加渐变背景 */
-        // background: linear-gradient(to bottom right, #c52005, #fa5430);
-        background: linear-gradient(to bottom right, @color-primary, @color-secondary);
-
-        .day {
-            position: relative;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
-
-            &::after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 10%;
-                right: 10%;
-                height: 2px;
-                background-color: #f55b5b;
-                /* 更浅的颜色 */
-                box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
-                /* 更浅的内阴影 */
-            }
-        }
-
-        .year {
-            margin-top: 2px;
-        }
-    }
-
-    &>.shortcut {
-        background-color: transparent;
-        border-radius: 0;
-        box-shadow: 0;
-        padding: @padding-mini 0
-    }
-
-    &>.asset {
-        .row;
-        flex-wrap: wrap;
-
-        .aircraft,
-        .hr {
-            width: 50%;
-        }
-    }
-
-
-    &>.more {
-        box-shadow: none;
-        background-color: transparent;
-    }
-}
-</style>
