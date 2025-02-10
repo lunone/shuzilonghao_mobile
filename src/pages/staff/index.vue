@@ -30,18 +30,13 @@
 </template>
 
 <script lang="ts" setup>
-import StatVue from '@/pages/index/stat.vue';
-import ShortcutVue from '@/pages/index/shortcut.vue';
-import FlightVue from '@/pages/index/flight.vue';
-import HrVue from '@/pages/index/hr.vue';
-import AircraftVue from '@/pages/index/aircraft.vue';
-import PlanVue from '@/pages/index/plan.vue';
+import StatVue from './stat.vue';
+import ShortcutVue from './shortcut.vue';
+import FlightVue from './flight.vue';
+import HrVue from './hr.vue';
+import AircraftVue from './aircraft.vue';
+import PlanVue from './plan.vue';
 import dividerVue from '@/components/zl/divider.vue';
-import splashVue from '../public/splash.vue';
-import publicVue from '../public/public.vue';
-
-
-
 </script>
 
 

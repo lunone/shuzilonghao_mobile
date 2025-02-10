@@ -14,7 +14,7 @@ import config from '@/config';
 
 import splashVue from '@/pages/public/splash.vue';
 import publicVue from '@/pages/public/public.vue';
-import indexVue from '@/pages/index/index.vue';
+import indexVue from '@/pages/staff/index.vue';
 
 const user = ref('init');
 onLoad(async (e) => {
