@@ -22,9 +22,9 @@
 import { ref, computed, onMounted, Ref } from 'vue';
 import Profile from '@/pages/hr/profile.vue';
 import { User } from '@/interface';
-import useInfoStore from '@/store/basis.store';
+import usebasisStore from '@/store/basis.store';
 import actionSheet from '@/components/zl/actionSheet.vue';
-const store = useInfoStore();
+const store = usebasisStore();
 const props = defineProps({
     name: { type: String, default: '' },
     userId: { type: String, required: true },

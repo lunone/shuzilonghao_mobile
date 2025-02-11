@@ -58,7 +58,7 @@
 import { ref, computed, watch, onMounted, Ref } from 'vue';
 import { FlightItem } from '@/interface';
 import dayjs from 'dayjs';
-import useInfoStore from '@/store/basis.store';
+import usebasisStore from '@/store/basis.store';
 
 // 定义 props 来接收外部传入的航班数据数组
 const props = defineProps<{ data: FlightItem[], dateRange: [string, string] }>();
@@ -69,7 +69,7 @@ const stations = ref<string[]>([]);
 // 定义 airports 数据，用于存储机场信息
 const airports = ref<Record<string, any>>({});
 
-const store = useInfoStore();
+const store = usebasisStore();
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');

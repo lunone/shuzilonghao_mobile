@@ -33,12 +33,12 @@ import { ref, computed, onMounted, reactive, Ref } from 'vue';
 import dayjs from 'dayjs';
 
 import { AircraftItem } from '@/interface';
-import useInfoStore from '@/store/basis.store';
+import usebasisStore from '@/store/basis.store';
 import AcSummaryVue from './aircraftSummary.vue';
 import MelCardVue from '../maintenance/mel/card.vue'; 
 import detail from './detail.vue';
 
-const store = useInfoStore();
+const store = usebasisStore();
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');

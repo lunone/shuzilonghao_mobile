@@ -18,12 +18,12 @@
 </template>
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
-import useInfoStore from '@/store/basis.store';
+import usebasisStore from '@/store/basis.store';
 
 import { AircraftItem } from '@/interface';
 import dayjs from 'dayjs';
 
-const store = useInfoStore();
+const store = usebasisStore();
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');
