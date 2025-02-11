@@ -14,7 +14,7 @@ import CONFIG from '@/config';
 import _ from 'lodash-es';
 
 const dayLenth = 22;
-const flights: Ref<FlightItem[]> = ref([]);
+const flights: Ref<Record<string, Record<string, number>>> = ref({});
 const option = ref();
 const fetchFlishgts = async () => {
     const startDate = dayjs().add(0, 'day').format('YYYY-MM-DD');
@@ -76,18 +76,14 @@ function setOption(flights: Record<string, Record<string, number>>) {
 const showTip = (chart, event) => {
     // 获取图表中当前事件的数据索引
     const item = chart.getCurrentDataIndex(event);
+    const date = dates[item.index];
     // 将分组后的航班数据转换为文本格式，用于显示在提示框中
-    const arr = Object.keys(flights.value).map(acType => ({
-        text: `${acType}: ${flights.value[acType].length}`
-    }));
+    const textList = _.reduce(flights.value[date], (acc, counter, acType) => [...acc, {
+        text: `${acType}: ${counter}`, color: "#3870FF"
+    }], [{ text: dayjs(date).format('M月D'), color: "#9820FF" }]);
 
     // 显示工具提示框，包含日期和各 acType 的航班数量
-    chart.showToolTip(event, {
-        textList: [
-            { text: dayjs(dates[item.index]).format('M月D'), color: "#9820FF" }, // 显示日期
-            ...arr // 显示各 acType 的航班数量
-        ]
-    });
+    chart.showToolTip(event, { textList });
 };
 
 onMounted(() => {
