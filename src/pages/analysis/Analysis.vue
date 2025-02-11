@@ -25,6 +25,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, Ref } from 'vue';
+import CONFIG from '@/config';
 import overviewVue from '@/pages/analysis/overview.vue';
 import stationsVue from '@/pages/analysis/station.vue';
 import airplaneVue from '@/pages/analysis/airplane.vue';
@@ -73,7 +74,7 @@ watch(() => range, async () => {
     loading.value = true;
     error.value = '';
     try {
-        const res = await api('/flight/atd/', { startDate, endDate }) as any[];
+        const res = await api(CONFIG.url.flightATD, { startDate, endDate }) as any[];
         // console.log('#####', startDate, endDate, res);
         // 过滤掉备降和取消航班
         // res.forEach(flight => {

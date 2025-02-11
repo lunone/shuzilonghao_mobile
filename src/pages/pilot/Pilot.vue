@@ -31,7 +31,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 // import zlNav from '@/components/Nav.vue';
 import api from '@/utils/api';
 import dayjs from 'dayjs';
-
+import CONFIG from '@/config';
 import { AirportItem, FlightItem } from '@/interface';
 import usebasisStore from '@/store/basis.store';
 import RankListVue from './rank.vue';
@@ -74,7 +74,7 @@ const pilotsStat = ref<any[]>([]);
 // 获取统计数据和飞行员排名
 const fetchStatsAndRankings = async (startDate: string, endDate: string) => {
     try {
-        const res = await api('/stat/crew/fh', { startDate, endDate }) as any[];
+        const res = await api(CONFIG.url.statCrewFh, { startDate, endDate }) as any[];
         // console.log(res);
         const stat = res.map((pilot: any) => ({
             rank: -1,

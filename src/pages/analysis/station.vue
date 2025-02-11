@@ -202,7 +202,6 @@ const fetchAirports = async () => {
     loading.value = true;
     error.value = '';
     try {
-        // const res = await api('/airport/code4/', {}) as any;
         const res = await store.airportsCode4();
         airports.value = res;
     } catch (err) {

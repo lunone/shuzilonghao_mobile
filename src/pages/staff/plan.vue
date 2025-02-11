@@ -10,7 +10,7 @@ import dayjs from 'dayjs';
 import api from '@/utils/api';
 import { FlightItem } from '@/interface';
 import ucharts from '@/components/ucharts/ucharts.vue';
-import { offsetCorrect } from '@/utils/ucharts';
+import CONFIG from '@/config';
 
 const dayLenth = 22;
 const flights: Ref<FlightItem[]> = ref([]);
@@ -19,7 +19,7 @@ const fetchFlishgts = async () => {
     const startDate = dayjs().add(0, 'day').format('YYYY-MM-DD');
     const endDate = dayjs().add(dayLenth, 'day').format('YYYY-MM-DD');
     try {
-        const res = await api('/flight/date/', { startDate, endDate }) as FlightItem[];
+        const res = await api(CONFIG.url.flightDate, { startDate, endDate }) as FlightItem[];
         flights.value = res;
         option.value = setOption(res);
     } catch (error) {

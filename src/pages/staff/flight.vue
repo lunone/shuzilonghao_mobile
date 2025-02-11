@@ -46,7 +46,7 @@
 <script setup lang="ts">
 	import { ref, computed, onMounted, watch, Ref } from 'vue';
 	import api from '@/utils/api';
-	// import usebasisStore from '@/store/main.store';
+	import CONFIG from '@/config';
 	import dayjs from 'dayjs';
 	import { FlightItem } from '@/interface';
 
@@ -56,7 +56,7 @@
 	const fetchFlights = async () => {
 		const today = dayjs().format('YYYY-MM-DD');
 		try {
-			const res = await api('/flight/date/', { startDate: today, endDate: today }) as FlightItem[];
+			const res = await api(CONFIG.url.flightDate, { startDate: today, endDate: today }) as FlightItem[];
 			console.log('res', res);
 			flights.value = res;
 		} catch (err) {

@@ -33,7 +33,7 @@ import { AirportItem, FlightItem } from '@/interface';
 import usebasisStore from '@/store/basis.store';
 import api from '@/utils/api';
 import dayjs from 'dayjs';
-
+import CONFIG from '@/config';
 import { onMounted, PropType, ref, watch } from 'vue';
 const props = defineProps({
     dateRange: {
@@ -58,7 +58,7 @@ const store = usebasisStore();
 // 获取飞行员轨迹
 const fetchFlightTracks = async (startDate: string, endDate: string, userId: string) => {
     try {
-        const res = await api('/crew/list/', { startDate, endDate, userId }) as FlightItem[];
+        const res = await api(CONFIG.url.crewList, { startDate, endDate, userId }) as FlightItem[];
         // 这里给res加上arrName,depName;
         res.map((flight: FlightItem) => {
             flight.arrName = airports.value[flight.arr!]?.city;

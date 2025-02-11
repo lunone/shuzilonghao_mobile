@@ -60,7 +60,7 @@
 import api from '@/utils/api';
 import dayjs from 'dayjs';
 import { computed, onMounted, PropType, reactive, Ref, ref } from 'vue';
-
+import CONFIG from '@/config';
 type Stat = { counter: number, weight: number, hours: number };
 const props = defineProps({
     text: { type: String, default: '获取' },
@@ -121,11 +121,11 @@ const rate = computed(() => {
 // 先渲染一遍数据，挂载完成再获取资源，避免页面跳变。
 onMounted(async () => {
     if (props.range == 'year') {
-        thisYearRes.value = await api('/stat/period/', { startDate: DateStr.firstDayOfYear, endDate: DateStr.now }) as Stat;
-        lastYearRes.value = await api('/stat/period/', { startDate: DateStr.firstDayOfLastYear, endDate: DateStr.dayBeforeOneYear }) as Stat;
+        thisYearRes.value = await api(CONFIG.url.statPeriod, { startDate: DateStr.firstDayOfYear, endDate: DateStr.now }) as Stat;
+        lastYearRes.value = await api(CONFIG.url.statPeriod, { startDate: DateStr.firstDayOfLastYear, endDate: DateStr.dayBeforeOneYear }) as Stat;
     } else {
-        thisYearRes.value = await api('/stat/period/', { startDate: DateStr.yesterday, endDate: DateStr.today }) as Stat;
-        lastYearRes.value = await api('/stat/period/', { startDate: DateStr.theDayBeforeYesterday, endDate: DateStr.yesterday }) as Stat;
+        thisYearRes.value = await api(CONFIG.url.statPeriod, { startDate: DateStr.yesterday, endDate: DateStr.today }) as Stat;
+        lastYearRes.value = await api(CONFIG.url.statPeriod, { startDate: DateStr.theDayBeforeYesterday, endDate: DateStr.yesterday }) as Stat;
     }
 });
 

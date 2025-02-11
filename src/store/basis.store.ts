@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import api from '@/utils/api';
 import { AircraftItem, AirportItem, User } from '@/interface';
 import dayjs from 'dayjs';
+import CONFIG from '@/config';
 
 export default defineStore('basis', {
     state: () => ({
@@ -15,20 +16,20 @@ export default defineStore('basis', {
 
         async airports() {
             if (!this.airports.length) {
-                this.airports = await api('/airport/list') as AirportItem[];
+                this.airports = await api(CONFIG.url.ariports) as AirportItem[];
             }
             return this.airports;
         },
         async airportsCode4() {
             if (!this.airportsCode4['ZHCC']) {
-                const res = await api('/airport/code4/') as Record<string, AirportItem>;
+                const res = await api(CONFIG.url.airportsCode4) as Record<string, AirportItem>;
                 this.airportsCode4 = res;
             }
             return this.airportsCode4;
         },
         async aircrafts() {
             if (!Object.keys(this.aircrafts).length) {
-                const res = await api('/aircraft/list/') as AircraftItem[];
+                const res = await api(CONFIG.url.aircrafts) as AircraftItem[];
                 res.map(aircraft => {
                     aircraft.startDate = dayjs(aircraft.startDate).format('YYYY-MM-DD');
                     aircraft.endDate = aircraft.endDate ? dayjs(aircraft.endDate).format('YYYY-MM-DD') : undefined;

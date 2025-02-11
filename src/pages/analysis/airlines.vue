@@ -13,6 +13,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
 import api from '@/utils/api';
+import CONFIG from '@/config';
 
 // 定义 props 来接收外部传入的航班数据数组
 const props = defineProps<{ data: { dep: string; arr: string }[] }>();
@@ -64,7 +65,7 @@ const fetchAirports = async () => {
     loading.value = true;
     error.value = '';
     try {
-        const res = await api('/airport/code4/', {}) as any;
+        const res = await api(CONFIG.url.airportsCode4, {}) as any;
         airports.value = res;
     } catch (err) {
         error.value = '获取机场信息失败';

@@ -113,7 +113,7 @@ watch(users, () => {
 // 模拟 API 请求
 // onMounted(async () => {
 //     try {
-//         const response = await api('/stat/hr/') as HrData;
+//         const response = await api() as HrData;
 //         stats.value = response;
 //     } catch (error) {
 //         console.error('获取HR数据失败', error);

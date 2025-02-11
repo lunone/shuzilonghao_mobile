@@ -19,7 +19,7 @@
 import { ref } from 'vue';
 import api from '@/utils/api';
 import usebasisStore from '@/store/user.store';
-
+import CONFIG from '@/config';
 const store = usebasisStore();
 const disable = ref(false);
 const activationCode = ref('');
@@ -31,7 +31,7 @@ const activate = async () => {
     disable.value = true;
     const jsCode = await new Promise(resolve => uni.login({ provider: 'weixin', success: res => resolve(res.code) }));
     console.log('activate', activationCode.value, jsCode);
-    api('/login/activate', { code: activationCode.value, wx: jsCode }).then((res) => {
+    api(CONFIG.url.activate, { regCode: activationCode.value, code: jsCode }).then((res) => {
         console.log('激活结果', res);
         // 激活成功返回token
         if (res) {

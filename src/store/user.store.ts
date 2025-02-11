@@ -32,7 +32,7 @@ export default defineStore('user', {
         },
         async users() {
             if (!Object.keys(this.users).length) {
-                const res = {}//await api('/user/list/') as Record<string, User>;
+                const res = {}//await api(CONFIG.url.users) as Record<string, User>;
                 this.users = res;
             }
             return this.users;

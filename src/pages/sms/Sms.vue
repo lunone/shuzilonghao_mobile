@@ -6,7 +6,7 @@
         <view class="summary">
             最近一个月， {{ recentEventCount }} 事件报告 ， {{ selfs.length }} 自愿报告<br>
         </view>
-        <zl-tabs v-model:active="activeTab" >
+        <zl-tabs v-model:active="activeTab">
             <zl-tab title="主动报告 列表">
                 <view v-if="selfs.length === 0">暂无主动报告</view>
                 <view class="report-list" v-else>
@@ -31,7 +31,7 @@ import dayjs from 'dayjs';
 import { EventItem } from '@/interface';
 import voluntary from './card/voluntary.vue';
 import EventVue from './card/event.vue';
-
+import CONFIG from '@/config';
 import backTop from '@/components/zl/backTop.vue';
 
 // 定义 loading 和 error 状态
@@ -62,8 +62,8 @@ const fetchData = async () => {
     const endDate = dayjs().format('YYYY-MM-DD');
     const startDate = dayjs().subtract(1, 'month').format('YYYY-MM-DD');
     try {
-        const res = await api('/sms/event/list', { startDate, endDate }) as EventItem[];
-        const resSelf = await api('/sms/self/list', { startDate, endDate }) as EventItem[];
+        const res = await api(CONFIG.url.smsEventList, { startDate, endDate }) as EventItem[];
+        const resSelf = await api(CONFIG.url.smsVoluntaryList, { startDate, endDate }) as EventItem[];
         events.value = res;
         selfs.value = resSelf;
     } catch (err) {
