@@ -6,8 +6,7 @@ export default {
         login: '/login/wx',
         activate: '/login/activate',
         //
-        ariports: '/airport/list',
-        airportsCode4: '/airport/code4/',
+        airports: '/airport/code4/',
         aircrafts: '/aircraft/list/',
         flightsDate: '/flight/date/',
         flightsATD: '/flight/atd/',

@@ -13,16 +13,9 @@ export default defineStore('basis', {
     getters: {
     },
     actions: {
-
         async airports() {
-            if (!this.airports.length) {
-                this.airports = await api(CONFIG.url.ariports) as AirportItem[];
-            }
-            return this.airports;
-        },
-        async airportsCode4() {
             if (!this.airportsCode4['ZHCC']) {
-                const res = await api(CONFIG.url.airportsCode4) as Record<string, AirportItem>;
+                const res = await api(CONFIG.url.airports) as Record<string, AirportItem>;
                 this.airportsCode4 = res;
             }
             return this.airportsCode4;

@@ -65,7 +65,7 @@ const fetchAirports = async () => {
     loading.value = true;
     error.value = '';
     try {
-        const res = await api(CONFIG.url.airportsCode4, {}) as any;
+        const res = await api(CONFIG.url.airports, {}) as any;
         airports.value = res;
     } catch (err) {
         error.value = '获取机场信息失败';

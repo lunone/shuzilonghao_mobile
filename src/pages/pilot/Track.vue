@@ -83,7 +83,7 @@ const fetchAirports = async () => {
     loading.value = true;
     error.value = '';
     try {
-        const res = await store.airportsCode4();
+        const res = await store.airports();
         airports.value = res;
     } catch (err) {
         error.value = '获取机场信息失败';
