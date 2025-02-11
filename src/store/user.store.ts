@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import api from '@/utils/api';
+import CONFIG from '@/config';
 import { User } from '@/interface';
 
 
@@ -14,7 +15,6 @@ export default defineStore('user', {
     },
     actions: {
         token(token?: string) {
-            console.log('setToken', token);
             if (token) {
                 this._token = token;
             }
@@ -22,7 +22,7 @@ export default defineStore('user', {
         },
         async myself(refresh = false) {
             if (this.self.isInit || refresh) {
-                let self = await api('/user/init') as User;
+                let self = await api(CONFIG.url.init) as User;
                 if (self?.id) {
                     this.self = self;
                 }

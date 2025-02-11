@@ -10,9 +10,6 @@ export default defineStore('basis', {
         aircrafts: {} as Record<string, AircraftItem>,
     }),
     getters: {
-        getSelf(): any {
-            return this.self;
-        }
     },
     actions: {
 
