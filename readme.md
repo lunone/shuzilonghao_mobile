@@ -23,3 +23,6 @@
 
 ## 低级错误
 * setup里面,也就是<script setup>里面不能使用异步,会报错或者使用那个<Suspense> ,没啥必要的话写到onMounted里面呗.
+
+### 文件结构
+现在pages/Index.vue是唯一入口,处理跳转与身份逻辑,后负责跳转到响应功能页面.

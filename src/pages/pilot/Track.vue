@@ -30,7 +30,7 @@
 </template>
 <script lang="ts" setup>
 import { AirportItem, FlightItem } from '@/interface';
-import { useStore } from '@/store';
+import useInfoStore from '@/store/basis.store';
 import api from '@/utils/api';
 import dayjs from 'dayjs';
 
@@ -53,7 +53,7 @@ const airports = ref<Record<string, AirportItem>>({});
 const selectedDate = ref<Date | null>(null);
 const dateFlights = ref<any[]>([]);
 const flights = ref<Record<string, FlightItem[]>>({});
-const store = useStore();
+const store = useInfoStore();
 
 // 获取飞行员轨迹
 const fetchFlightTracks = async (startDate: string, endDate: string, userId: string) => {
@@ -83,7 +83,7 @@ const fetchAirports = async () => {
     loading.value = true;
     error.value = '';
     try {
-        const res = await store.useAirportsCode4();
+        const res = await store.airportsCode4();
         airports.value = res;
     } catch (err) {
         error.value = '获取机场信息失败';

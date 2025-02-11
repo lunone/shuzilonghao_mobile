@@ -46,11 +46,11 @@
 <script setup lang="ts">
 	import { ref, computed, onMounted, watch, Ref } from 'vue';
 	import api from '@/utils/api';
-	// import { useStore } from '@/store';
+	// import useInfoStore from '@/store/main.store';
 	import dayjs from 'dayjs';
 	import { FlightItem } from '@/interface';
 
-	// const store = useStore();
+	// const store = useInfoStore();
 
 	const flights = ref<FlightItem[]>([]);
 	const fetchFlights = async () => {

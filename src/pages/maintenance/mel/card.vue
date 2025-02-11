@@ -25,7 +25,6 @@
     </div>
 </template>
 <script setup lang="ts">
-import { useStore } from '@/store'
 import api from '@/utils/api'
 import dayjs from 'dayjs'
 

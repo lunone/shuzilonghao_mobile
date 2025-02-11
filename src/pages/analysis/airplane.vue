@@ -64,7 +64,7 @@ import api from '@/utils/api';
 import { AircraftItem, AirportItem, FlightItem } from '@/interface';
 import dayjs from 'dayjs';
 
-import { useStore } from '@/store';
+import useInfoStore from '@/store/basis.store';
 // 定义 props 来接收外部传入的航班数据数组
 const props = defineProps<{ data: FlightItem[], dateRange: [string, string] }>();
 
@@ -75,7 +75,7 @@ const activeNames: Ref<string[]> = ref([]);
 const airports = ref<Record<string, AirportItem>>({});
 const aircrafts = ref<Record<string, AircraftItem>>({});
 
-const store = useStore();
+const store = useInfoStore();
 
 // 定义 loading 和 error 状态
 const loading = ref(false);
@@ -155,7 +155,7 @@ const fetchAirports = async () => {
     loading.value = true;
     error.value = '';
     try {
-        const res = await store.useAirportsCode4();
+        const res = await store.airportsCode4();
         airports.value = res;
     } catch (err) {
         error.value = '获取机场信息失败';
@@ -168,7 +168,7 @@ const fetchAircrafts = async () => {
     loading.value = true;
     error.value = '';
     try {
-        const res = await store.useAircrafts();
+        const res = await store.aircrafts();
         aircrafts.value = res;
         // console.log('飞机', res);
     } catch (err) {

@@ -18,29 +18,34 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import api from '@/utils/api';
+import useInfoStore from '@/store/user.store';
 
+const store = useInfoStore();
 const disable = ref(false);
 const activationCode = ref('');
 const activate = async () => {
     // 判断activationCode是否是一个4位字符串,如果不是弹出警告
-    if (/[a-zA-Z0-9]{4}/.test(activationCode.value)) {
-        uni.showToast({ title: '激活码错误', duration: 2e3, icon: 'error' });
+    if (!/^[a-zA-Z0-9]{4}$/.test(activationCode.value)) {
+        return error('激活码错误');
     }
     disable.value = true;
     const jsCode = await new Promise(resolve => uni.login({ provider: 'weixin', success: res => resolve(res.code) }));
     console.log('activate', activationCode.value, jsCode);
-    api('/login/activate', { activationCode: activationCode.value }).then((res) => {
+    api('/login/activate', { code: activationCode.value, wx: jsCode }).then((res) => {
         console.log('激活结果', res);
-        if (res.code === 0) {
-            alert('激活成功,请刷新页面');
+        // 激活成功返回token
+        if (res) {
+            store.token(res);
+            // 跳转到首页
+            uni.redirectTo({ url: '/pages/Index?activate=true' });
         } else {
-            alert('激活失败,请检查激活码是否正确');
+            return error('激活失败');
         }
     }).finally(() => disable.value = false);
-
-
 };
-
+function error(message = '激活失败') {
+    uni.showToast({ title: message, duration: 2e3, icon: 'error' });
+}
 </script>
 <style lang="less" scoped>
 @import '@/css/base.less';

@@ -33,12 +33,12 @@ import { ref, computed, onMounted, reactive, Ref } from 'vue';
 import dayjs from 'dayjs';
 
 import { AircraftItem } from '@/interface';
-import { useStore } from '@/store';
+import useInfoStore from '@/store/basis.store';
 import AcSummaryVue from './aircraftSummary.vue';
 import MelCardVue from '../maintenance/mel/card.vue'; 
 import detail from './detail.vue';
 
-const store = useStore();
+const store = useInfoStore();
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');
@@ -83,7 +83,7 @@ const fetchAircrafts = async () => {
     loading.value = true;
     error.value = '';
     try {
-        const res = await store.useAircrafts();
+        const res = await store.aircrafts();
         aircrafts.value = Object.values(res);
         console.log('飞机', res);
     } catch (err) {

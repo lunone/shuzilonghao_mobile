@@ -33,7 +33,7 @@ import api from '@/utils/api';
 import dayjs from 'dayjs';
 
 import { AirportItem, FlightItem } from '@/interface';
-import { useStore } from '@/store';
+import useInfoStore from '@/store/basis.store';
 import RankListVue from './rank.vue';
 import TrackVue from './track.vue';
 // 定义 loading 和 error 状态

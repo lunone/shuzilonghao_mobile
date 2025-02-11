@@ -58,7 +58,7 @@
 import { ref, computed, watch, onMounted, Ref } from 'vue';
 import { FlightItem } from '@/interface';
 import dayjs from 'dayjs';
-import { useStore } from '@/store';
+import useInfoStore from '@/store/basis.store';
 
 // 定义 props 来接收外部传入的航班数据数组
 const props = defineProps<{ data: FlightItem[], dateRange: [string, string] }>();
@@ -69,7 +69,7 @@ const stations = ref<string[]>([]);
 // 定义 airports 数据，用于存储机场信息
 const airports = ref<Record<string, any>>({});
 
-const store = useStore();
+const store = useInfoStore();
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');
@@ -203,7 +203,7 @@ const fetchAirports = async () => {
     error.value = '';
     try {
         // const res = await api('/airport/code4/', {}) as any;
-        const res = await store.useAirportsCode4();
+        const res = await store.airportsCode4();
         airports.value = res;
     } catch (err) {
         error.value = '获取机场信息失败';

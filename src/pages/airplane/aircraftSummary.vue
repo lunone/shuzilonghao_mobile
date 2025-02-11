@@ -16,11 +16,11 @@
 </template>
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
-import { useStore } from '@/store';
+import useInfoStore from '@/store/basis.store';
 import { AircraftItem } from '@/interface';
 import dayjs from 'dayjs';
 
-const store = useStore();
+const store = useInfoStore();
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');
@@ -58,7 +58,7 @@ const fetchAircrafts = async () => {
     loading.value = true;
     error.value = '';
     try {
-        const res = await store.useAircrafts();
+        const res = await store.aircrafts();
         aircrafts.value = Object.values(res);
     } catch (err) {
         error.value = '获取飞机信息失败';

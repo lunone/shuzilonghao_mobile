@@ -1,8 +1,8 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { useStore } from "@/store";
+import useUserStore from '@/store/user.store';
 import CONFIG from '@/config';
 
-const store = useStore();
+const store = useUserStore();
 
 let isRefreshing = false// 是否正在刷新的flag
 let qweue = []// 请求队列
@@ -43,9 +43,8 @@ const instanceWithoutInterceptors = axios.create(option);
 
 const beforeRequest = async (config) => {
     // todo:判断白名单
-    const token = await store.useToken();
     // todo:是否从storage中获取token
-    config.headers[CONFIG.key.token] = token;
+    config.headers[CONFIG.key.token] = store.token();
     return config
 }
 // 请求拦截器
@@ -65,7 +64,7 @@ instance.interceptors.response.use(response => {
         .then(code => instanceWithoutInterceptors({ url: CONFIG.url.login, data: { code } }))
         .then(resp => {// todo:是否storage固化token 持久化token
             if (resp.status == 200 && resp.data.data) {// 这里不使用可选链就是等报错
-                store.useToken(resp.data.data)
+                store.token(resp.data.data)
             } else {// 因为没有任何拦截器,所以要自己处理异常
                 throw new Error('refreshTokenError');
             }
@@ -75,7 +74,12 @@ instance.interceptors.response.use(response => {
             return instanceWithoutInterceptors(response.config);// 重试本次请求
         }).catch(err => {// 拦截刷新token失败error,直接跳转登录页
             if (err.message == 'refreshTokenError' && response.config.url !== CONFIG.url.init) {
-                uni.redirectTo({ url: `${CONFIG.page.register}?redir=true` })
+                console.warn('401后token获取失败');
+                uni.showModal({
+                    title: '提示', content: '身份超期且再认证失败',
+                    confirmText: '重试', showCancel: false, confirmColor: '#f55850',
+                    success: (res) => res.confirm && uni.redirectTo({ url: `${CONFIG.page.register}?` })
+                });
             }
         }).finally(() => {
             isRefreshing = false;
