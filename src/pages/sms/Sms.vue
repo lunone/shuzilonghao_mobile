@@ -62,8 +62,8 @@ const fetchData = async () => {
     const endDate = dayjs().format('YYYY-MM-DD');
     const startDate = dayjs().subtract(1, 'month').format('YYYY-MM-DD');
     try {
-        const res = await api(CONFIG.url.smsEventList, { startDate, endDate }) as EventItem[];
-        const resSelf = await api(CONFIG.url.smsVoluntaryList, { startDate, endDate }) as EventItem[];
+        const res = await api(CONFIG.url.smsEvents, { startDate, endDate }) as EventItem[];
+        const resSelf = await api(CONFIG.url.smsVoluntarys, { startDate, endDate }) as EventItem[];
         events.value = res;
         selfs.value = resSelf;
     } catch (err) {

@@ -58,7 +58,7 @@ const store = usebasisStore();
 // 获取飞行员轨迹
 const fetchFlightTracks = async (startDate: string, endDate: string, userId: string) => {
     try {
-        const res = await api(CONFIG.url.crewList, { startDate, endDate, userId }) as FlightItem[];
+        const res = await api(CONFIG.url.crewFlights, { startDate, endDate, userId }) as FlightItem[];
         // 这里给res加上arrName,depName;
         res.map((flight: FlightItem) => {
             flight.arrName = airports.value[flight.arr!]?.city;

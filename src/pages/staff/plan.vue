@@ -19,7 +19,7 @@ const fetchFlishgts = async () => {
     const startDate = dayjs().add(0, 'day').format('YYYY-MM-DD');
     const endDate = dayjs().add(dayLenth, 'day').format('YYYY-MM-DD');
     try {
-        const res = await api(CONFIG.url.flightDate, { startDate, endDate }) as FlightItem[];
+        const res = await api(CONFIG.url.flightsDate, { startDate, endDate }) as FlightItem[];
         flights.value = res;
         option.value = setOption(res);
     } catch (error) {

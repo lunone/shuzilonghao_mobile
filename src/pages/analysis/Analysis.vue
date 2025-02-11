@@ -74,7 +74,7 @@ watch(() => range, async () => {
     loading.value = true;
     error.value = '';
     try {
-        const res = await api(CONFIG.url.flightATD, { startDate, endDate }) as any[];
+        const res = await api(CONFIG.url.flightsATD, { startDate, endDate }) as any[];
         // console.log('#####', startDate, endDate, res);
         // 过滤掉备降和取消航班
         // res.forEach(flight => {
