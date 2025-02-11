@@ -10,6 +10,7 @@ export default {
         aircrafts: '/aircraft/list/',
         flightsDate: '/flight/date/',
         flightsATD: '/flight/atd/',
+        flightPlan: '/flight/plan',
         meMel: '/me/mel/',
         statCrewFh: '/stat/crew/fh',
         statPeriod: '/stat/period/',

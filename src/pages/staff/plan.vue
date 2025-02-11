@@ -11,6 +11,7 @@ import api from '@/utils/api';
 import { FlightItem } from '@/interface';
 import ucharts from '@/components/ucharts/ucharts.vue';
 import CONFIG from '@/config';
+import _ from 'lodash-es';
 
 const dayLenth = 22;
 const flights: Ref<FlightItem[]> = ref([]);
@@ -19,7 +20,7 @@ const fetchFlishgts = async () => {
     const startDate = dayjs().add(0, 'day').format('YYYY-MM-DD');
     const endDate = dayjs().add(dayLenth, 'day').format('YYYY-MM-DD');
     try {
-        const res = await api(CONFIG.url.flightsDate, { startDate, endDate }) as FlightItem[];
+        const res = await api(CONFIG.url.flightPlan, { startDate, endDate });
         flights.value = res;
         option.value = setOption(res);
     } catch (error) {
@@ -33,26 +34,12 @@ const fetchFlishgts = async () => {
 //     '#6e7074', '#546570', '#c4ccd3'
 // ];
 let dates, groupedFlights;
-function setOption(flights: FlightItem[]) {
-    if (flights.length == 0) {
-        return
-    }
-    let totalCount = 0;
-    groupedFlights = flights?.reduce((acc, flight) => {
-        const date = dayjs(flight.date).format('YYYY-MM-DD');
-        // 初始化日期对应的航班数量为0
-        acc[date] = acc[date] || [];
-        // 如果没有取消的，则将航班数量加1
-        if (!flight.flagCs && !flight.flagPatch) {
-            totalCount++;
-            acc[date].push(flight);
-        }
-        return acc;
-    }, {}) ?? {};
-
-    const avgDay = totalCount / Object.keys(groupedFlights).length || 0;
+function setOption(flights: Record<string, Record<string, number>>) {
+    // 将每日的各种类型的航班数量加一块
+    groupedFlights = _.mapValues(flights, flts => _.sum(Object.values(flts)));
+    // 算出平均数
+    const avgDay = _.mean(Object.values(groupedFlights));
     dates = Object.keys(groupedFlights).sort();
-    // flightCounts = dates.map(date => groupedFlights[date].length);
 
     return {
         type: 'column',
@@ -61,11 +48,11 @@ function setOption(flights: FlightItem[]) {
             {
                 name: "排班量",
                 data: dates.map(date => {
-                    const flights = groupedFlights[date];
+                    const flightCounter = groupedFlights[date];
                     // 超过平均值20%的颜色红色，低于平均值20%的颜色暗绿色，其他的颜色为蓝色
-                    const diff = (flights.length - avgDay) / avgDay;
+                    const diff = (flightCounter - avgDay) / avgDay;
                     const color = diff > 0.4 ? '#d48264' : (diff < -0.4) ? '#c4ccd3' : "#91c7ae";
-                    return { color, value: flights.length }
+                    return { color, value: flightCounter }
                 })
             },
         ],
@@ -89,28 +76,15 @@ function setOption(flights: FlightItem[]) {
 const showTip = (chart, event) => {
     // 获取图表中当前事件的数据索引
     const item = chart.getCurrentDataIndex(event);
-
-    // 根据索引获取对应的航班数据
-    const flights = groupedFlights[dates[item.index]];
-
-    // 将航班数据按 acType 分组
-    const groupFlights = flights.reduce((acc, flight) => {
-        // 如果 acc 中没有当前 acType 的数组，则初始化为空数组
-        acc[flight.acType] = acc[flight.acType] || [];
-        // 将当前航班添加到对应 acType 的数组中
-        acc[flight.acType].push(flight);
-        return acc;
-    }, {}) as Record<string, FlightItem[]>;
-
     // 将分组后的航班数据转换为文本格式，用于显示在提示框中
-    const arr = Object.keys(groupFlights).map(acType => ({
-        text: `${acType}: ${groupFlights[acType].length}`
+    const arr = Object.keys(flights.value).map(acType => ({
+        text: `${acType}: ${flights.value[acType].length}`
     }));
 
     // 显示工具提示框，包含日期和各 acType 的航班数量
     chart.showToolTip(event, {
         textList: [
-            { text: dayjs(dates[item.index]).format('M月D') ,color:"#9820FF"}, // 显示日期
+            { text: dayjs(dates[item.index]).format('M月D'), color: "#9820FF" }, // 显示日期
             ...arr // 显示各 acType 的航班数量
         ]
     });
