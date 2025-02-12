@@ -16,7 +16,7 @@ export default {
         statPeriod: '/stat/period/',
         crewFlights: '/crew/list/',
         smsEvents: '/sms/event/list',
-        smsVoluntarys: '/sms/self/list',
+        smsVoluntarys: '/sms/voluntary/list',
         users: '/user/list/',
     },
     page: {

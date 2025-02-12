@@ -4,23 +4,19 @@
     <view v-else-if="error" class="error">{{ error }}</view>
     <view v-else>
         <view class="summary">
-            最近一个月， {{ recentEventCount }} 事件报告 ， {{ selfs.length }} 自愿报告<br>
+            最近一个月， {{ events.length }} 事件报告 ， {{ 'voluntarys.length' }} 自愿报告<br>
         </view>
-        <zl-tabs v-model:active="activeTab">
-            <zl-tab title="主动报告 列表">
-                <view v-if="selfs.length === 0">暂无主动报告</view>
-                <view class="report-list" v-else>
-                    <voluntary v-for="(self, index) in selfs" :key="index" :data="self" />
-                </view>
+        <!-- <zl-tabs v-model:active="activeTab">
+            <zl-tab title="主动报告 列表" name="voluntary" />
+
+            <zl-tab title="事件 列表" name="events">
+                <EventVue :data="event" v-for="event in events" :key="event.id" />
             </zl-tab>
-            <zl-tab title="事件 列表">
-                <van-list>
-                    <EventVue :data="event" v-for="event in events" :key="event.id" />
-                </van-list>
-            </zl-tab>
-        </zl-tabs>
-        <back-top />
+        </zl-tabs> -->
+        <!-- <back-top /> -->
+         
     </view>
+    <voluntarys v-show="activeTab === 'voluntary'" />
 </template>
 
 <script setup lang="ts">
@@ -29,10 +25,10 @@ import { ref, computed, onMounted, Ref } from 'vue';
 import api from '@/utils/api';
 import dayjs from 'dayjs';
 import { EventItem } from '@/interface';
-import voluntary from './card/voluntary.vue';
 import EventVue from './card/event.vue';
 import CONFIG from '@/config';
-import backTop from '@/components/zl/backTop.vue';
+// import backTop from '@/components/zl/backTop.vue';
+import voluntarys from './voluntarys.vue';
 
 // 定义 loading 和 error 状态
 const loading = ref(false);
@@ -40,38 +36,26 @@ const error = ref('');
 
 // 定义事件列表和自愿报告列表
 const events: Ref<EventItem[]> = ref([]);
-const selfs: Ref<any[]> = ref([]);
-const voluntaryReports: Ref<any[]> = ref([]); // 暂时用空数组占位
 
 // 定义当前激活的 Tab，默认为 'events'
-const activeTab = ref('events');
-
-// 计算最近一个月的事件报告数量
-const recentEventCount = computed(() => {
-    // const oneMonthAgo = dayjs().subtract(1, 'month').toDate();
-    return events.value.length;
-});
-
-// 计算自愿报告数量
-const voluntaryReportCount = computed(() => voluntaryReports.value.length);
-
+const activeTab = ref('voluntary');
+const endDate = dayjs().format('YYYY-MM-DD');
+const startDate = dayjs().subtract(1, 'month').format('YYYY-MM-DD');
 // 获取事件列表
 const fetchData = async () => {
     loading.value = true;
     error.value = '';
-    const endDate = dayjs().format('YYYY-MM-DD');
-    const startDate = dayjs().subtract(1, 'month').format('YYYY-MM-DD');
+
     try {
         const res = await api(CONFIG.url.smsEvents, { startDate, endDate }) as EventItem[];
-        const resSelf = await api(CONFIG.url.smsVoluntarys, { startDate, endDate }) as EventItem[];
         events.value = res;
-        selfs.value = resSelf;
     } catch (err) {
         error.value = '获取事件列表失败';
     } finally {
         loading.value = false;
     }
 };
+
 
 // 组件挂载时获取事件列表
 onMounted(() => {
