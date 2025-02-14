@@ -12,19 +12,17 @@
             </slot>
         </view>
     </view>
-    <actionSheet v-model="showProfile" title="员工信息">
+    <zl-actionSheet v-model="showProfile" title="员工信息">
         <!-- 加个 v-if="showProfile"防止暗戳戳的渲染一堆 -->
         <Profile :userId="userId" v-if="showProfile" />
-    </actionSheet>
+    </zl-actionSheet>
 </template>
-<!-- v-if="showProfile" -->
 <script lang="ts" setup>
 import { ref, computed, onMounted, Ref } from 'vue';
 import Profile from '@/pages/hr/profile.vue';
-import { User } from '@/interface';
-import usebasisStore from '@/store/basis.store';
-import actionSheet from '@/components/zl/actionSheet.vue';
-const store = usebasisStore();
+import { UserItem } from '@/interface';
+import useUserStore from '@/store/user.store';
+const store = useUserStore();
 const props = defineProps({
     name: { type: String, default: '' },
     userId: { type: String, required: true },
@@ -35,13 +33,12 @@ const props = defineProps({
     gender: { type: Number, default: 2 },
 });
 
-const users: Ref<Record<string, User>> = ref({});
+const users: Ref<Record<string, UserItem>> = ref({});
 const userName = ref(props.name);
 
 onMounted(() => {
     if (props.userId && users.value[props.userId]) {
         userName.value = users.value[props.userId].name || '';
-        // gender.value = users.value[props.userId].gender || 2;
     }
 });
 
@@ -56,12 +53,10 @@ const showProfile = ref(false);
 // todo:从store获取信息
 const fetchUsers = async () => {
     try {
-        const res = await store.useUsers();
+        const res = await store.staff();
         users.value = res;
     } catch (err) {
-        // error.value = '获取飞机信息失败';
     } finally {
-        // loading.value = false;
     }
 };
 const toggleProfile = () => {
@@ -76,7 +71,6 @@ const toggleProfile = () => {
 
 onMounted(() => {
     fetchUsers();
-    // console.log(message);
 });
 </script>
 

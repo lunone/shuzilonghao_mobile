@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import api from '@/utils/api';
-import { AircraftItem, AirportItem, User } from '@/interface';
+import { AircraftItem, AirportItem, UserItem } from '@/interface';
 import dayjs from 'dayjs';
 import CONFIG from '@/config';
 

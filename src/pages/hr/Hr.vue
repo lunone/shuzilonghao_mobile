@@ -50,7 +50,7 @@
 import { Ref, ref, watch } from 'vue';
 // import NavVue from '@/components/Nav.vue';
 import ProfileVue from './profile.vue';
-import { User } from '@/interface';
+import { UserItem } from '@/interface';
 
 // import router from '@/router';
 import UserCardVue from './userCard.vue';
@@ -83,7 +83,7 @@ const mockData: HrData = {
         ]
     }
 };
-const users = ref<User[]>([]);
+const users = ref<UserItem[]>([]);
 // 定义响应式数据
 // const stats = ref<HrData>({
 //     users: [],
@@ -94,7 +94,7 @@ const users = ref<User[]>([]);
 // });
 // 使用模拟数据
 // stats.value = mockData;
-const stat: Ref<{ totalCount: number, departments: Record<string, User[]> }> = ref({
+const stat: Ref<{ totalCount: number, departments: Record<string, UserItem[]> }> = ref({
     totalCount: 0,
     departments: {},
 });

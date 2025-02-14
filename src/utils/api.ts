@@ -100,8 +100,9 @@ instance.interceptors.response.use(response => {
         // 禁止访问
     } else if (status == 500) {
         // 服务器错误
+        throw new Error('服务器错误');
     } else if (status == 501) {
-
+        throw new Error('服务器错误');
     }
 })
 
@@ -110,4 +111,8 @@ instance.interceptors.response.use(json => {
     return json?.data;
 });
 
-export default (url: string, data?: any) => instance({ url, data }) as Promise<any>;
+export default (url: string, data?: any) => instance({ url, data }).catch(err => {
+    if (['网络错误', '服务器错误'].indexOf(err.message) !== -1) {
+        uni.redirectTo({ url: `${CONFIG.page.error}?message=${err.message}` })
+    }
+}) as Promise<any>;

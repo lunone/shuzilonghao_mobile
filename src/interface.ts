@@ -10,10 +10,11 @@ export type WatchUser = {
     state?: number,
 }
 // 
-export type User = {
-    id:string,
+export type UserItem = {
+    id: string,
     userId: string,
     name?: string,
+    avatar?: string,
     gender?: number,
     departmentId?: number,
     departmentName?: string,
@@ -26,6 +27,14 @@ export type User = {
     idCard?: string,
     district?: string,
     address?: string,
+}
+
+export type DepartmenItem = {
+    id: number,
+    name: string,
+    abbr?: string,
+    order?: number,
+    parentId: number,
 }
 
 export type TableColumnItem = {

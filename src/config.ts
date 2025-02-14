@@ -7,20 +7,30 @@ export default {
         activate: '/login/activate',
         //
         airports: '/airport/code4/',
+        //
         aircrafts: '/aircraft/list/',
+        //
         flightsDate: '/flight/date/',
         flightsATD: '/flight/atd/',
         flightPlan: '/flight/plan',
-        meMel: '/me/mel/',
+        //
+        mels: '/me/mel/',
+        //
         statCrewFh: '/stat/crew/fh',
         statPeriod: '/stat/period/',
+        //
         crewFlights: '/crew/list/',
+        //
         smsEvents: '/sms/event/list',
         smsVoluntarys: '/sms/voluntary/list',
-        users: '/user/list/',
+        //
+        staff: '/user/staff',
+        userProfile:'/user/profile',
+        departments: '/department/list',
     },
     page: {
-        register: '/pages/public/Public',
+        register: '/pages/public/public',
+        error:'/pages/public/error'
     },
     key: { token: 'Authorization', },
     css: { splash: { duration: 5e3, } }

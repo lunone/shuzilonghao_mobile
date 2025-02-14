@@ -42,7 +42,7 @@ const emits = defineEmits(['getMel'])
 // 获取 MEL 数据
 const fetchMels = async () => {
     try {
-        const res = await api(CONFIG.url.meMel, { date: dayjs().format('YYYY-MM-DD') }) as any[];
+        const res = await api(CONFIG.url.mels, { date: dayjs().format('YYYY-MM-DD') }) as any[];
         mels.value = res.reduce((acc, cur) => ({ ...acc, [cur.acReg]: [...(acc[cur.acReg] || []), cur] }), {});
     } catch (err) {
         error.value = '获取 MEL 数据失败';

@@ -1,17 +1,18 @@
 import { defineStore } from 'pinia';
 import api from '@/utils/api';
 import CONFIG from '@/config';
-import { User } from '@/interface';
+import { DepartmenItem, UserItem } from '@/interface';
 
 
 export default defineStore('user', {
     state: () => ({
-        users: {},
-        self: { isInit: true } as User & { isInit?: boolean },
+        staff: {},
+        departments: [] as DepartmenItem[],
+        self: { isInit: true } as UserItem & { isInit?: boolean },
         _token: '' as string,
     }),
     getters: {
-       
+
     },
     actions: {
         token(token?: string) {
@@ -22,7 +23,7 @@ export default defineStore('user', {
         },
         async myself(refresh = false) {
             if (this.self.isInit || refresh) {
-                let self = await api(CONFIG.url.init) as User;
+                let self = await api(CONFIG.url.init) as UserItem;
                 if (self?.id) {
                     this.self = self;
                 }
@@ -30,12 +31,19 @@ export default defineStore('user', {
             }
             return this.self;
         },
-        async users() {
-            if (!Object.keys(this.users).length) {
-                const res = {}//await api(CONFIG.url.users) as Record<string, User>;
-                this.users = res;
+        async staff() {
+            if (!Object.keys(this.staff).length) {
+                const res = await api(CONFIG.url.staff) as Record<string, UserItem>;
+                this.staff = Object.keys(res).length ? res : {};
             }
-            return this.users;
+            return this.staff;
+        },
+        async departments() {
+            if (!this.departments.length) {
+                const res = await api(CONFIG.url.departments) as Record<string, UserItem>;
+                this.departments = res.length ? res : [];
+            }
+            return this.departments;
         },
     }
 })

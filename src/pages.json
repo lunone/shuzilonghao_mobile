@@ -8,6 +8,12 @@
             }
         },
         {
+            "path": "pages/public/error",
+            "style": {
+                "navigationBarTitleText": "错误页"
+            }
+        },
+        {
             "path": "pages/sms/sms",
             "style": {
                 "navigationBarTitleText": "安全数据"
