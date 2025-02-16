@@ -8,7 +8,7 @@ export default defineStore('user', {
     state: () => ({
         staff: {},
         departments: [] as DepartmenItem[],
-        self: { isInit: true } as UserItem & { isInit?: boolean },
+        self: {} as UserItem,
         _token: '' as string,
     }),
     getters: {
@@ -22,13 +22,16 @@ export default defineStore('user', {
             return this._token;
         },
         async myself(refresh = false) {
-            if (this.self.isInit || refresh) {
-                let self = await api(CONFIG.url.init) as UserItem;
+            // if (refresh) {
+                api(CONFIG.url.aircrafts)// 模拟发出俩请求试试
+                const self = await api(CONFIG.url.init) as UserItem;
+                // console.log('myself', self);
                 if (self?.id) {
                     this.self = self;
                 }
-                this.self.isInit = false;
-            }
+                // this.self.isInit = false;
+                // this.self.error = true;
+            // }
             return this.self;
         },
         async staff() {

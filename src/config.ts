@@ -25,12 +25,13 @@ export default {
         smsVoluntarys: '/sms/voluntary/list',
         //
         staff: '/user/staff',
-        userProfile:'/user/profile',
+        userProfile: '/user/profile',
         departments: '/department/list',
     },
     page: {
-        register: '/pages/public/public',
-        error:'/pages/public/error'
+        index: '/pages/Index',
+        error: '/pages/public/error',
+        register: '/pages/public/public'
     },
     key: { token: 'Authorization', },
     css: { splash: { duration: 5e3, } }

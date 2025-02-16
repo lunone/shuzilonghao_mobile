@@ -50,14 +50,23 @@ function error(message = '激活失败') {
 @text-color: #333;
 
 .login-wrapper {
-
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 50vh;
+    margin: 0;
+    padding: 0;
     text-align: center;
+    background-image: url('https://ooo.0x0.ooo/2025/02/16/OGscKi.png');
+    background-size: cover;
+    background-repeat: no-repeat;
 
     .intro {
         font-size: 12px;
         color: #b9b8b5;
         text-align: center;
         margin-bottom: 10px;
+        margin-top: 200px;
     }
 
     .action {
