@@ -1,12 +1,11 @@
 <template>
     <div class="login-wrapper">
-        <div class="intro">
-            测试期间需要邀请才能使用本程序<br>
-            激活只需一次,后续不再弹出<br>
-        </div>
         <div class="action">
             <input type="text" class="code" v-model="activationCode" placeholder="请输入邀请码">
             <button @click="activate" class="button" :disabled="disable">激活</button>
+        </div>
+        <div class="intro">
+            测试期间需邀请才能使用, 激活后不再弹出
         </div>
     </div>
 
@@ -57,19 +56,16 @@ function error(message = '激活失败') {
     margin: 0;
     padding: 0;
     text-align: center;
-    background-image: url('https://ooo.0x0.ooo/2025/02/16/OGscKi.png');
+    
+    background-image: url(https://ooo.0x0.ooo/2025/02/16/OGVrci.jpg);
     background-size: cover;
     background-repeat: no-repeat;
-
-    .intro {
-        font-size: 12px;
-        color: #b9b8b5;
-        text-align: center;
-        margin-bottom: 10px;
-        margin-top: 200px;
-    }
+    display: flex;
+    flex-direction: column-reverse;
 
     .action {
+        margin-bottom: 40px;
+
         .code {
             padding: 10px;
             font-size: 18px;
@@ -93,6 +89,13 @@ function error(message = '激活失败') {
                 cursor: not-allowed;
             }
         }
+    }
+
+    .intro {
+        font-size: 12px;
+        color: #97b8b5;
+        text-align: center;
+        width: 100%;
     }
 }
 </style>
