@@ -1,23 +1,23 @@
 <template>
     <div>
-        <uni-datetime-picker v-model="range" type="daterange" @change="onConfirm" :start="minDate" :end="maxDate"
-            rangeSeparator="至" />
-
+        <uni-datetime-picker v-model="range" type="daterange" @change="onConfirm" :start="minDate" rangeSeparator="至"
+            :end="maxDate" />
         <div v-if="loading" class="loading">加载中...</div>
         <div v-else-if="error" class="error">{{ error }}</div>
         <div v-else>
-            <zl-tabs v-model:active="activeTab">
-                <zl-tab name="overview" title="总览" icon="calendar">
+            <uni-segmented-control :current="current" :values="items" @clickItem="onClickItem" styleType="text"
+                activeColor="#007aff" />
+            <view class="content">
+                <view v-show="current === 0">
                     <overview-vue :data="flights" :dateRange="range" />
-                </zl-tab>
-                <zl-tab name="stations" title="站点分析" icon="location">
+                </view>
+                <view v-show="current === 1">
                     <stations-vue :data="flights" :dateRange="range" />
-                </zl-tab>
-                <zl-tab name="aircrafts" title="飞机分析" icon="airplane">
+                </view>
+                <view v-show="current === 2">
                     <airplane-vue :data="flights" :dateRange="range" />
-                </zl-tab>
-            </zl-tabs>
-
+                </view>
+            </view>
             <!-- <van-back-top /> -->
         </div>
     </div>
@@ -36,8 +36,6 @@ import api from '@/utils/api';
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');
-// 定义当前激活的 Tab，默认为 'weight'
-const activeTab = ref('overview');
 
 const dateformatStr = 'YYYY-MM-DD';
 // 定义 Tab 配置数组
@@ -51,16 +49,9 @@ const range = ref<[string, string]>([
     dayjs().subtract(20, 'day').startOf('day').format(dateformatStr),
     dayjs().subtract(1, 'day').startOf('day').format(dateformatStr)
 ]);
-// const show = ref(false);
-
-// const formatDate = (date: Date) => {
-//     return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
-// };
-
-// const dateRangeText = computed(() => {
-//     const [start, end] = dateRange.value;
-//     return `${formatDate(start)} - ${formatDate(end)}`;
-// });
+const items = ref(['总览', '站点分析', '飞机分析']);
+const current = ref(0);
+const onClickItem = e => current.value = current != e.currentIndex ? e.currentIndex : current.value;
 
 const flights: Ref<any[]> = ref([]);
 // 使用watch监控props.startDate和props.endDate变化,并在控制台输出变化提示
