@@ -57,7 +57,6 @@
 		const today = dayjs().format('YYYY-MM-DD');
 		try {
 			const res = await api(CONFIG.url.flightsDate, { startDate: today, endDate: today }) as FlightItem[];
-			console.log('res', res);
 			flights.value = res;
 		} catch (err) {
 			console.error('获取航班信息失败', err);

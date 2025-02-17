@@ -79,30 +79,37 @@ instance.interceptors.response.use(
 )
 
 // 响应-处理401的token竞争问题
-instance.interceptors.response.use(response => response, (error: AxiosError) => {
+instance.interceptors.response.use(response => {
+    console.log('401竞争', response, response.config.url)
+    return response
+}, (error: AxiosError) => {
     const response = error.response;
-    if (response?.status !== 401) {
+    if (response?.status == 200) {// * 401重试队列也会走这里,不走正常?
+        return response;
+    } else if (response?.status !== 401) {
         return Promise.reject(error);// 抛出错误,后面处理
     }
     // 刷新token时,将resolve放进队列，用一个函数形式来保存，等token刷新后直接执行
-    const pendingPromise = new Promise(resolve => notLoginQweue.push(() => resolve(instance(response.config))))
     if (isRefreshing) {
-        return pendingPromise
+        return new Promise(resolve => notLoginQweue.push(() => resolve(instance(response.config))))
     }
     isRefreshing = true// 第一次要登录一下
-    return new Promise((resolve) => uni.login({ provider: 'weixin', success: res => resolve(res.code) }))
-        .then(code => instance({ url: CONFIG.url.login, data: { code } }))
+    return new Promise((resolve) => uni.login({ provider: 'weixin', success: res => resolve(res.code) }))// 登录微信
+        .then(code => instance({ url: CONFIG.url.login, data: { code } }))// 刷新token
+        .then(_ => instance(response.config)) // 重试本次需求
 })
 // 响应-402错误
 
 // 响应-处理内容部分,判断code问题,判断token问题.
 instance.interceptors.response.use((response: AxiosResponse) => {
-    const { data, token, code, status } = response?.data || {};
+    const { token, code, status } = response?.data || {};
     if (token) {// 返回如过携带了token,就是要更新token了.
+        console.log('更新token:', token);
         store.token(token);
         notLoginQweue.forEach(f => f());// 新token重试积压请求
         notLoginQweue = []; // 清空队列
         isRefreshing = false;
+        return response // 正常返回,防止在进入错误拦截,只不过这个结果后面不用.
     }
     if (!code) {
         return response;
@@ -112,7 +119,10 @@ instance.interceptors.response.use((response: AxiosResponse) => {
 // 最后-错误处理,默认的void返回也会触发之前pending的Promise,就不会继续进行.
 instance.interceptors.response.use(response => response, error => {
     const response = error.response;
-    if (response.status == 402) {
+    if (!response?.status) {
+        console.log('错误处理逃单', error)
+        // 前面终止继续的到这里,防止报错
+    } else if (response.status == 402) {
         notLoginQweue = [];// 非注册用户就不可能再401重试了,清空401队列了
         console.log('402___跳转____', response)
         uni.reLaunch({ url: `${CONFIG.page.index}?error=402` })
@@ -141,4 +151,4 @@ instance.interceptors.response.use(response => response, error => {
 });
 
 
-export default (url: string, data?: any) => instance({ url, data }).then(repsonse => repsonse?.data) as Promise<any>;
+export default (url: string, data?: any) => instance({ url, data }).then(repsonse => repsonse?.data?.data) as Promise<any>;

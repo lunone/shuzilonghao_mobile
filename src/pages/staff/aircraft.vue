@@ -3,13 +3,13 @@
         <view class="total">
             <i class="icon zl-icon-aircraft" />
             <view class="text">
-                <text class="value">{{ Object.values(stat).reduce((acc, cur) => acc + cur, 0) }}</text>
+                <text class="value">{{Object.values(stat).reduce((acc, cur) => acc + cur, 0)}}</text>
                 <text class="unit">架</text>
             </view>
         </view>
         <view class="detail">
-            <view class="item" v-for="number, acType in stat" :key="acType">
-                <text class="title">{{ acTypeShortTranslate[acType] || acType }} </text>
+            <view class="item" v-for="number, acTypeLong in stat" :key="acTypeLong">
+                <text class="title">{{ acTypeLong }} </text>
                 <text class="value">{{ number }}</text>
                 <text class="unit">架</text>
             </view>
@@ -27,17 +27,10 @@ const store = usebasisStore();
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');
-
-
 // 定义机队数据
 const aircrafts = ref<AircraftItem[]>([]);
-const acTypeShortTranslate: Record<string, string> = {
-    B73: 'B737', B74: 'B747', A32: 'A320', A31: 'A319'
-}
 
-
-
-const stat = computed(() => {
+const stat = computed(() => {// todo:页面变更飞机变0
     const today = dayjs().startOf('day');
     const stat: Record<string, number> = {}
 
@@ -47,9 +40,10 @@ const stat = computed(() => {
         if (!aircraft.endDate || (startDate.isBefore(today) && endDate.isAfter(today))) {
             if (aircraft.regId.length < 6) {
                 // 统计在役飞机,738前面俩字符
-                const acType = aircraft.acType.slice(0, 3);
-                stat[acType] = stat[acType] || 0;
-                stat[acType]++;
+                // const acType = aircraft.acType.slice(0, 3);
+                const acTypeLong = aircraft.acTypeLong;
+                stat[acTypeLong] = stat[acTypeLong] || 0;
+                stat[acTypeLong]++;
             }
         }
     }
@@ -62,6 +56,7 @@ const fetchAircrafts = async () => {
     error.value = '';
     try {
         const res = await store.aircrafts();
+        console.log('res---', res);
         aircrafts.value = Object.values(res);
     } catch (err) {
         error.value = '获取飞机信息失败';

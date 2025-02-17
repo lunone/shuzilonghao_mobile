@@ -8,7 +8,7 @@
         <agentVue v-else-if="user == 'agent'" />
         <publicVue v-else />
         <!-- </template> -->
-        <activateVue />
+        <activateVue v-if="user == 'public'" />
     </div>
 </template>
 <script lang="ts" setup>

@@ -57,7 +57,7 @@ function error(message = '激活失败') {
     padding: 0;
     text-align: center;
     
-    background-image: url(https://ooo.0x0.ooo/2025/02/16/OGVrci.jpg);
+    background-image: url(https://app.airlonghao.com/cover.png);
     background-size: cover;
     background-repeat: no-repeat;
     display: flex;

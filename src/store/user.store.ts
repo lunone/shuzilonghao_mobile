@@ -23,14 +23,10 @@ export default defineStore('user', {
         },
         async myself(refresh = false) {
             // if (refresh) {
-                api(CONFIG.url.aircrafts)// 模拟发出俩请求试试
-                const self = await api(CONFIG.url.init) as UserItem;
-                // console.log('myself', self);
-                if (self?.id) {
-                    this.self = self;
-                }
-                // this.self.isInit = false;
-                // this.self.error = true;
+            const self = await api(CONFIG.url.init) as UserItem;
+            if (self?.id) {
+                this.self = self;
+            }
             // }
             return this.self;
         },

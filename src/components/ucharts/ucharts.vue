@@ -22,12 +22,12 @@ const margin = { left: 0, right: 0, top: 0, bottom: 0 };
 // 获取当前实例,不能放在再深层次,会导致获取不到
 const _this = getCurrentInstance();
 watch(() => props.option, (val, oldVal) => {
-    setTimeout(() => {// 延时执行，防止getCurrentInstance获取到的高度宽度为0
+    // setTimeout(() => {// 延时执行，防止getCurrentInstance获取到的高度宽度为0
         if (val && Object.keys(val).length) {
             // 深拷贝防止重复触发
             draw(val)
         }
-    }, 1e3);
+    // }, 1e3);
 }, { deep: true, immediate: true })
 function draw(data) {
     const { pixelRatio, screenWidth } = uni.getSystemInfoSync();
@@ -96,6 +96,8 @@ function tap(e) {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    width: 100%;
+    height: 100%;
 
     .chart {
         width: 100%;

@@ -155,6 +155,7 @@ export interface StatusItem {
 export type AircraftItem = {
     acReg: string; // 注册号
     acType: string; // 机型
+    acTypeLong?: string; // 机型
     filiale?: string  // 分公司
     restYn: string; // 是否有休息区(Y/N)
     dow?: number;  // 基本重量-近程
