@@ -85,7 +85,6 @@ function tap(e) {
 
     .chart {
         width: 100%;
-        // border: red 1px solid;
     }
 }
 </style>
