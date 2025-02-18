@@ -18,6 +18,8 @@ export default {
         //
         statCrewFh: '/stat/crew/fh',
         statPeriod: '/stat/period/',
+        statByStation: '/stat/by/station',
+        statByAircraft: '/stat/by/aircraft',
         //
         crewFlights: '/crew/list/',
         //
@@ -35,8 +37,8 @@ export default {
     },
     key: { token: 'Authorization', },
     css: { splash: { duration: 5e3, } },
-    chart:{
-        color:{
+    chart: {
+        color: {
             ZHCC: '#91CB74',
         }
     }

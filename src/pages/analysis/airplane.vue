@@ -62,7 +62,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, Ref } from 'vue';
-import api from '@/utils/api';
 import { AircraftItem, AirportItem, FlightItem } from '@/interface';
 import dayjs from 'dayjs';
 
@@ -187,8 +186,8 @@ onMounted(() => {
 });
 
 // 处理点击面板的事件
-const airplaneClick = (name: string) => {
-    console.log('点击了面板', name);
+const airplaneClick = (names: string[]) => {
+    activeNames.value = names
 };
 </script>
 

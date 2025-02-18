@@ -2,55 +2,59 @@
     <div v-if="loading" class="loading">加载中...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else>
-        <press-collapse :value="activeNames" @change="stationClick">
-            <press-collapse-item :title="station.city" :name="station.key" v-for="station in stationsWithDetail"
-                :key="station.key">
-                <div class="way">
-                    <div class="dep" :class="isDep[station.key] ? '' : 'hover'">出港</div>
-                    <switch @change="isDep[station.key] = !isDep[station.key]" :size="20" />
-                    <div class="arr" :class="isDep[station.key] ? 'hover' : ''">进港</div>
-                </div>
-                <div class="airlines">
-                    <div v-for="code4 in station[isDep[station.key] ? 'dep' : 'arr'].flights" class="item" :key="code4">
-                        <div class="fromto">
-                            <span class="city dep">
-                                {{ isDep[station.key] ? airports[code4].city || code4 : station.city }}
-                            </span>
-                            <!-- todo:这里有个报错airports[code4]不存在 -->
-                            <span class="city arr">
-                                <!-- {{ !isDep[station.key] ? airports[code4].city || code4 : station.city }} -->
-                            </span>
-                        </div>
-                        <div class="summary">
-                            <span class="title">总计:</span>
-                            <span class="count">
-                                {{ station[isDep[station.key] ? 'dep' : 'arr'].stat[code4].flightCount }}班
-                            </span>
-                            <span class="weight">
-                                {{ station[isDep[station.key] ? 'dep' :
-                                    'arr'].stat[code4].netWeightCargo
-                                }}吨
-                            </span>
-                            <span class="hour">
-                                平均空时: {{ station[isDep[station.key] ? 'dep' : 'arr'].stat[code4].avgFlightTime }}分钟
-                            </span>
-                        </div>
-                        <div class="weight">
-                            <span class="title">运量:</span>
-                            <span class="avg">
-                                平均{{ station[isDep[station.key] ? 'dep' : 'arr'].stat[code4].avgFlightWeight }}吨
-                            </span>
-                            <span class="min">
-                                最少{{ station[isDep[station.key] ? 'dep' : 'arr'].stat[code4].minFlightWeight }}吨
-                            </span>
-                            <span class="max">
-                                最多{{ station[isDep[station.key] ? 'dep' : 'arr'].stat[code4].maxFlightWeight }}吨
-                            </span>
+        <scroll-view scroll-y enhanced scroll-with-animation :scroll-top="newScrollTop" @scroll="onScroll">
+            <press-collapse :value="activeNames" @change="stationClick">
+                <press-collapse-item :title="station.city" :name="station.key" v-for="station in stationsWithDetail"
+                    :key="station.key">
+                    <div class="way">
+                        <div class="dep" :class="isDep[station.key] ? '' : 'hover'">出港</div>
+                        <switch @change="isDep[station.key] = !isDep[station.key]" :size="20" />
+                        <div class="arr" :class="isDep[station.key] ? 'hover' : ''">进港</div>
+                    </div>
+                    <div class="airlines">
+                        <div v-for="code4 in station[isDep[station.key] ? 'dep' : 'arr'].flights" class="item"
+                            :key="code4">
+                            <div class="fromto">
+                                <span class="city dep">
+                                    {{ isDep[station.key] ? airports[code4].city || code4 : station.city }}
+                                </span>
+                                <!-- todo:这里有个报错airports[code4]不存在 -->
+                                <span class="city arr">
+                                    <!-- {{ !isDep[station.key] ? airports[code4].city || code4 : station.city }} -->
+                                </span>
+                            </div>
+                            <div class="summary">
+                                <span class="title">总计:</span>
+                                <span class="count">
+                                    {{ station[isDep[station.key] ? 'dep' : 'arr'].stat[code4].flightCount }}班
+                                </span>
+                                <span class="weight">
+                                    {{ station[isDep[station.key] ? 'dep' :
+                                        'arr'].stat[code4].netWeightCargo
+                                    }}吨
+                                </span>
+                                <span class="hour">
+                                    平均空时: {{ station[isDep[station.key] ? 'dep' : 'arr'].stat[code4].avgFlightTime }}分钟
+                                </span>
+                            </div>
+                            <div class="weight">
+                                <span class="title">运量:</span>
+                                <span class="avg">
+                                    平均{{ station[isDep[station.key] ? 'dep' : 'arr'].stat[code4].avgFlightWeight }}吨
+                                </span>
+                                <span class="min">
+                                    最少{{ station[isDep[station.key] ? 'dep' : 'arr'].stat[code4].minFlightWeight }}吨
+                                </span>
+                                <span class="max">
+                                    最多{{ station[isDep[station.key] ? 'dep' : 'arr'].stat[code4].maxFlightWeight }}吨
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </press-collapse-item>
-        </press-collapse>
+                </press-collapse-item>
+            </press-collapse>
+        </scroll-view>
+        <press-back-top :scroll-top="scrollTop" :scroll-to-top="scrollToTop" />
     </div>
 </template>
 
@@ -59,6 +63,18 @@ import { ref, computed, watch, onMounted, Ref } from 'vue';
 import { FlightItem } from '@/interface';
 import dayjs from 'dayjs';
 import usebasisStore from '@/store/basis.store';
+const newScrollTop = ref(0);
+const scrollTop = ref(0);
+function onScroll(e) {
+    console.log('[uniapp]:scroll', e.target.scrollTop);
+    scrollTop.value = e.target.scrollTop;
+}
+function scrollToTop() {
+    newScrollTop.value = scrollTop.value;
+    setTimeout(() => {
+        newScrollTop.value = 0;
+    });
+}
 
 // 定义 props 来接收外部传入的航班数据数组
 const props = defineProps<{ data: FlightItem[], dateRange: [string, string] }>();
@@ -217,8 +233,8 @@ onMounted(() => {
     fetchAirports();
 });
 
-const stationClick = (name: string[]) => {
-    activeNames.value = name
+const stationClick = (names: string[]) => {
+    activeNames.value = names
 }
 </script>
 
