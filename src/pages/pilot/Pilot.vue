@@ -3,7 +3,6 @@
         <div v-if="loading" class="loading">加载中...</div>
         <div v-else-if="error" class="error">{{ error }}</div>
         <div v-else>
-            <!-- <zl-nav title="飞行员数据" text="主页" url='/home' /> -->
             <!-- <van-cell title="点击选择时间段" :value="dateRangeText" @click="showCalendar = true" />
             <van-calendar :first-day-of-week="1"  v-model:show="showCalendar" :min-date="minDate" :max-date="maxDate" type="range"
                 :max-range="62" @confirm="dateRangeChange" /> -->

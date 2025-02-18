@@ -2,8 +2,8 @@
     <div v-if="loading" class="loading">加载中...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else>
-        <uni-collapse v-model="activeNames" @change="stationClick">
-            <uni-collapse-item :title="station.city" :name="station.key" v-for="station in stationsWithDetail"
+        <press-collapse :value="activeNames" @change="stationClick">
+            <press-collapse-item :title="station.city" :name="station.key" v-for="station in stationsWithDetail"
                 :key="station.key">
                 <div class="way">
                     <div class="dep" :class="isDep[station.key] ? '' : 'hover'">出港</div>
@@ -49,8 +49,8 @@
                         </div>
                     </div>
                 </div>
-            </uni-collapse-item>
-        </uni-collapse>
+            </press-collapse-item>
+        </press-collapse>
     </div>
 </template>
 
@@ -217,8 +217,8 @@ onMounted(() => {
     fetchAirports();
 });
 
-const stationClick = (name: string) => {
-
+const stationClick = (name: string[]) => {
+    activeNames.value = name
 }
 </script>
 

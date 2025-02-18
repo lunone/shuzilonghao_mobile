@@ -1,23 +1,22 @@
 <template>
     <div>
-        <uni-datetime-picker v-model="range" type="daterange" @change="onConfirm" :start="minDate" rangeSeparator="至"
-            :end="maxDate" />
+        <press-cell title="选择日期区间" :value="date" @click="showCalender" />
+        <press-calendar :show="show" type="range" @close="show = false" @confirm="onConfirm" />
+
         <div v-if="loading" class="loading">加载中...</div>
         <div v-else-if="error" class="error">{{ error }}</div>
         <div v-else>
-            <uni-segmented-control :current="current" :values="items" @clickItem="onClickItem" styleType="text"
-                activeColor="#007aff" />
-            <view class="content">
-                <view v-show="current === 0">
+            <press-tabs :active="current" @change="onClickItem">
+                <press-tab title="总览">
                     <overview-vue :data="flights" :dateRange="range" />
-                </view>
-                <view v-show="current === 1">
+                </press-tab>
+                <press-tab title="站点分析">
                     <stations-vue :data="flights" :dateRange="range" />
-                </view>
-                <view v-show="current === 2">
+                </press-tab>
+                <press-tab title="飞机分析">
                     <airplane-vue :data="flights" :dateRange="range" />
-                </view>
-            </view>
+                </press-tab>
+            </press-tabs>
             <!-- <van-back-top /> -->
         </div>
     </div>
@@ -32,14 +31,28 @@ import airplaneVue from '@/pages/analysis/airplane.vue';
 import dayjs from 'dayjs';
 import api from '@/utils/api';
 
-
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');
-
+const date = ref(''), show = ref(false)
 const dateformatStr = 'YYYY-MM-DD';
 // 定义 Tab 配置数组
+function showCalender() {
+    show.value = true;
+}
 
+
+function formatDate(date) {
+    date = new Date(date);
+    return `${date.getMonth() + 1}/${date.getDate()}`;
+}
+
+function onConfirm(detail) {
+    console.log(detail);
+    const [start, end] = detail;
+    show.value = false;
+    date.value = `${formatDate(start)} - ${formatDate(end)}`;
+}
 // 计算3年前的日期
 const minDate = dayjs().subtract(3, 'year').startOf('day').format(dateformatStr);
 // 今天的日期
@@ -49,7 +62,9 @@ const range = ref<[string, string]>([
     dayjs().subtract(20, 'day').startOf('day').format(dateformatStr),
     dayjs().subtract(1, 'day').startOf('day').format(dateformatStr)
 ]);
-const items = ref(['总览', '站点分析', '飞机分析']);
+
+
+
 const current = ref(0);
 const onClickItem = e => current.value = current != e.currentIndex ? e.currentIndex : current.value;
 
@@ -83,11 +98,7 @@ watch(() => range, async () => {
 }, { deep: true, immediate: true });
 
 
-const onConfirm = (values: [Date, Date]) => {
-    // show.value = false;
-    // dateRange.value = values;
-    console.log(values);
-};
+
 
 </script>
 

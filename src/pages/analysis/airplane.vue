@@ -2,8 +2,8 @@
     <div v-if="loading" class="loading">加载中...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else>
-        <uni-collapse v-model="activeNames" @change="airplaneClick">
-            <uni-collapse-item :name="airplane.acReg" v-for="airplane in airplanesWithDetail" :key="airplane.acReg">
+        <press-collapse :value="activeNames" @change="airplaneClick">
+            <press-collapse-item :name="airplane.acReg" v-for="airplane in airplanesWithDetail" :key="airplane.acReg">
                 <template #title>
                     <div class="ac">
                         <span class="acreg">{{ airplane.acReg }}</span>
@@ -53,8 +53,10 @@
                         </div>
                     </div>
                 </div>
-            </uni-collapse-item>
-        </uni-collapse>
+            </press-collapse-item>
+
+        </press-collapse>
+
     </div>
 </template>
 
@@ -170,7 +172,7 @@ const fetchAircrafts = async () => {
     try {
         const res = await store.aircrafts();
         aircrafts.value = res;
-        // console.log('飞机', res);
+        console.log('飞机', res);
     } catch (err) {
         error.value = '获取飞机信息失败';
     } finally {
@@ -179,6 +181,7 @@ const fetchAircrafts = async () => {
 };
 // 组件挂载时获取机场信息
 onMounted(() => {
+    console.log('组件挂载时获取机场信息');
     fetchAirports();
     fetchAircrafts();
 });

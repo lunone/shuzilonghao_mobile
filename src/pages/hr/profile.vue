@@ -14,24 +14,22 @@
             <view class="address">地址：{{ employee2?.district }}{{ employee2?.address }}</view>
         </view>
         <view class="id-number">身份证号：{{ employee2?.idCard }}</view>
-        <uni-segmented-control :current="current" :values="items" @clickItem="onClickItem" styleType="text"
-            activeColor="#007aff" />
-        <view class="content">
-            <view v-show="current === 0">
-                <view class="education"> </view>
+        <press-tabs :active="current" @change="onClickItem">
+            <press-tab title="联系人">
                 <Contract />
-
+            </press-tab>
+            <press-tab title="培训工作">
                 <Education />
-
                 <Experience />
-            </view>
-            <view v-show="current === 1">
+            </press-tab>
+            <press-tab title="绩效分析">
                 <Salary />
-            </view>
-            <view v-show="current === 2">
+            </press-tab>
+            <press-tab title="工作轨迹">
                 <Job />
-            </view>
-        </view>
+            </press-tab>
+        </press-tabs>
+
     </view>
 </template>
 
@@ -56,7 +54,7 @@ const active = ref(0);
 const employee2: Ref<UserItem> = ref();
 const fetchEmployee = async () => {
     const res = await api(CONFIG.url.userProfile, { userId: props.userId });
-    const departments = await store.departments();
+    // const departments = await store.departments();
     employee2.value = res;
 };
 const items = ref(['更多信息', '薪酬表现', '工作记录']);

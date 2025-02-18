@@ -6,17 +6,20 @@
         <view class="summary">
             最近一个月， {{ events.length }} 事件报告 ， {{ 'voluntarys.length' }} 自愿报告<br>
         </view>
-        <!-- <zl-tabs v-model:active="activeTab">
-            <zl-tab title="主动报告 列表" name="voluntary" />
-
-            <zl-tab title="事件 列表" name="events">
+        <press-tabs :active="current" @change="onClickItem">
+            <press-tab title="主动报告"  >
+                <voluntarys   />
+            </press-tab>
+            <press-tab title="事件" >
                 <EventVue :data="event" v-for="event in events" :key="event.id" />
-            </zl-tab>
-        </zl-tabs> -->
+            </press-tab>
+            
+        </press-tabs>
         <!-- <back-top /> -->
-         
+
     </view>
-    <voluntarys v-show="activeTab === 'voluntary'" />
+   
+    
 </template>
 
 <script setup lang="ts">
@@ -37,8 +40,9 @@ const error = ref('');
 // 定义事件列表和自愿报告列表
 const events: Ref<EventItem[]> = ref([]);
 
-// 定义当前激活的 Tab，默认为 'events'
-const activeTab = ref('voluntary');
+const current = ref(0);
+const onClickItem = e => current.value = current != e.currentIndex ? e.currentIndex : current.value;
+
 const endDate = dayjs().format('YYYY-MM-DD');
 const startDate = dayjs().subtract(1, 'month').format('YYYY-MM-DD');
 // 获取事件列表

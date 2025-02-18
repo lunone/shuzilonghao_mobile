@@ -12,16 +12,18 @@
             </slot>
         </view>
     </view>
-    <zl-actionSheet v-model="showProfile" title="员工信息">
+
+    <press-action-sheet :show="showProfile" title="员工信息" @close="showProfile = false">
         <!-- 加个 v-if="showProfile"防止暗戳戳的渲染一堆 -->
         <Profile :userId="userId" v-if="showProfile" />
-    </zl-actionSheet>
+    </press-action-sheet>
 </template>
 <script lang="ts" setup>
 import { ref, computed, onMounted, Ref } from 'vue';
 import Profile from '@/pages/hr/profile.vue';
 import { UserItem } from '@/interface';
 import useUserStore from '@/store/user.store';
+
 const store = useUserStore();
 const props = defineProps({
     name: { type: String, default: '' },
@@ -60,7 +62,6 @@ const fetchUsers = async () => {
     }
 };
 const toggleProfile = () => {
-    console.log('toggleProfile_____', showProfile.value);
     if (!props.isLink) {
         showProfile.value = !showProfile.value;
     } else {

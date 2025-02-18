@@ -1,9 +1,9 @@
 <template>
     <!-- <nav-vue title="机队统计" text="主页" url='/home' /> -->
     <ac-summary-vue class="summary" />
-    <zl-tabs v-model:active="activeTab" @change="sortChanged">
+    <press-tabs :active="activeTab" @change="onSortTabClick">
         <template v-for="aircraftGroup, groupName in aircraftSorted" :key=" groupName">
-            <zl-tab :name="groupName" :title="`${aircraftGroup.name}(${aircraftGroup.aircrafts.length})`"
+            <press-tab :name="groupName" :title="`${aircraftGroup.name}(${aircraftGroup.aircrafts.length})`"
                 v-if="aircraftGroup.aircrafts.length > 0">
                 <div class="aircrafts">
                     <div class="buttons">
@@ -14,18 +14,20 @@
                         </div>
                     </div>
                 </div>
-            </zl-tab>
+            </press-tab>
         </template>
-    </zl-tabs>
+    </press-tabs>
+
     <!-- 放到前一个的里面会被循环生成多个的 -->
-    <zl-tabs v-model:active="infoTab" class="info">
-        <zl-tab name="detail" title="飞机参数">
+    <press-tabs :active="infoTab" @change="onInfoTabClick" class="info">
+        <press-tab name="detail" title="飞机参数">
             <detail v-if="selectedAircraft" :aircraft="selectedAircraft" />
-        </zl-tab>
-        <zl-tab name="mel" :title="`保留单详情(${mels?.length || 0})`">
+        </press-tab>
+        <press-tab name="mel" :title="`保留单详情(${mels?.length || 0})`">
             <mel-card-vue :acReg="selectedAircraft?.acReg" @get-mel="acRegMelUpdate" />
-        </zl-tab>
-    </zl-tabs>
+        </press-tab>
+    </press-tabs>
+
 </template>
 
 <script setup lang="ts">
@@ -35,7 +37,7 @@ import dayjs from 'dayjs';
 import { AircraftItem } from '@/interface';
 import usebasisStore from '@/store/basis.store';
 import AcSummaryVue from './aircraftSummary.vue';
-import MelCardVue from '../maintenance/mel/card.vue'; 
+import MelCardVue from '../maintenance/mel/card.vue';
 import detail from './detail.vue';
 
 const store = usebasisStore();
@@ -46,6 +48,10 @@ const error = ref('');
 // 定义当前激活的 Tab，默认为 'inService'
 const activeTab = ref('inService');
 const infoTab = ref('detail');
+const onSortTabClick = e => activeTab.value = activeTab != e.currentIndex ? e.currentIndex : activeTab.value;
+const onInfoTabClick = e => infoTab.value = infoTab != e.currentIndex ? e.currentIndex : infoTab.value;
+
+
 const showMoreFlags = reactive<Record<string, boolean>>({});
 
 // 定义机队数据
@@ -92,11 +98,11 @@ const fetchAircrafts = async () => {
         loading.value = false;
     }
 };
-const sortChanged = (active: any) => {
-    console.log('sortChanged', active);
-    // 加载完成默认第一个按钮显示
-    showInfo(aircraftSorted.value[active].aircrafts[0])
-};
+// const sortChanged = (active: any) => {
+//     console.log('sortChanged', active);
+//     // 加载完成默认第一个按钮显示
+//     showInfo(aircraftSorted.value[active].aircrafts[0])
+// };
 
 const acRegMelUpdate = (acRegMel: any[]) => {
     console.log('acRegMelUpdate', acRegMel);
