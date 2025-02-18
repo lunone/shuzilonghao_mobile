@@ -89,7 +89,7 @@ const fetchAircrafts = async () => {
     loading.value = true;
     error.value = '';
     try {
-        const res = await store.aircrafts();
+        const res = await store.getAircrafts();
         aircrafts.value = Object.values(res);
         console.log('飞机', res);
     } catch (err) {

@@ -55,7 +55,7 @@ const fetchAircrafts = async () => {
     loading.value = true;
     error.value = '';
     try {
-        const res = await store.aircrafts();
+        const res = await store.getAircrafts();
         console.log('res---', res);
         aircrafts.value = Object.values(res);
     } catch (err) {
