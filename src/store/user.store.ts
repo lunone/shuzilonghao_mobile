@@ -9,19 +9,19 @@ export default defineStore('user', {
         staff: {},
         departments: [] as DepartmenItem[],
         self: {} as UserItem,
-        _token: '' as string,
+        token: '' as string,
     }),
     getters: {
 
     },
     actions: {
-        token(token?: string) {
+        getToken(token?: string) {
             if (token) {
-                this._token = token;
+                this.token = token;
             }
-            return this._token;
+            return this.token;
         },
-        async myself(refresh = false) {
+        async getMyself(refresh = false) {
             // if (refresh) {
             const self = await api(CONFIG.url.init) as UserItem;
             if (self?.id) {
@@ -30,14 +30,14 @@ export default defineStore('user', {
             // }
             return this.self;
         },
-        async staff() {
+        async getStaff() {
             if (!Object.keys(this.staff).length) {
                 const res = await api(CONFIG.url.staff) as Record<string, UserItem>;
                 this.staff = Object.keys(res).length ? res : {};
             }
             return this.staff;
         },
-        async departments() {
+        async getDepartments() {
             if (!this.departments.length) {
                 const res = await api(CONFIG.url.departments) as Record<string, UserItem>;
                 this.departments = res.length ? res : [];

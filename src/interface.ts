@@ -264,3 +264,13 @@ export type AircraftItem = {
     efbGroundoil: number; // EFB接口列，飞机在地面每小时标准油耗
     eighteenItem19: string; // 补充情报第19项编组
 };
+
+export type statItem = {
+    acRegs?: string[],
+    avgFlightTime: number,
+    avgFlightWeight: number
+    flightCount: number
+    maxFlightWeight: number
+    minFlightWeight: number
+    netWeightCargo: number
+}

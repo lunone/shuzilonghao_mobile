@@ -31,6 +31,24 @@
             }
         },
         {
+            "path": "pages/analysis/year",
+            "style": {
+                "navigationBarTitleText": "运行分析-年度分析"
+            }
+        },
+        {
+            "path": "pages/analysis/airlines",
+            "style": {
+                "navigationBarTitleText": "运行分析-站点"
+            }
+        },
+        {
+            "path": "pages/analysis/airplane",
+            "style": {
+                "navigationBarTitleText": "运行分析-飞机"
+            }
+        },
+        {
             "path": "pages/airplane/airplane",
             "style": {
                 "navigationBarTitleText": "机队分析"

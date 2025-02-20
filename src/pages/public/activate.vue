@@ -31,7 +31,7 @@ const activate = async () => {
         console.log('激活结果', res);
         // 激活成功返回token
         if (res) {
-            store.token(res);
+            store.getToken(res);
             // 跳转到首页
             uni.redirectTo({ url: '/pages/Index?activate=true' });
         } else {

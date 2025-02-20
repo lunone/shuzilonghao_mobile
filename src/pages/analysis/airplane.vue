@@ -3,11 +3,11 @@
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else>
         <press-collapse :value="activeNames" @change="airplaneClick">
-            <press-collapse-item :name="airplane.acReg" v-for="airplane in airplanesWithDetail" :key="airplane.acReg">
+            <press-collapse-item :name="acReg" v-for="airplane, acReg in airplanesWithDetail" :key="acReg">
                 <template #title>
                     <div class="ac">
-                        <span class="acreg">{{ airplane.acReg }}</span>
-                        <span class="actype">({{ airplane.acType }})</span>
+                        <span class="acreg">{{ acReg }}</span>
+                        <span class="actype">({{ aircrafts[acReg].acType }})</span>
                     </div>
                 </template>
                 <div class="content">
@@ -37,7 +37,6 @@
                         </div>
                         <div class="avg">
                             <span class="title">班均:</span>
-                            <!-- {{ airplane.stat.totalNetWeightCargo }} -->
                             <span class="value">
                                 {{ airplane.stat.avgNetWeightCargo }}
                             </span>
@@ -47,131 +46,71 @@
                         <div class="rate">
                             <span class="title"></span>
                             <span class="value">
-                                {{ airplane.stat.weightRate }}
+                                <!-- {{ airplane.stat.weightRate }} -->
                             </span>
                             <span class="unit"> %</span>
                         </div>
                     </div>
                 </div>
             </press-collapse-item>
-
         </press-collapse>
 
     </div>
 </template>
-
 <script setup lang="ts">
 import { ref, computed, onMounted, Ref } from 'vue';
 import { AircraftItem, AirportItem, FlightItem } from '@/interface';
 import dayjs from 'dayjs';
-
-import usebasisStore from '@/store/basis.store';
+import CONFIG from '@/config';
+import useBasisStore from '@/store/basis.store';
+import api from '@/utils/api';
 // 定义 props 来接收外部传入的航班数据数组
 const props = defineProps<{ data: FlightItem[], dateRange: [string, string] }>();
 
 // 折叠面板的 activeNames 数组，用于控制面板的展开和折叠
 const activeNames: Ref<string[]> = ref([]);
 
+const store = useBasisStore();
 // 定义 airports 数据，用于存储机场信息
 const airports = ref<Record<string, AirportItem>>({});
 const aircrafts = ref<Record<string, AircraftItem>>({});
+const acRegs = ref<string[]>([]);
 
-const store = usebasisStore();
 
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');
 
 // 定义 airplanesWithDetail 数组，用于存储带有详细信息的飞机
-const airplanesWithDetail = computed(() => {
-    // 定义 airplaneData 对象，包含每个飞机的航班信息
-    const airplaneData: Record<string, {
-        acReg: string, acType: string, flights: FlightItem[], stations: string[], stat: Record<string, any>
-    }> = {};
-    const dayLength = dayjs(props.dateRange[1]).diff(dayjs(props.dateRange[0]), 'day');
-    // console.log(props.dateRange, dayLength);
-    // 遍历 props.data 中的每个航班
-    for (let flight of props.data) {
-        // 获取飞机的注册号
-        const acReg = flight.acReg!;
-        const acType = flight.acType!;
-        // 初始化 airplaneData 中的飞机数据
-        airplaneData[acReg] = airplaneData[acReg] ?? {
-            acReg,
-            acType,
-            // acReg: acReg,
-            flights: [], // 存储该飞机的所有航班
-            stations: [], // 存储该飞机的所有机场
-            stat: {} // 存储该飞机的统计信息
-        };
-
-        // 添加航班到 airplaneData 中的相应飞机
-        airplaneData[acReg].flights.push(flight);
-        const depName = flight.dep;
-        // 添加机场到 airplaneData 中的相应飞机
-        if (!airplaneData[acReg].stations.includes(depName)) {
-            airplaneData[acReg].stations.push(depName);
-        }
-    }
-
-    // 计算每个飞机的统计信息
-    for (let acReg in airplaneData) {
-        const flights = airplaneData[acReg].flights;
-
-        // 计算飞行时间,计算每班运送重量
-        let totalFlightTime = 0, totalNetWeightCargo = 0, counter = 0;
-
-        for (let flight of flights) {
-            counter++;
-            const flightTime = dayjs(flight.ata).diff(dayjs(flight.atd), 'minute');
-
-            totalFlightTime += dayjs(flight.ata).diff(dayjs(flight.atd), 'minute');
-            totalNetWeightCargo += flight.netWeightCargo || 0;
-        }
-        // console.log(totalFlightTime, dayLength);
-        if (isNaN(totalFlightTime)) {
-            console.log(acReg, flights);
-        }
-
-        const weightRate = (totalNetWeightCargo / counter / aircrafts.value[acReg]?.maxPayload * 100).toFixed(2)
-        // console.log()
-        // 更新统计信息
-        airplaneData[acReg].stat = {
-            totalFlightTime: (totalFlightTime / 60).toFixed(2),
-            avgFlightTime: (totalFlightTime / dayLength / 60).toFixed(2),
-            totalNetWeightCargo: (totalNetWeightCargo / 1e3).toFixed(2),
-            avgNetWeightCargo: (totalNetWeightCargo / 1e3 / counter).toFixed(2),
-            weightRate
-        };
-    }
-
-    // 返回处理后的飞机详细信息
-    return Object.values(airplaneData);
-});
+const airplanesWithDetail = ref({}) as Ref<Res>
 
 
 
 // 获取机场信息
 const fetchAirports = async () => {
-    loading.value = true;
-    error.value = '';
-    try {
-        const res = await store.getAirports();
-        airports.value = res;
-    } catch (err) {
-        error.value = '获取机场信息失败';
-    } finally {
-        loading.value = false;
-    }
+    const res = await store.getAirports();
+    const res2 = await store.getAircrafts();
+    airports.value = res;
+    aircrafts.value = res2;
 };
+type statItem = {
+    avgFlightTime: number
+    avgNetWeightCargo: number
+    totalFlightTime: number
+    totalNetWeightCargo: number
+}
+type Res = Record<string, { stations: string[], stat: statItem }>
 // 从store获取航班信息
-const fetchAircrafts = async () => {
+const fetchData = async () => {
     loading.value = true;
     error.value = '';
+    const startDate = '2025-02-09';
+    const endDate = '2025-02-18';
     try {
-        const res = await store.getAircrafts();
-        aircrafts.value = res;
+        const res = await api(CONFIG.url.statByAircraft, { startDate, endDate }) as Res;
         console.log('飞机', res);
+        acRegs.value = Object.keys(res);
+        airplanesWithDetail.value = res;
     } catch (err) {
         error.value = '获取飞机信息失败';
     } finally {
@@ -182,7 +121,7 @@ const fetchAircrafts = async () => {
 onMounted(() => {
     console.log('组件挂载时获取机场信息');
     fetchAirports();
-    fetchAircrafts();
+    fetchData();
 });
 
 // 处理点击面板的事件

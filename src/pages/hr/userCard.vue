@@ -55,7 +55,7 @@ const showProfile = ref(false);
 // todo:从store获取信息
 const fetchUsers = async () => {
     try {
-        const res = await store.staff();
+        const res = await store.getStaff();
         users.value = res;
     } catch (err) {
     } finally {

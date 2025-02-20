@@ -37,7 +37,7 @@ onLoad(async (e) => {
         }
     } else {
         // e.activate是激活成功后需要强制刷新个人信息
-        const res = await store.myself(e.activate);
+        const res = await store.getMyself(e.activate);
         console.log('获取到的user', res);
         // 因为现在本页面已经成了入口级别页面了.所以不一定要初始化了
         // 如果是初始化就要加载封面页,如果不是就立即跳转了
