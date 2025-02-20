@@ -23,6 +23,7 @@ export default {
         //
         crewFlights: '/crew/list/',
         //
+        smsStat: '/sms/stat',
         smsEvents: '/sms/event/list',
         smsVoluntarys: '/sms/voluntary/list',
         //

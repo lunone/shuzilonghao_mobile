@@ -3,23 +3,21 @@
     <view v-if="loading" class="loading">加载中...</view>
     <view v-else-if="error" class="error">{{ error }}</view>
     <view v-else>
-        <view class="summary">
-            最近一个月， {{ events.length }} 事件报告 ， {{ 'voluntarys.length' }} 自愿报告<br>
-        </view>
+        <ucharts :option="pieOption" @select="showTip" :height="200" />
+        --------
         <press-tabs :active="current" @change="onClickItem">
-            <press-tab title="主动报告"  >
-                <voluntarys   />
+            <press-tab title="主动报告">
+                <voluntarys :start-date="selectStartDate" :end-date="selectEndDate" />
             </press-tab>
-            <press-tab title="事件" >
+            <!-- <press-tab title="事件">
                 <EventVue :data="event" v-for="event in events" :key="event.id" />
-            </press-tab>
-            
+            </press-tab> -->
+
         </press-tabs>
-        <!-- <back-top /> -->
 
     </view>
-   
-    
+
+
 </template>
 
 <script setup lang="ts">
@@ -27,32 +25,97 @@ import { ref, computed, onMounted, Ref } from 'vue';
 // import NavVue from '@/components/Nav.vue';
 import api from '@/utils/api';
 import dayjs from 'dayjs';
-import { EventItem } from '@/interface';
-import EventVue from './card/event.vue';
 import CONFIG from '@/config';
 // import backTop from '@/components/zl/backTop.vue';
+import ucharts from '@/components/ucharts/ucharts.vue';
+import EventVue from './card/event.vue';
 import voluntarys from './voluntarys.vue';
 
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');
 
-// 定义事件列表和自愿报告列表
-const events: Ref<EventItem[]> = ref([]);
-
+const pieOption = ref({});
+const stats = ref({}) as Ref<Record<string, { events, voluntarys }>>;
+const months = ref([]);
 const current = ref(0);
 const onClickItem = e => current.value = current != e.currentIndex ? e.currentIndex : current.value;
 
+const startDate = dayjs().subtract(1, 'year').startOf('month').format('YYYY-MM-DD');
 const endDate = dayjs().format('YYYY-MM-DD');
-const startDate = dayjs().subtract(1, 'month').format('YYYY-MM-DD');
+
+const selectStartDate = ref(dayjs().startOf('month').format('YYYY-MM-DD'));
+const selectEndDate = ref(dayjs().format('YYYY-MM-DD'));
+const getOption = (res) => {
+    months.value = Object.keys(res);
+    const events = [];
+    const voluntarys = [];
+    for (let month of months.value) {
+        events.push(res[month].events);
+        voluntarys.push(res[month].voluntarys);
+    }
+    console.log(events, voluntarys);
+    const step = 2;
+    return {
+        type: "mix",
+        categories: months,
+        series: [
+            {
+                color: "#aaaaaa",
+                name: "安全事件", type: "column",
+                data: events
+                //  yData.map(value => {
+                //     // 超过平均值20%的颜色红色，低于平均值20%的颜色暗绿色，其他的颜色为蓝色
+                //     const diff = (value - avgDay) / avgDay;
+                //     const color = diff > 0.2 ? '#d48264' : (diff < -0.2) ? '#c4ccd3' : "#91c7ae";
+                //     return { color, value }
+                // })
+            }, {
+                name: '主动报告', type: "line",
+                data: voluntarys
+            },
+            // { name: '班次', type: "column", data: counters }
+        ],
+        animation: false,
+        // background: "#FFFFFF",
+        padding: [15, 0, 10, 0],
+        legend: { show: false, },
+        xAxis: {
+            disableGrid: true,
+            // labelCount: 8,// 这个确实会自动控制显示标签数量,但是不显示的标签的val就是''了,没办法formatter
+            formatter: (val, index) => index % step != 0 ? '' : val,
+        },
+        yAxis: {
+            disabled: true,
+            // disableGrid: true,
+            data: [{
+                min: 0,
+                // disabled: true,
+            },
+            {
+                disabled: false,
+                min: 10, max: 50,
+            }]
+        },
+        extra: {
+            mix: {
+                column: {
+                    width: 16
+                }
+            }
+        }
+    }
+}
 // 获取事件列表
 const fetchData = async () => {
     loading.value = true;
     error.value = '';
 
     try {
-        const res = await api(CONFIG.url.smsEvents, { startDate, endDate }) as EventItem[];
-        events.value = res;
+        const res = await api(CONFIG.url.smsStat, { startDate, endDate });
+        console.log('事件列表', res);
+        stats.value = res;
+        pieOption.value = getOption(res);
     } catch (err) {
         error.value = '获取事件列表失败';
     } finally {
@@ -60,7 +123,20 @@ const fetchData = async () => {
     }
 };
 
-
+function showTip(chart, event) {
+    const item = chart.getCurrentDataIndex(event);
+    const month = months.value[item.index];
+    const value = stats.value[month];
+    chart.showToolTip(event, {
+        textList: [
+            { text: `主动报告:${value.voluntarys}`, color: "#1890FF" },
+            { text: `安全事件:${value.events}`, color: "#91CB74" }
+        ]
+    });
+    selectStartDate.value = dayjs(`20${month}/01`).format('YYYY-MM-DD');
+    selectEndDate.value = dayjs(`20${month}/01`).add(1, 'month').subtract(1, 'day').format('YYYY-MM-DD');
+    console.log('激活下面的俩小baby', item, selectEndDate.value, selectStartDate.value);
+}
 // 组件挂载时获取事件列表
 onMounted(() => {
     fetchData();
