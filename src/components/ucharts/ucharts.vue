@@ -47,7 +47,7 @@ function draw(data) {
                 type: "column",
                 animation: true,
                 background: "#333333",
-                // color: ["#1890FF", "#91CB74", "#FAC858", "#EE6666", "#73C0DE", "#3CA272", "#FC8452", "#9A60B4", "#ea7ccc"],
+                color: ["#91CB74","#FAC858","#EE6666","#73C0DE","#3CA272","#FC8452","#9A60B4","#EA7CCC"],
                 padding: [0, 0, 0, 0],
                 legend: { show: false },
                 xAxis: {}

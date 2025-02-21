@@ -69,6 +69,7 @@ const getOption = (res) => {
     return {
         type: "mix",
         categories: months,
+        color: ["#91CB74","#FAC858","#EE6666","#73C0DE","#3CA272","#FC8452","#9A60B4","#ea7ccc"],
         series: [
             {
                 color: "#aaaaaa",
