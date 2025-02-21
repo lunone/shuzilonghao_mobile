@@ -1,8 +1,5 @@
 <template>
-    <van-notice-bar wrapable :scrollable="false" left-icon="info-o">
-        这部分数据需要接入 航投人力资源系统,
-        <br>该功能为实现，仅为展示
-    </van-notice-bar>
+
     如果是行政人员:<b>行政班</b><br>
 
     如果是维修人员，显示倒班日期:

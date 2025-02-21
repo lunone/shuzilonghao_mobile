@@ -34,11 +34,10 @@
 </template>
 <script lang="ts" setup>
 import dayjs from 'dayjs';
+import { call } from '@/utils/tools';
 const props = defineProps<{ data: Record<string, any> }>();
 // 拨打电话的方法
-const call = (phoneNumber: string) => {
-    window.location.href = `tel:${phoneNumber}`;
-};
+
 </script>
 <style lang="less" scoped>
 .event {

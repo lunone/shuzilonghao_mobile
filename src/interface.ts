@@ -16,6 +16,7 @@ export type UserItem = {
     name?: string,
     avatar?: string,
     gender?: number,
+    position?: string,
     departmentId?: number,
     departmentName?: string,
     topDepartmentId?: number,

@@ -15,7 +15,7 @@
             <view class="text"> 飞机分析 </view>
         </navigator>
 
-
+        <Profile :userId="`A00725`"   />
 
 
     </div>
@@ -24,6 +24,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, Ref } from 'vue';
 import CONFIG from '@/config';
+import Profile from '../hr/profile.vue';
 
 </script>
 

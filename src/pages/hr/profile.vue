@@ -1,65 +1,83 @@
 <template>
-    <view class="employee-profile">
-        <view class="profile-header">
-            <img :src="employee2?.avatar" alt="Avatar" class="avatar" />
-            <view class="profile-info">
-                <view class="userId">{{ employee2?.userId }}</view>
-                <view class="name">{{ employee2?.name }}</view>
-                <!-- <view class="department">{{ employee.department }}/{{ employee.subDepartment }}</view> -->
-            </view>
-        </view>
-
-        <view class="basic-info">
-            <view class="phone">电话：{{ employee2?.mobile }}</view>
-            <view class="address">地址：{{ employee2?.district }}{{ employee2?.address }}</view>
-        </view>
-        <view class="id-number">身份证号：{{ employee2?.idCard }}</view>
-        <press-tabs :active="current" @change="onClickItem">
-            <press-tab title="联系人">
-                <Contract />
-            </press-tab>
-            <press-tab title="培训工作">
-                <Education />
-                <Experience />
-            </press-tab>
-            <press-tab title="绩效分析">
-                <Salary />
-            </press-tab>
-            <press-tab title="工作轨迹">
-                <Job />
-            </press-tab>
-        </press-tabs>
-
-    </view>
+    <div class="profile">
+        <div class="header">
+            <div class="avatar">
+                <img :src="employee2?.avatar" alt="Avatar" />
+            </div>
+            <div class="info">
+                <div class="kv name">{{ employee2?.name }}({{ employee2?.userId }})</div>
+                <div class="ietm department">{{ depName }}</div>
+                <div class="kv position">
+                    <div class="key">岗位</div>
+                    <div class="value">{{ employee2?.position }}</div>
+                </div>
+                <div class="kv phone" @click="call(employee2?.mobile)">
+                    <div class="key">电话</div>
+                    <div class="value"> {{ employee2?.mobile }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="details">
+            <press-tabs :active="current">
+                <press-tab title="背景信息">
+                    <referenceVue :district="employee2?.district" :address="employee2?.address"
+                        :idCard="employee2?.idCard" />
+                </press-tab>
+                <press-tab title="个人经历">
+                    <div class="exp">
+                        <experienceVue />
+                    </div>
+                </press-tab>
+                <press-tab title="人资信息">
+                    <div class="hr">
+                        <Contract />
+                        <Performance />
+                        <Salary />
+                    </div>
+                </press-tab>
+                <press-tab title="工作轨迹">
+                    <div class="duty">
+                        <dutyVue />
+                    </div>
+                </press-tab>
+            </press-tabs>
+        </div>
+    </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, Ref, ref } from 'vue';
+import { computed, onMounted, Ref, ref } from 'vue';
 import CONFIG from '@/config';
 import api from '@/utils/api';
 import { UserItem } from '@/interface';
 import useUserStore from '@/store/user.store';
 import Salary from './profile/salary.vue';
-import Experience from './profile/experience.vue';
-import Job from './profile/job.vue';
+import experienceVue from './profile/experience.vue';
+import dutyVue from './profile/duty.vue';
+import referenceVue from './profile/reference.vue';
+import education from './profile/education.vue';
+import { call } from '@/utils/tools';
+import Performance from './profile/performance.vue';
 import Contract from './profile/contract.vue';
-import Education from './profile/education.vue';
+const store = useUserStore();
 
 const props = defineProps({
     userId: { type: String, default: '' }
 });
 
-const store = useUserStore();
 const active = ref(0);
 const employee2: Ref<UserItem> = ref();
+let departments = ref([]);
+const depName = ref('');
 const fetchEmployee = async () => {
     const res = await api(CONFIG.url.userProfile, { userId: props.userId });
-    // const departments = await store.departments();
+    const deps = await store.getDepartments(); departments.value = deps;
+    depName.value = getDepartmentPath(deps, +res.department);
     employee2.value = res;
 };
-const items = ref(['更多信息', '薪酬表现', '工作记录']);
+
 const current = ref(0);
-const onClickItem = (e) => {
+const onClickkv = (e) => {
     if (current != e.currentIndex) {
         current.value = e.currentIndex;
     }
@@ -67,179 +85,93 @@ const onClickItem = (e) => {
 onMounted(() => {
     fetchEmployee();
 });
+interface Department {
+    id: string | number;
+    parentId?: string | number | null;
+    name: string;
+}
+
+const getDepartmentPath = (departments: Department[], targetId: string | number): string => {
+    // 创建哈希映射提升查询效率
+    const deptMap = new Map<string | number, Department>();
+    departments.forEach(dept => deptMap.set(dept.id, dept));
+
+    const path: string[] = [];
+    let currentId: string | number | undefined = targetId;
+    const visited = new Set<string | number>(); // 防止循环引用
+    while (currentId && deptMap.has(currentId)) {
+        if (visited.has(currentId)) break; // 检测到循环立即终止
+        visited.add(currentId);
+
+        const currentDept = deptMap.get(currentId)!;
+        path.unshift(currentDept.name); // 从头部插入保证层级顺序
+
+        currentId = currentDept.parentId;
+    }
+    // 因为root是中原龙浩,所以得裁掉一段
+    return path.slice(1).join(' / ');
+}
 </script>
 
 <style lang="less" scoped>
 @import "@/css/base.less";
+@import "@/css/kv.less";
 
-.employee-profile {
+.profile {
     padding: 20px;
-    background-color: @color-background;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    min-height: 40vh;
-    max-height: 60vh;
+    height: 40vh;
     overflow-y: scroll;
 
-    .profile-header {
+    .header {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
 
         .avatar {
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 120px;
             border-radius: 3px;
             margin-right: 20px;
             border: solid 1px @color-border;
+            border-radius: 10px;
+            background: url('https://app.airlonghao.com/picph.jpg');
         }
 
-        .profile-info {
-            .userId {
-                font-size: 14px;
-                color: @color-text;
-            }
+        .info {
+            .column;
+            width: 100%;
+            align-items: flex-start;
+            height: 90px;
 
             .name {
                 font-size: 20px;
                 font-weight: bold;
-                margin-top: 5px;
             }
 
             .department {
-                margin-top: 5px;
                 color: @color-text;
             }
+
+            .position {}
+
+            .phone {}
         }
     }
 
-    .profile-details {
+    .details {
         margin-top: 20px;
         border-top: 1px solid @color-border;
         padding-top: 10px;
 
-        .id-number,
-        .join-date,
-        .leave-date,
-        .contract-expiry,
-        .district {
-            margin-bottom: 10px;
-            color: @color-text;
+        .hr,
+        .duty,
+        .exp {
+            background-image: url('https://app.airlonghao.com/sample.png');
+            /* 替换为你的图片URL */
+            background-position: top right;
+            background-repeat: no-repeat;
         }
     }
 
-    .basic-info {
-        margin-top: 20px;
-        border-top: 1px solid @color-border;
-        padding-top: 10px;
 
-        .phone,
-        .address,
-        .district {
-            margin-bottom: 10px;
-            color: @color-text;
-        }
-    }
-
-    .emergency-contacts {
-        margin-top: 20px;
-        border-top: 1px solid @color-border;
-        padding-top: 10px;
-
-        .emergency-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .contact {
-            margin-bottom: 10px;
-
-            .contact-name,
-            .contact-relationship,
-            .contact-address,
-            .contact-workplace {
-                margin-bottom: 5px;
-                color: @color-text;
-            }
-        }
-    }
-
-    .education {
-        margin-top: 20px;
-        border-top: 1px solid @color-border;
-        padding-top: 10px;
-
-        .education-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .graduation-school {
-            margin-bottom: 10px;
-            color: @color-text;
-        }
-
-        .education-experience {
-            .education-item {
-                margin-bottom: 10px;
-
-                .education-period,
-                .education-school,
-                .education-nature {
-                    margin-bottom: 5px;
-                    color: @color-text;
-                }
-            }
-        }
-    }
-
-    .level {
-        margin-top: 20px;
-        border-top: 1px solid @color-border;
-        padding-top: 10px;
-
-        .level-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .level-details {
-            .level-item {
-                margin-bottom: 5px;
-                color: @color-text;
-            }
-        }
-    }
-
-    .experience {
-        margin-top: 20px;
-        border-top: 1px solid @color-border;
-        padding-top: 10px;
-
-        .experience-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .job-period,
-        .job-title,
-        .job-company {
-            margin-bottom: 5px;
-            color: @color-text;
-        }
-
-        .job-period {
-            display: block;
-
-            .start,
-            .end {
-                font-size: 14px;
-                margin-right: 3rem;
-            }
-        }
-    }
 }
 </style>

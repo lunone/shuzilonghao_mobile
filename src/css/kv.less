@@ -1,0 +1,25 @@
+.kv {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1rpx solid #e0e0e0;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    .key {
+        font-size: 28rpx;
+        color: #999;
+        text-align: left;
+        width: 60px;
+    }
+
+    .value {
+        color: #333;
+        text-align: right;
+        flex: 1;
+        overflow: scroll;
+        white-space: nowrap;
+    }
+}
