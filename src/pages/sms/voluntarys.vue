@@ -1,7 +1,8 @@
 <template>
     <!-- <view v-if="voluntarys.length === 0">暂无主动报告</view> -->
     <view class="report-list" style="height: 800px;">
-        <press-list v-model="loading" :finished="finished" :immediate-check="immediateCheck" finished-text="没有更多了">
+        <press-list v-model="loading" :finished="finished" :immediate-check="false" finished-text="没有更多了"
+            :load="loadMore">
             <voluntary v-for="(voluntary, index) in voluntarys" :key="index" :data="voluntary" />
         </press-list>
     </view>
@@ -14,7 +15,6 @@ import CONFIG from '@/config';
 import dayjs from 'dayjs';
 import voluntary from './card/voluntary.vue';
 
-
 const props = defineProps({
     startDate: { type: String, default: dayjs().add(-1, 'month').format('YYYY-MM-DD') },
     endDate: { type: String, default: dayjs().format('YYYY-MM-DD') },
@@ -23,23 +23,20 @@ const props = defineProps({
 const voluntarys: Ref<any[]> = ref([]);
 const loading = ref(false);
 const finished = ref(false);
-const immediateCheck = ref(false);
 const page = ref(1);
-const size = 10;
+// const size = 300;
 
 
 // 获取事件列表
-const fetchData = async (currentPage: number) => {
+const fetchData = async (currentPage: number = 1) => {
     loading.value = true;
-    page.value++;
+    // page.value++;
     try {
-        const resVoluntary = await api(CONFIG.url.smsVoluntarys, { startDate: props.startDate, endDate: props.endDate, page: currentPage, size });
-        console.log('resVoluntary', resVoluntary, props);
-        // todo:如果日期没变,
-        voluntarys.value = voluntarys.value.concat(resVoluntary.data);
-
+        const resVoluntary = await api(CONFIG.url.smsVoluntarys, { startDate: props.startDate, endDate: props.endDate });
+        // console.log('resVoluntary', resVoluntary, props);
+        voluntarys.value = voluntarys.value.concat(resVoluntary);
         loading.value = false;
-        finished.value = voluntarys.value.length > resVoluntary.total;
+        // finished.value = voluntarys.value.length > resVoluntary.total;, page: currentPage, size
     } catch (err) {
         console.error('获取事件列表失败', err);
     } finally {
@@ -47,15 +44,17 @@ const fetchData = async (currentPage: number) => {
     }
 };
 
-
-
 // 加载更多数据
-const loadMore = () => fetchData(page.value);
+const loadMore = () => {
+    console.log('loadmore');
+    fetchData(page.value);
+}
 
 watch(() => props, () => {
-
-    console.log('组件挂载时获取事件列表', page.value, props);
+    // console.log('组件挂载时获取事件列表', page.value, props);
     fetchData(page.value);
+    voluntarys.value = [];
+    // page.value = 1;
 }, { immediate: true, deep: true })
 // 组件挂载时获取事件列表
 onMounted(() => {

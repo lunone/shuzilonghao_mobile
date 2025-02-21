@@ -32,8 +32,14 @@ export default defineStore('user', {
         },
         async getStaff() {
             if (!Object.keys(this.staff).length) {
-                const res = await api(CONFIG.url.staff) as Record<string, UserItem>;
-                this.staff = Object.keys(res).length ? res : {};
+                const res = await api(CONFIG.url.staff) as UserItem[];
+                const obj = {}
+                if (res.length) {
+                    for (let user of res) {
+                        obj[user.userId] = user
+                    }
+                }
+                this.staff = obj;
             }
             return this.staff;
         },

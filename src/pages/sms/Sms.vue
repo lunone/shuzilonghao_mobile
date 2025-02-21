@@ -3,15 +3,16 @@
     <view v-if="loading" class="loading">加载中...</view>
     <view v-else-if="error" class="error">{{ error }}</view>
     <view v-else>
+        <div class="title">安全趋势</div>
         <ucharts :option="pieOption" @select="showTip" :height="200" />
-        --------
-        <press-tabs :active="current" @change="onClickItem">
-            <press-tab title="主动报告">
-                <voluntarys :start-date="selectStartDate" :end-date="selectEndDate" />
+        <press-divider contentPosition="center">{{ title }}详情</press-divider>
+        <press-tabs :active="tabCurrent" @change="onClickItem">
+            <press-tab :title="`主动报告(${select.voluntarys})`">
+                <voluntarysVue :start-date="selectStartDate" :end-date="selectEndDate" />
             </press-tab>
-            <!-- <press-tab title="事件">
-                <EventVue :data="event" v-for="event in events" :key="event.id" />
-            </press-tab> -->
+            <press-tab :title="`事件(${select.events})`">
+                <eventsVue :start-date="selectStartDate" :end-date="selectEndDate" />
+            </press-tab>
 
         </press-tabs>
 
@@ -26,20 +27,24 @@ import { ref, computed, onMounted, Ref } from 'vue';
 import api from '@/utils/api';
 import dayjs from 'dayjs';
 import CONFIG from '@/config';
-// import backTop from '@/components/zl/backTop.vue';
 import ucharts from '@/components/ucharts/ucharts.vue';
-import EventVue from './card/event.vue';
-import voluntarys from './voluntarys.vue';
+import eventsVue from '@/pages/sms/events.vue';
+import voluntarysVue from './voluntarys.vue';
 
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');
-
+const title = ref(dayjs().format('YY/MM'));
 const pieOption = ref({});
-const stats = ref({}) as Ref<Record<string, { events, voluntarys }>>;
+
 const months = ref([]);
-const current = ref(0);
-const onClickItem = e => current.value = current != e.currentIndex ? e.currentIndex : current.value;
+const events = ref([]);
+const voluntarys = ref([]);
+const select = ref({ events: 0, voluntarys: 0 })
+const stats = ref({}) as Ref<Record<string, { events, voluntarys }>>;
+
+const tabCurrent = ref(0);
+const onClickItem = e => tabCurrent.value = tabCurrent != e.currentIndex ? e.currentIndex : tabCurrent.value;
 
 const startDate = dayjs().subtract(1, 'year').startOf('month').format('YYYY-MM-DD');
 const endDate = dayjs().format('YYYY-MM-DD');
@@ -48,13 +53,18 @@ const selectStartDate = ref(dayjs().startOf('month').format('YYYY-MM-DD'));
 const selectEndDate = ref(dayjs().format('YYYY-MM-DD'));
 const getOption = (res) => {
     months.value = Object.keys(res);
-    const events = [];
-    const voluntarys = [];
+    const events2 = [];
+    const voluntarys2 = [];
+    let last = { events: 0, voluntarys: 0 }
     for (let month of months.value) {
-        events.push(res[month].events);
-        voluntarys.push(res[month].voluntarys);
+        events2.push(res[month].events);
+        voluntarys2.push(res[month].voluntarys);
+        last = { events: res[month].events, voluntarys: res[month].voluntarys }
     }
-    console.log(events, voluntarys);
+    select.value = last
+    events.value = events2;
+    voluntarys.value = voluntarys2;
+    // console.log(events2, voluntarys2);
     const step = 2;
     return {
         type: "mix",
@@ -63,7 +73,7 @@ const getOption = (res) => {
             {
                 color: "#aaaaaa",
                 name: "安全事件", type: "column",
-                data: events
+                data: events2
                 //  yData.map(value => {
                 //     // 超过平均值20%的颜色红色，低于平均值20%的颜色暗绿色，其他的颜色为蓝色
                 //     const diff = (value - avgDay) / avgDay;
@@ -72,7 +82,7 @@ const getOption = (res) => {
                 // })
             }, {
                 name: '主动报告', type: "line",
-                data: voluntarys
+                data: voluntarys2
             },
             // { name: '班次', type: "column", data: counters }
         ],
@@ -91,8 +101,7 @@ const getOption = (res) => {
             data: [{
                 min: 0,
                 // disabled: true,
-            },
-            {
+            }, {
                 disabled: false,
                 min: 10, max: 50,
             }]
@@ -135,6 +144,9 @@ function showTip(chart, event) {
     });
     selectStartDate.value = dayjs(`20${month}/01`).format('YYYY-MM-DD');
     selectEndDate.value = dayjs(`20${month}/01`).add(1, 'month').subtract(1, 'day').format('YYYY-MM-DD');
+    select.value.events = value.events;
+    select.value.voluntarys = value.voluntarys;
+    title.value = `${month}`;
     console.log('激活下面的俩小baby', item, selectEndDate.value, selectStartDate.value);
 }
 // 组件挂载时获取事件列表
@@ -149,6 +161,12 @@ onMounted(() => {
 .error {
     text-align: center;
     margin-top: 20px;
+}
+
+.title {
+    margin: 10px;
+    font-size: 16px;
+    color: #888;
 }
 
 .summary {

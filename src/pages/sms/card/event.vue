@@ -12,24 +12,24 @@
         <div class="desc">
             {{ data.desc }}
         </div>
-        <van-steps direction="vertical" :active="data.status.length">
-            <van-step>
+        <div direction="vertical" :active="data.status.length">
+            <div>
                 <h3>{{ data.reportDate }}：{{ data.reporter || `神秘人` }}
                     <i class="icon zl-icon-phone" :style="{ marginLeft: '10px' }" @click="call(data.reporterTel)" />
                     <!-- 添加电话图标 -->
 
                 </h3>
                 <span>提交事件</span>
-            </van-step>
-            <van-step v-for="(value, key) in data.status" :key="key">
+            </div>
+            <div v-for="(value, key) in data.status" :key="key">
                 <h3>{{ value.updateTime }}：{{ value.updater || `神秘人` }} </h3>
                 <span v-if="value.reason && value.reason != data.status[key - 1]?.reason">填写了原因：{{
                     value.reason }}</span>
                 <span v-if="value.result">填写了结果：{{ value.result }}</span>
                 <span v-if="value.reason || value.result">，</span>
                 <span v-if="value.deleteFlag"> 关闭了该事件</span>
-            </van-step>
-        </van-steps>
+            </div>
+        </div>
     </div>
 </template>
 <script lang="ts" setup>
@@ -83,23 +83,23 @@ const call = (phoneNumber: string) => {
         margin-bottom: 10px;
     }
 
-    .van-steps {
+    .divs {
         margin-top: 10px;
 
-        .van-step {
-            .van-step__circle-container {
-                .van-step__circle {
+        .div {
+            .div__circle-container {
+                .div__circle {
                     background-color: #4a90e2;
                     border-color: #4a90e2;
                 }
 
-                .van-step__line {
+                .div__line {
                     background-color: #4a90e2;
                 }
             }
 
-            .van-step__content {
-                .van-step__title {
+            .div__content {
+                .div__title {
                     font-size: 0.9rem;
                     color: #333;
 
@@ -109,7 +109,7 @@ const call = (phoneNumber: string) => {
                     }
                 }
 
-                .van-step__description {
+                .div__description {
                     font-size: 0.8rem;
                     color: #666;
                 }
