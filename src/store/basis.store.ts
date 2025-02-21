@@ -7,6 +7,7 @@ import CONFIG from '@/config';
 export default defineStore('basis', {
     state: () => ({
         airportsCode4: {} as Record<string, AirportItem>,
+        airportsCode3: {} as Record<string, AirportItem>,
         aircrafts: {} as Record<string, AircraftItem>,
     }),
     getters: {
@@ -18,6 +19,19 @@ export default defineStore('basis', {
                 this.airportsCode4 = res;
             }
             return this.airportsCode4;
+        },
+        async getAirportsCode3() {
+            if (!this.airportsCode3['CGO']) {
+                const res = await this.getAirports();
+                const code3 = {}
+                for (const key in res) {
+                    if (res[key].code3) {
+                        code3[res[key].code3] = res[key];
+                    }
+                }
+                this.airportsCode3 = code3;
+            }
+            return this.airportsCode3;
         },
         async getAircrafts() {
             if (!Object.keys(this.aircrafts).length) {

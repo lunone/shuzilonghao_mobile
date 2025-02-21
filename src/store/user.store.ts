@@ -10,6 +10,7 @@ export default defineStore('user', {
         departments: [] as DepartmenItem[],
         self: {} as UserItem,
         token: '' as string,
+        nameToUserId: {} as Record<string, string>,
     }),
     getters: {
 
@@ -30,7 +31,7 @@ export default defineStore('user', {
             // }
             return this.self;
         },
-        async getStaff() {
+        async getStaff(): Promise<Record<string, UserItem>> {
             if (!Object.keys(this.staff).length) {
                 const res = await api(CONFIG.url.staff) as UserItem[];
                 const obj = {}
@@ -49,6 +50,19 @@ export default defineStore('user', {
                 this.departments = res.length ? res : [];
             }
             return this.departments;
+        },
+        async getNameToUserId() {
+            if (Object.keys(this.nameToUserId).length === 0) {
+                const userObj = await this.getStaff();
+                const nameToUserId = {}
+                for (let userId in userObj) {
+                    const name = userObj[userId].name;
+                    nameToUserId[name] = userId;
+                }
+                this.nameToUserId = nameToUserId;
+            }
+
+            return this.nameToUserId;
         },
     }
 })

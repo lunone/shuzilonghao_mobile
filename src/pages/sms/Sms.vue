@@ -5,13 +5,13 @@
     <view v-else>
         <div class="title">安全趋势</div>
         <ucharts :option="pieOption" @select="showTip" :height="200" />
-        <press-divider contentPosition="center">{{ title }}详情</press-divider>
+        <press-divider contentPosition="center">{{ title }} 详情</press-divider>
         <press-tabs :active="tabCurrent" @change="onClickItem">
             <press-tab :title="`主动报告(${select.voluntarys})`">
-                <voluntarysVue :start-date="selectStartDate" :end-date="selectEndDate" />
+                <voluntarysVue :range="selectRange" />
             </press-tab>
             <press-tab :title="`事件(${select.events})`">
-                <eventsVue :start-date="selectStartDate" :end-date="selectEndDate" />
+                <eventsVue :range="selectRange" />
             </press-tab>
 
         </press-tabs>
@@ -34,7 +34,7 @@ import voluntarysVue from './voluntarys.vue';
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');
-const title = ref(dayjs().format('YY/MM'));
+const title = ref(dayjs().format('YY年MM月'));
 const pieOption = ref({});
 
 const months = ref([]);
@@ -49,8 +49,12 @@ const onClickItem = e => tabCurrent.value = tabCurrent != e.currentIndex ? e.cur
 const startDate = dayjs().subtract(1, 'year').startOf('month').format('YYYY-MM-DD');
 const endDate = dayjs().format('YYYY-MM-DD');
 
-const selectStartDate = ref(dayjs().startOf('month').format('YYYY-MM-DD'));
-const selectEndDate = ref(dayjs().format('YYYY-MM-DD'));
+// const selectStartDate = ref(dayjs().startOf('month').format('YYYY-MM-DD'));
+// const selectEndDate = ref(dayjs().format('YYYY-MM-DD'));
+const selectRange = ref([
+    dayjs().startOf('month').format('YYYY-MM-DD'),
+    dayjs().format('YYYY-MM-DD')
+]) as Ref<[string, string]>;
 const getOption = (res) => {
     months.value = Object.keys(res);
     const events2 = [];
@@ -69,7 +73,7 @@ const getOption = (res) => {
     return {
         type: "mix",
         categories: months,
-        color: ["#91CB74","#FAC858","#EE6666","#73C0DE","#3CA272","#FC8452","#9A60B4","#ea7ccc"],
+        color: ["#91CB74", "#FAC858", "#EE6666", "#73C0DE", "#3CA272", "#FC8452", "#9A60B4", "#ea7ccc"],
         series: [
             {
                 color: "#aaaaaa",
@@ -83,7 +87,8 @@ const getOption = (res) => {
                 // })
             }, {
                 name: '主动报告', type: "line",
-                data: voluntarys2
+                // 默认太高了,裁掉一节
+                data: voluntarys2.map((value, index) => value - 30)
             },
             // { name: '班次', type: "column", data: counters }
         ],
@@ -120,10 +125,8 @@ const getOption = (res) => {
 const fetchData = async () => {
     loading.value = true;
     error.value = '';
-
     try {
         const res = await api(CONFIG.url.smsStat, { startDate, endDate });
-        console.log('事件列表', res);
         stats.value = res;
         pieOption.value = getOption(res);
     } catch (err) {
@@ -134,6 +137,7 @@ const fetchData = async () => {
 };
 
 function showTip(chart, event) {
+
     const item = chart.getCurrentDataIndex(event);
     const month = months.value[item.index];
     const value = stats.value[month];
@@ -143,12 +147,13 @@ function showTip(chart, event) {
             { text: `安全事件:${value.events}`, color: "#91CB74" }
         ]
     });
-    selectStartDate.value = dayjs(`20${month}/01`).format('YYYY-MM-DD');
-    selectEndDate.value = dayjs(`20${month}/01`).add(1, 'month').subtract(1, 'day').format('YYYY-MM-DD');
+    selectRange.value = [
+        dayjs(`20${month}/01`).format('YYYY-MM-DD'),
+        dayjs(`20${month}/01`).add(1, 'month').subtract(1, 'day').format('YYYY-MM-DD')
+    ];
     select.value.events = value.events;
     select.value.voluntarys = value.voluntarys;
-    title.value = `${month}`;
-    console.log('激活下面的俩小baby', item, selectEndDate.value, selectStartDate.value);
+    title.value = `${month.replace('/', '年')}月`;
 }
 // 组件挂载时获取事件列表
 onMounted(() => {

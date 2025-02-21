@@ -38,11 +38,6 @@ const props = defineProps({
 const users: Ref<Record<string, UserItem>> = ref({});
 const userName = ref(props.name);
 
-onMounted(() => {
-    if (props.userId && users.value[props.userId]) {
-        userName.value = users.value[props.userId].name || '';
-    }
-});
 
 const genderClass = computed(() => {
     if (props.gender === 0) return 'woman';
@@ -56,6 +51,7 @@ const showProfile = ref(false);
 const fetchUsers = async () => {
     try {
         const res = await store.getStaff();
+        // console.log(res);
         users.value = res;
     } catch (err) {
     } finally {
@@ -70,8 +66,13 @@ const toggleProfile = () => {
 };
 
 
-onMounted(() => {
-    fetchUsers();
+onMounted(async () => {
+    await fetchUsers();
+    // console.log('userCard已经加载', props.userId, users.value[props.userId])
+    if (props.userId && users.value[props.userId]) {
+        userName.value = users.value[props.userId].name || '';
+    }
+
 });
 </script>
 

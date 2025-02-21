@@ -1,46 +1,74 @@
 <template>
-    <div class="event">
+    <div class="event-wrapper">
         <div class="meta">
             <span class="date">{{ data.date }}</span>
             <span class="flightno">航班号:{{ data.flightNo }}</span>
             <span class="acreg">飞机号:{{ data.acReg }}</span>
-            <span class="status">状态:</span>
+            <span class="way">{{ data.dep }} - {{ data.arr }}</span>
         </div>
-        <div class="title">
-            机组 {{ data.crews }} 站点：{{ data.dep || data.arr }}
+        <div class="crews">
+            <div class="title">机组</div>
+            <div class="value">
+                <template v-for="crew in data.crews" :key="crew.name">
+                    <UserCardVue :userId="crew.userId" :name="crew.name" class="name" v-if="crew.userId"
+                        :show-icon="false" />
+                    <div class="name" v-else>{{ crew.name }}</div>
+                </template>
+            </div>
         </div>
+        <!-- <div class="station">
+            <div class="title">站点</div>
+            <div class="value">{{ data.dep || data.arr }}</div>
+        </div> -->
         <div class="desc">
             {{ data.desc }}
         </div>
         <div direction="vertical" :active="data.status.length">
             <div>
-                <h3>{{ data.reportDate }}：{{ data.reporter || `神秘人` }}
-                    <i class="icon zl-icon-phone" :style="{ marginLeft: '10px' }" @click="call(data.reporterTel)" />
+                <div class="time-name">
+                    <div class="time">{{ data.reportDate }}</div>
+                    <UserCardVue :userId="data.reporter" name="dd" class="name" v-if="/A/.test(data.reporter)"
+                        :show-icon="false" />
+                    <span class="name" v-else>{{ data.reporter || `神秘人` }}</span>
+                    <!-- {{ data.reporter || `神秘人` }}
+                    <i class="icon zl-icon-phone" :style="{ marginLeft: '10px' }" @click="call(data.reporterTel)" /> -->
                     <!-- 添加电话图标 -->
-
-                </h3>
+                </div>
                 <span>提交事件</span>
             </div>
-            <div v-for="(value, key) in data.status" :key="key">
-                <h3>{{ value.updateTime }}：{{ value.updater || `神秘人` }} </h3>
-                <span v-if="value.reason && value.reason != data.status[key - 1]?.reason">填写了原因：{{
-                    value.reason }}</span>
-                <span v-if="value.result">填写了结果：{{ value.result }}</span>
+            <div class="step" v-for="(value, key) in data.status" :key="key">
+                <div class="time-name">
+                    <div class="time">{{ value.updateTime }}</div>
+                    <template>
+                        <UserCardVue :userId="value.updater" name="dd" class="name" v-if="/A/.test(value.updater)"
+                            :show-icon="false" />
+                        <span class="name" v-else>{{ value.updater || `神秘人` }}</span>
+                    </template>
+                </div>
+                <span v-if="value.reason && value.reason != data.status[key - 1]?.reason">
+                    填写了原因：{{ value.reason }}
+                </span>
+                <span v-if="value.result">
+                    填写了结果：{{ value.result }}
+                </span>
                 <span v-if="value.reason || value.result">，</span>
-                <span v-if="value.deleteFlag"> 关闭了该事件</span>
+                <span v-if="value.deleteFlag">
+                    关闭了该事件
+                </span>
             </div>
         </div>
     </div>
 </template>
 <script lang="ts" setup>
 import dayjs from 'dayjs';
+import UserCardVue from '@/pages/hr/userCard.vue';
 import { call } from '@/utils/tools';
 const props = defineProps<{ data: Record<string, any> }>();
 // 拨打电话的方法
 
 </script>
 <style lang="less" scoped>
-.event {
+.event-wrapper {
     border-bottom: solid 1px #eee;
     text-align: left;
     padding: 15px;
@@ -61,13 +89,32 @@ const props = defineProps<{ data: Record<string, any> }>();
 
         .flightno,
         .acreg,
-        .status {
+        .way {
             color: #666;
         }
 
         .date {
             font-weight: bold;
         }
+    }
+
+    .crews {
+        .title {}
+
+        .value {
+            display: flex;
+            flex-direction: row;
+
+            .name {
+                margin: auto 10px;
+            }
+        }
+    }
+
+    .station {
+        .title {}
+
+        .value {}
     }
 
     .title {
@@ -82,38 +129,6 @@ const props = defineProps<{ data: Record<string, any> }>();
         margin-bottom: 10px;
     }
 
-    .divs {
-        margin-top: 10px;
 
-        .div {
-            .div__circle-container {
-                .div__circle {
-                    background-color: #4a90e2;
-                    border-color: #4a90e2;
-                }
-
-                .div__line {
-                    background-color: #4a90e2;
-                }
-            }
-
-            .div__content {
-                .div__title {
-                    font-size: 0.9rem;
-                    color: #333;
-
-                    .van-icon {
-                        color: #4a90e2;
-                        cursor: pointer;
-                    }
-                }
-
-                .div__description {
-                    font-size: 0.8rem;
-                    color: #666;
-                }
-            }
-        }
-    }
 }
 </style>
