@@ -19,12 +19,6 @@
             }
         },
         {
-            "path": "pages/sms/sms",
-            "style": {
-                "navigationBarTitleText": "安全数据"
-            }
-        },
-        {
             "path": "pages/analysis/analysis",
             "style": {
                 "navigationBarTitleText": "运行分析"
@@ -33,25 +27,31 @@
         {
             "path": "pages/analysis/year",
             "style": {
-                "navigationBarTitleText": "运行分析-年度分析"
+                "navigationBarTitleText": "历史情况"
             }
         },
         {
             "path": "pages/analysis/airlines",
             "style": {
-                "navigationBarTitleText": "运行分析-站点"
+                "navigationBarTitleText": "航线分析"
             }
         },
         {
-            "path": "pages/analysis/airplane",
+            "path": "pages/analysis/overview",
             "style": {
-                "navigationBarTitleText": "运行分析-飞机"
+                "navigationBarTitleText": "运行概览"
             }
         },
         {
             "path": "pages/airplane/airplane",
             "style": {
                 "navigationBarTitleText": "机队分析"
+            }
+        },
+        {
+            "path": "pages/sms/sms",
+            "style": {
+                "navigationBarTitleText": "安全数据"
             }
         },
         {

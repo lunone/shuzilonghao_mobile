@@ -1,6 +1,6 @@
 <template>
     <div class="chart-wrpper">
-        <ucharts :option="option" @select="showTip" :height="150" />
+        <ucharts :option="option" @select="showTip" :height="120" />
     </div>
 </template>
 
@@ -27,12 +27,6 @@ const fetchFlishgts = async () => {
         console.error('Error fetching data:', error);
     }
 };
-
-// const colorList = [
-//     '#c23531', '#2f4554', '#61a0a8', '#d48265',
-//     '#91c7ae', '#749f83', '#ca8622', '#bda29a',
-//     '#6e7074', '#546570', '#c4ccd3'
-// ];
 let dates, groupedFlights;
 function setOption(flights: Record<string, Record<string, number>>) {
     // 将每日的各种类型的航班数量加一块
@@ -51,9 +45,12 @@ function setOption(flights: Record<string, Record<string, number>>) {
                     const flightCounter = groupedFlights[date];
                     // 超过平均值20%的颜色红色，低于平均值20%的颜色暗绿色，其他的颜色为蓝色
                     const diff = (flightCounter - avgDay) / avgDay;
-                    const color = diff > 0.4 ? '#d48264' : (diff < -0.4) ? '#c4ccd3' : "#91c7ae";
-                    return { color, value: flightCounter }
-                })
+                    // console.log('---------',diff, flightCounter, avgDay)
+                    const color = diff > 0.4 ? '#C52305' : (diff < -0.4) ? '#C52305' : "#E27C69";
+                    return { color, value: flightCounter - Math.round(avgDay / 3) }
+                }),
+                formatter: val => val + Math.round(avgDay / 3),
+                textOffset: 18,
             },
         ],
         animation: false,

@@ -19,7 +19,7 @@
     </press-action-sheet>
 </template>
 <script lang="ts" setup>
-import { ref, computed, onMounted, Ref } from 'vue';
+import { ref, computed, onMounted, Ref, watch } from 'vue';
 import Profile from '@/pages/hr/profile.vue';
 import { UserItem } from '@/interface';
 import useUserStore from '@/store/user.store';
@@ -71,11 +71,11 @@ const toggleProfile = () => {
 };
 
 
-onMounted(async () => {
+watch(() => props, async () => {
     await fetchUsers();
     // 优先id的name,如果没有就是props.name,最后实在不行就是工号
     userName.value = users.value[props.userId]?.name || props.error || props.userId || '未知';
-});
+},{immediate:true,deep:true});
 </script>
 
 <style lang="less" scoped>

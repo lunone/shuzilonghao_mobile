@@ -34,6 +34,7 @@ export default defineStore('user', {
         async getStaff(): Promise<Record<string, UserItem>> {
             if (!Object.keys(this.staff).length) {
                 const res = await api(CONFIG.url.staff) as UserItem[];
+                console.log('renyuanyuanshi',res)
                 const obj = {}
                 if (res.length) {
                     for (let user of res) {

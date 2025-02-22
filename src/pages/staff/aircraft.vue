@@ -3,12 +3,11 @@
         <view class="total">
             <i class="icon zl-icon-aircraft" />
             <view class="text">
-                <text class="value">{{Object.values(stat).reduce((acc, cur) => acc + cur, 0)}}</text>
-                <text class="unit">架</text>
+                {{Object.values(stat).reduce((acc, cur) => acc + cur, 0)}} 架
             </view>
         </view>
         <view class="detail">
-            <view class="item" v-for="number, acTypeLong in stat" :key="acTypeLong">
+            <view class="section" v-for="number, acTypeLong in stat" :key="acTypeLong">
                 <text class="title">{{ acTypeLong }} </text>
                 <text class="value">{{ number }}</text>
                 <text class="unit">架</text>
@@ -41,6 +40,7 @@ const stat = computed(() => {// todo:页面变更飞机变0
             if (aircraft.regId.length < 6) {
                 // 统计在役飞机,738前面俩字符
                 // const acType = aircraft.acType.slice(0, 3);
+                // console.log(aircraft.acTypeLong, aircraft.acReg,aircraft.acType);
                 const acTypeLong = aircraft.acTypeLong;
                 stat[acTypeLong] = stat[acTypeLong] || 0;
                 stat[acTypeLong]++;
@@ -56,7 +56,7 @@ const fetchAircrafts = async () => {
     error.value = '';
     try {
         const res = await store.getAircrafts();
-        console.log('res---', res);
+        // console.log('res---', res);
         aircrafts.value = Object.values(res);
     } catch (err) {
         error.value = '获取飞机信息失败';
@@ -76,72 +76,67 @@ onMounted(() => {
 
 .flight-wrapper {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    align-items: stretch;
+    background: #fff;
+
 
     .total {
+        flex: 0 0 35%;
         display: flex;
-        align-items: center;
         flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding-right: 2px;
 
         .icon {
-            size: 50px;
-            color: #3f3f3f;
+            color: #085E7B;
+            font-size: 34px;
+            margin-bottom: 2px;
         }
 
-        .title,
-        .value,
-        .unit {
-            display: inline-block;
-            vertical-align: middle;
-            // margin-right: 10px;
-        }
-
-        .title {
-            font-weight: bold;
-            color: #333;
-        }
-
-        .value {
-            font-size: 1.1rem;
-            color: #4a90e2;
-        }
-
-        .unit {
-            color: #555;
+        .text {
+            color: #085E7B;
+            font-size: .9rem;
+            font-weight: 500;
+            white-space: nowrap;
         }
     }
 
     .detail {
+        flex: 1;
         display: flex;
         flex-direction: column;
-        margin-left: 2rem;
+        justify-content: center;
+        margin-left: 2px;
 
-        .item {
+        .section {
             display: flex;
             align-items: center;
-            margin-right: 20px;
+            padding: 0 4px;
+            margin: 0;
+            border-bottom: dashed 1px #aaa;
 
-            .title,
-            .value,
-            .unit {
-                display: inline-block;
-                vertical-align: middle;
-                margin-right: 5px;
+            &:last-child {
+                border-bottom: 0;
             }
 
             .title {
-                font-weight: bold;
-                color: #333;
+                color: #1B4C5C;
+                font-size: 0.95rem;
+                white-space: nowrap;
+                // min-width: 2em; // 保证至少显示2个汉字
             }
 
             .value {
-                font-size: 1rem;
-                color: #4a90e2;
+                color: #C52305;
+                font-weight: bold;
+                flex: 1;
+                text-align: center;
             }
 
             .unit {
-                color: #555;
+                color: #945F28;
+                font-size: 0.85rem;
             }
         }
     }

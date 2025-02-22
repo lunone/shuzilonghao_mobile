@@ -1,59 +1,59 @@
 <template>
-    <view class="wrapper">
-        <view class="lastyear">
-            <view class="title"> {{ props.range == 'year' ? '去年' : '前日' }} </view>
-            <view class="counter">
-                <text class="value">{{ lastYear.counter }}</text>
-                <text class="unit">班</text>
-            </view>
-            <view class="weight">
-                <text class="value">{{ lastYear.weight }}</text>
-                <text class="unit">吨</text>
-            </view>
-            <view class="hour">
-                <text class="value">{{ lastYear.hours }}</text>
-                <text class="unit">小时</text>
-            </view>
-        </view>
-        <view class="thisyear">
-            <text class="title"> {{ props.range == 'year' ? '今年' : '昨日' }} </text>
-            <view class="counter">
-                <text class="value">{{ thisYear.counter }}</text>
-                <text class="unit">班</text>
-            </view>
-            <view class="weight">
-                <text class="value">{{ thisYear.weight }}</text>
-                <text class="unit">吨</text>
-            </view>
-            <view class="hour">
-                <view class="value">{{ thisYear.hours }}</view>
-                <view class="unit">小时</view>
-            </view>
-        </view>
-        <view class="rate">
-            <text class="title">变化 </text>
-            <view class="counter">
-                <text class="value">{{ rate.counter }}</text>
-                <text class="unit">%</text>
-            </view>
-            <view class="weight">
-                <text class="value">{{ rate.weight }}</text>
-                <text class="unit">%</text>
-            </view>
-            <view class="hour">
-                <text class="value">{{ rate.hour }}</text>
-                <text class="unit">%</text> 
-            </view>
- 
-        </view>
-        <view class="remark" v-if="props.range == 'year'">
+    <div class="wrapper">
+        <div class="lastyear">
+            <div class="title"> {{ props.range == 'year' ? '去年' : '前日' }} </div>
+            <div class="counter">
+                <span class="value"><zl-number :value="lastYear.counter" /></span>
+                <span class="unit">班</span>
+            </div>
+            <div class="weight">
+                <span class="value"><zl-number :value="lastYear.weight" /></span>
+                <span class="unit">吨</span>
+            </div>
+            <div class="hour">
+                <span class="value"><zl-number :value="lastYear.hours" /></span>
+                <span class="unit">小时</span>
+            </div>
+        </div>
+        <div class="thisyear">
+            <span class="title"> {{ props.range == 'year' ? '今年' : '昨日' }} </span>
+            <div class="counter">
+                <span class="value"><zl-number :value="thisYear.counter" /></span>
+                <span class="unit">班</span>
+            </div>
+            <div class="weight">
+                <span class="value"><zl-number :value="thisYear.weight" /></span>
+                <span class="unit">吨</span>
+            </div>
+            <div class="hour">
+                <div class="value"><zl-number :value="thisYear.hours" /></div>
+                <div class="unit">小时</div>
+            </div>
+        </div>
+        <div class="rate">
+            <span class="title">变化 </span>
+            <div class="counter">
+                <span class="value">{{ rate.counter }}</span>
+                <span class="unit">%</span>
+            </div>
+            <div class="weight">
+                <span class="value">{{ rate.weight }}</span>
+                <span class="unit">%</span>
+            </div>
+            <div class="hour">
+                <span class="value">{{ rate.hour }}</span>
+                <span class="unit">%</span>
+            </div>
+
+        </div>
+        <div class="remark" v-if="props.range == 'year'">
             <!-- <van-icon name="info" /> -->
-			<i class="icon zl-icon-info" />
+            <i class="icon zl-icon-info" />
             今年:{{ dayjs(DateStr.firstDayOfYear).format('YYYY/M/D') }}-{{ dayjs(DateStr.now).format('YYYY/M/D') }},
             去年:{{ dayjs(DateStr.firstDayOfLastYear).format('YYYY/M/D') }}-{{
                 dayjs(DateStr.dayBeforeOneYear).format('YYYY/M/D') }}
-        </view>
-    </view>
+        </div>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -134,6 +134,7 @@ onMounted(async () => {
 <style lang="less" scoped>
 /* 这里是样式部分，用于定义组件的样式 */
 @import "@/css/base.less";
+
 .wrapper {
     display: flex;
     flex-direction: column;
@@ -204,7 +205,7 @@ onMounted(async () => {
         /* 使用深色文字以适应半透明背景 */
         line-height: 1.2;
         display: flex;
-        
+
     }
 }
 </style>

@@ -6,22 +6,23 @@ export default {
         login: '/login/wx',
         activate: '/login/activate',
         //
-        airports: '/airport/code4/',
+        airports: '/airport/code4',
         //
-        aircrafts: '/aircraft/list/',
+        aircrafts: '/aircraft/list',
         //
-        flightsDate: '/flight/date/',
-        flightsATD: '/flight/atd/',
+        flightsDate: '/flight/date',
+        flightsATD: '/flight/atd',
         flightPlan: '/flight/plan',
         //
-        mels: '/me/mel/',
+        mels: '/me/mel',
         //
         statCrewFh: '/stat/crew/fh',
-        statPeriod: '/stat/period/',
+        statPeriod: '/stat/period',
+        statMonth: '/stat/month',
         statByAirline: '/stat/by/airline',
         statByAircraft: '/stat/by/aircraft',
         //
-        crewFlights: '/crew/list/',
+        crewFlights: '/crew/list',
         //
         smsStat: '/sms/stat',
         smsEvents: '/sms/event/list',
@@ -32,7 +33,7 @@ export default {
         departments: '/department/list',
     },
     page: {
-        index: '/pages/Index',
+        index: '/pages/index',
         error: '/pages/public/error',
         register: '/pages/public/public'
     },

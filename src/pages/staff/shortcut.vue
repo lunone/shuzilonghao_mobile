@@ -63,7 +63,7 @@ const data = ref([
             height: 100%;
 
             .icon {
-                font-size: 2rem;
+                font-size: 1.8rem;
                 color: #c52005;
             }
 

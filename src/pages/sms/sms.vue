@@ -30,6 +30,7 @@ import CONFIG from '@/config';
 import ucharts from '@/components/ucharts/ucharts.vue';
 import eventsVue from '@/pages/sms/events.vue';
 import voluntarysVue from './voluntarys.vue';
+import { format } from 'path';
 
 // 定义 loading 和 error 状态
 const loading = ref(false);
@@ -88,7 +89,8 @@ const getOption = (res) => {
             }, {
                 name: '主动报告', type: "line",
                 // 默认太高了,裁掉一节
-                data: voluntarys2.map((value, index) => value - 30)
+                data: voluntarys2.map((value, index) => value - 30),
+                formatter: val => val + 30
             },
             // { name: '班次', type: "column", data: counters }
         ],
@@ -109,7 +111,7 @@ const getOption = (res) => {
                 // disabled: true,
             }, {
                 disabled: false,
-                min: 10, max: 50,
+                min: 10, max: 50
             }]
         },
         extra: {

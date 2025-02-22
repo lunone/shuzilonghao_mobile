@@ -56,7 +56,7 @@ import experienceVue from './profile/experience.vue';
 import dutyVue from './profile/duty.vue';
 import referenceVue from './profile/reference.vue';
 import education from './profile/education.vue';
-import { call } from '@/utils/tools';
+import { call, getDepartmentPath } from '@/utils/tools';
 import Performance from './profile/performance.vue';
 import Contract from './profile/contract.vue';
 const store = useUserStore();
@@ -91,26 +91,7 @@ interface Department {
     name: string;
 }
 
-const getDepartmentPath = (departments: Department[], targetId: string | number): string => {
-    // 创建哈希映射提升查询效率
-    const deptMap = new Map<string | number, Department>();
-    departments.forEach(dept => deptMap.set(dept.id, dept));
 
-    const path: string[] = [];
-    let currentId: string | number | undefined = targetId;
-    const visited = new Set<string | number>(); // 防止循环引用
-    while (currentId && deptMap.has(currentId)) {
-        if (visited.has(currentId)) break; // 检测到循环立即终止
-        visited.add(currentId);
-
-        const currentDept = deptMap.get(currentId)!;
-        path.unshift(currentDept.name); // 从头部插入保证层级顺序
-
-        currentId = currentDept.parentId;
-    }
-    // 因为root是中原龙浩,所以得裁掉一段
-    return path.slice(1).join(' / ');
-}
 </script>
 
 <style lang="less" scoped>

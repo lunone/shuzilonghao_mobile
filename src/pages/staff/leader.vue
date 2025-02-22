@@ -50,17 +50,17 @@ import dividerVue from '@/components/zl/divider.vue';
 
     &>.section {
         padding: @padding-page;
-        border-radius: @radius-base;
+        border-radius: @radius-sm;
         background-color: @color-block;
-        margin: @margin-page @margin-page;
-        border-top-left-radius: @radius-sm;
-        border-top-right-radius: @radius-sm;
+        margin: 5px @margin-page;
+        // border-top-left-radius: @radius-sm;
+        // border-top-right-radius: @radius-sm;
         box-sizing: border-box;
         box-shadow: @shadow-base;
     }
 
     &>.overview {
-        background-color: #f9f9f9;
+        // background-color: #f9f9f9;
         border-radius: @radius-base;
         margin: 0 @margin-page;
         // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

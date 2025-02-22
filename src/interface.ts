@@ -16,11 +16,11 @@ export type UserItem = {
     name?: string,
     avatar?: string,
     gender?: number,
-    position?: string,
-    departmentId?: number,
-    departmentName?: string,
-    topDepartmentId?: number,
-    topDepartmentName?: string,
+    position: string,
+    department: number,
+    // departmentName?: string,
+    // topDepartmentId?: number,
+    // topDepartmentName?: string,
     hireDate?: string,
     mobile?: string,
     contract?: string,
@@ -28,6 +28,7 @@ export type UserItem = {
     idCard?: string,
     district?: string,
     address?: string,
+    status: number
 }
 
 export type DepartmenItem = {
@@ -98,15 +99,6 @@ export type AirportItem = {
     englishName?: string,
 }
 
-
-
-
-export type TreeNode = Record<string, any> & {
-    id: number,
-    url?: string,
-    parentId: number,
-    children?: TreeNode[],
-}
 export interface EventItem {
     id: string;
     name: string;
@@ -268,10 +260,22 @@ export type AircraftItem = {
 
 export type statItem = {
     acRegs?: string[],
-    avgFlightTime: number,
-    avgFlightWeight: number
     flightCount: number
-    maxFlightWeight: number
-    minFlightWeight: number
     netWeightCargo: number
+    avgFlightTime?: number,
+    avgFlightWeight?: number
+    maxFlightWeight?: number
+    minFlightWeight?: number
+}
+
+export type TreeNode = Record<string, any> & {
+    id: number,
+    name?: string,
+    parentId: number,
+    children?: TreeNode[],
+}
+export type ListNode = Record<string, any> & {
+    id: number,
+    name?: string,
+    parentId: number,
 }
