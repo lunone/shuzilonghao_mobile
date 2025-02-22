@@ -32,14 +32,18 @@ const fetchData = async (currentPage: number) => {
     try {
         const [startDate, endDate] = props.range;
         const resEvents = await api(CONFIG.url.smsEvents, { startDate, endDate });
+        console.log(`resEvents---------`, resEvents);
         const nameToUserId = await store.getNameToUserId();
         const airportsCode3 = await basis.getAirportsCode3();
         for (let event of resEvents) {
             const { dep, arr, acReg } = event;
-            const crews = (event.crews || '').split('、');
+            const crews = (event.crews || '').split(/[,\s;、。\.]+/);
+            // console.log(`event---------`, crews);
             const newCrews = [];
             for (let crew of crews) {
+                if (!crew.trim()) continue;
                 const userId = nameToUserId[crew];
+                // console.log(crew, userId)
                 newCrews.push({ userId, name: crew, });
             }
             // 举报人

@@ -3,7 +3,7 @@
         <view class="titles">
             <span v-for="item in tabs" :key="item.index" class="title" :class="isActive(item) ? 'activite' : ''"
                 @click="click(item.index)">
-                <i class="icon zl-icon" :class="`zl-icon-${item.icon}`"> </i>
+                <i :class="`zl-icon-${item.icon}`"> </i>
                 {{ item.title }}
             </span>
         </view>

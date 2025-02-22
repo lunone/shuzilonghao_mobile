@@ -6,20 +6,14 @@
             <span class="acreg">飞机号:{{ data.acReg }}</span>
             <span class="way">{{ data.dep }} - {{ data.arr }}</span>
         </div>
-        <div class="crews">
+        <div class="crews" v-if="data.crews?.length">
             <div class="title">机组</div>
             <div class="value">
                 <template v-for="crew in data.crews" :key="crew.name">
-                    <UserCardVue :userId="crew.userId" :name="crew.name" class="name" v-if="crew.userId"
-                        :show-icon="false" />
-                    <div class="name" v-else>{{ crew.name }}</div>
+                    <UserCardVue :userId="crew.userId" :error="crew.name" class="name" />
                 </template>
             </div>
         </div>
-        <!-- <div class="station">
-            <div class="title">站点</div>
-            <div class="value">{{ data.dep || data.arr }}</div>
-        </div> -->
         <div class="desc">
             {{ data.desc }}
         </div>
@@ -27,12 +21,8 @@
             <div>
                 <div class="time-name">
                     <div class="time">{{ data.reportDate }}</div>
-                    <UserCardVue :userId="data.reporter" name="dd" class="name" v-if="/A/.test(data.reporter)"
-                        :show-icon="false" />
-                    <span class="name" v-else>{{ data.reporter || `神秘人` }}</span>
-                    <!-- {{ data.reporter || `神秘人` }}
-                    <i class="icon zl-icon-phone" :style="{ marginLeft: '10px' }" @click="call(data.reporterTel)" /> -->
-                    <!-- 添加电话图标 -->
+                    <UserCardVue :userId="data.reporter" class="name" v-if="data.reporter" />
+                    <div v-else>none</div>
                 </div>
                 <span>提交事件</span>
             </div>
@@ -40,9 +30,7 @@
                 <div class="time-name">
                     <div class="time">{{ value.updateTime }}</div>
                     <template>
-                        <UserCardVue :userId="value.updater" name="dd" class="name" v-if="/A/.test(value.updater)"
-                            :show-icon="false" />
-                        <span class="name" v-else>{{ value.updater || `神秘人` }}</span>
+                        <UserCardVue :userId="value.updater" class="name" />
                     </template>
                 </div>
                 <span v-if="value.reason && value.reason != data.status[key - 1]?.reason">

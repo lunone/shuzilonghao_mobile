@@ -1,7 +1,7 @@
 <template>
     <view class="error-wrapper">
         <view>
-            <i class="icon zl-icon-error" />
+            <i class="zl-icon-error" />
         </view>
         <view class="error-content">{{ message }}</view>
     </view>

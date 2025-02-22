@@ -2,20 +2,20 @@
     <div>
 
         <navigator class="item" hover-class="navigator-hover" url="/pages/analysis/year">
-            <i class="icon zl-icon" :class="`zl-icon-j5`" />
+            <i :class="` zl-icon-j5`" />
             <view class="text"> 年度分析 </view>
         </navigator>
 
         <navigator class="item" hover-class="navigator-hover" url="/pages/analysis/airlines">
-            <i class="icon zl-icon" :class="`zl-icon-j5`" />
+            <i :class="` zl-icon-j5`" />
             <view class="text"> 站点分析 </view>
         </navigator>
         <navigator class="item" hover-class="navigator-hover" url="/pages/analysis/airplane">
-            <i class="icon zl-icon" :class="`zl-icon-j5`" />
+            <i :class="` zl-icon-j5`" />
             <view class="text"> 飞机分析 </view>
         </navigator>
 
-        <Profile :userId="`A00725`"   />
+        <!-- <Profile :userId="`A00725`"   /> -->
 
 
     </div>

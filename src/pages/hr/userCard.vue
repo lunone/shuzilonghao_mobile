@@ -26,9 +26,10 @@ import useUserStore from '@/store/user.store';
 
 const store = useUserStore();
 const props = defineProps({
-    name: { type: String, default: '' },
-    userId: { type: String, required: true },
-    showIcon: { type: Boolean, default: true },
+    userId: { type: String, require: true, default: '' },
+    // error是如果系统内没有该用户的话的占位名
+    error: { type: String, default: '' },
+    showIcon: { type: Boolean, default: false },
     showId: { type: Boolean, default: false },
     showInfo: { type: Boolean, default: true },
     isLink: { type: Boolean, default: false },
@@ -36,7 +37,7 @@ const props = defineProps({
 });
 
 const users: Ref<Record<string, UserItem>> = ref({});
-const userName = ref(props.name);
+const userName = ref('');
 
 
 const genderClass = computed(() => {
@@ -59,7 +60,11 @@ const fetchUsers = async () => {
 };
 const toggleProfile = () => {
     if (!props.isLink) {
-        showProfile.value = !showProfile.value;
+        if (users.value[props.userId]) {
+            showProfile.value = !showProfile.value;
+        } else {
+            uni.showToast({ title: `暂无${props.userId}信息`, icon: 'none' });
+        }
     } else {
         // router.push(`/user/${props.userId}`);
     }
@@ -68,11 +73,8 @@ const toggleProfile = () => {
 
 onMounted(async () => {
     await fetchUsers();
-    // console.log('userCard已经加载', props.userId, users.value[props.userId])
-    if (props.userId && users.value[props.userId]) {
-        userName.value = users.value[props.userId].name || '';
-    }
-
+    // 优先id的name,如果没有就是props.name,最后实在不行就是工号
+    userName.value = users.value[props.userId]?.name || props.error || props.userId || '未知';
 });
 </script>
 

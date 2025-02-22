@@ -1,4 +1,3 @@
-
 /* 在线链接服务仅供平台体验和调试使用，平台不承诺服务的稳定性，企业客户需下载字体包自行发布使用并做好备份。 */
 @font-face {
     font-family: 'zl';
@@ -14,7 +13,7 @@
     info: '\ed50';
     user: '\e65d';
     close: '\e7be';
-    no1: '\e60b';  
+    no1: '\e60b';
     no2: '\e61e';
     no3: '\e620';
     // 功能图标
@@ -36,14 +35,10 @@
     j5duty: '\e606';
 }
 
-.zl-icon {
-    font-family: 'zl';
-    font-style: normal;
-}
-
 each(@icons, {
     .zl-icon-@{key}::before {
-        .zl-icon;
+        font-family: 'zl';
+        font-style: normal;
         content: @value;
     }
 })

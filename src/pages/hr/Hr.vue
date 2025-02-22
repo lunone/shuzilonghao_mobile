@@ -29,7 +29,7 @@
                 </view>
                 <ul>
                     <li v-for="user in users" :key="user.name">
-                        <UserCardVue :userId="user.userId" :name="user.name" class="user" />
+                        <UserCardVue :userId="user.userId" :error="user.name" class="user" />
                         <text class="department">{{ user.department }}</text>
                         <text class="date">{{ user.date }}</text>
                     </li>

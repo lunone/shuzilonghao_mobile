@@ -3,11 +3,7 @@
         <div class="ask">
             <div class="user">
                 <i class="icon zl-icon-user" />
-                <UserCardVue :userId="data.userId" :name="data.userName" class="name" v-if="data.userId"
-                    :show-icon="false" />
-                <div class="name anonymous" v-else>
-                    匿名
-                </div>
+                <UserCardVue :userId="data.userId" error="匿名" class="name" />
             </div>
             <div class="content">
                 <div class="desc">{{ data.content }}</div>
@@ -24,9 +20,7 @@
                 </div>
                 <div class="user">
                     <i class="icon zl-icon-user" />
-                    <UserCardVue :userId="answer.userId" :name="answer.userName" class="name" v-if="answer.userId"
-                        :show-icon="false" />
-                    <div v-else class="name">{{ answer.userName }}</div>
+                    <UserCardVue :userId="answer.userId" :error="answer.userName" class="name" />
                 </div>
             </div>
         </template>

@@ -1,7 +1,6 @@
 <template>
     <view class="hr-summary">
         <view class="total">
-            <!-- <van-icon class-prefix="zl-icon" name="person" class="icon" :size="40" /> -->
 			<i class="icon zl-icon-person" />
             <view class="text">
                 <view class="title">XX人</view>
@@ -10,7 +9,6 @@
         </view>
         <view class="detail">
             <view class="section" v-for="(item, index) in sections" :key="index">
-                <!-- <van-icon class-prefix="zl-icon" :name="item.icon"  class="icon" /> -->
                 <!-- <view class="text"> -->
                 <!-- <span class="title">{{ acTypeShortTranslate[acType] || acType }} </span> -->
                 <view class="title">{{ item.title }}</view>
