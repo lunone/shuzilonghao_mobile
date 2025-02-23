@@ -57,7 +57,8 @@
         {
             "path": "pages/pilot/pilot",
             "style": {
-                "navigationBarTitleText": "飞行员"
+                "navigationBarTitleText": "飞行员",
+                // "navigationBarBackgroundColor":"#D13419"
             }
         },
         {

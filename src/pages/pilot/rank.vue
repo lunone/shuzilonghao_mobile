@@ -1,7 +1,7 @@
 <template>
     <div class="rank-wrapper">
         <div class="top">
-            <div class="title">飞行排行榜</div>
+            <div class="title">月度排行</div>
             <div class="date">
                 <div class="left" :class="isEnable.left ? '' : 'disable'" @click="clac(-1)">
                     <i class="zl-icon-left" />
@@ -65,7 +65,9 @@ import api from '@/utils/api';
 import CONFIG from '@/config';
 
 type PilotStat = { rank: number, userId: string, name: string, totalFlightHours: number, avgFlightHours: number }
-
+// 定义 loading 和 error 状态
+const loading = ref(false);
+const error = ref('');
 const data = ref([]) as Ref<PilotStat[]>;
 const dateRange = ref<[string, string]>([dayjs().format('YYYY'), dayjs().format('MM')]);
 // const dateStr = ref('');
@@ -88,6 +90,9 @@ const isEnable = computed(() => {
     }
 })
 function clac(num: number) {
+    if (loading.value) {
+        return
+    }
     const old = dayjs(dateRange.value.join('-') + '-01');
     console.log('----', old.format('YYYY-MM-DD'), dayjs().diff(old, 'month'), dayjs().add(-1, 'year').diff(old, 'month'))
     // old 和当前月份的月差值不能小于0,也和一年前不能大于0
@@ -104,12 +109,14 @@ function clac(num: number) {
 // 获取统计数据和飞行员排名
 watch(() => dateRange, async () => {
     try {
+        loading.value = true;
+        uni.showToast({ title: '加载中...', icon: 'loading', mask: true, duration: 33000 })
         const startDate = dayjs(dateRange.value.join('-') + '-01').toDate();
         const endDate = dayjs(startDate).endOf('month').toDate();
 
-        console.log('old', dayjs(startDate).format('YYYY-MM-DD'), endDate);
+        // console.log('old', dayjs(startDate).format('YYYY-MM-DD'), endDate);
         const res = await api(CONFIG.url.statCrewFh, { startDate, endDate }) as any[];
-        console.log('飞行小时', res, dateRange.value.join('-') + '-01', startDate, endDate);
+        // console.log('飞行小时', res, dateRange.value.join('-') + '-01', startDate, endDate);
         const stat = res.map((pilot: any) => ({
             rank: -1,
             userId: pilot.userId,
@@ -125,14 +132,17 @@ watch(() => dateRange, async () => {
         // 计算参与飞行人数、总参与飞行小时和每日人均飞行小时
         summary.value.participantCount = stat.length;
         summary.value.totalFlightHours = parseFloat(stat.reduce((sum, pilot) => sum + pilot.totalFlightHours, 0).toFixed(2));
-        console.log('sortStat---', sortStat[0].name, sortStat[1].name, sortStat[2].name);
+        // console.log('sortStat---', sortStat[0].name, sortStat[1].name, sortStat[2].name);
         first.value = sortStat.shift();
         second.value = sortStat.shift();
         third.value = sortStat.shift();
         data.value = sortStat;
         // 排序飞行员
     } catch (err) {
-        // error.value = '获取统计数据和飞行员排名失败';
+        error.value = '获取统计数据和飞行员排名失败';
+    } finally {
+        loading.value = false;
+        uni.hideToast();
     }
 }, { immediate: true, deep: true })
 
@@ -146,10 +156,50 @@ onMounted(() => {
 <style lang="less" scoped>
 @import '@/css/base.less';
 
+.loading {
+    text-align: center;
+}
+
+// 定义生成气泡底部箭头的mixin
+.arrow-effect(@color) {
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    color: #464646;
+    background-color: @color;
+    position: relative;
+    display: inline-block;
+    width: 30vw;
+    font-size: .8rem;
+    height: 100px;
+    text-align: center;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    .name {
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+
+    .ser {
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+        background-color: lighten(@color, 10%)
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 0;
+        border-width: 15vw;
+        border-style: solid;
+        border-color: @color transparent transparent transparent;
+    }
+}
+
 .rank-wrapper {
-    // background-color: #ddd;
+    background-color: #f8f8f8;
     // background-color: #e24f4f;
-    background: linear-gradient(to bottom right, @color-primary, @color-secondary);
+    // background: linear-gradient(to bottom right, @color-primary, @color-secondary);
 
     .top {
         .column;
@@ -181,7 +231,7 @@ onMounted(() => {
             }
 
             .disable {
-                color: #801212;
+                color: #cfcfcf;
             }
         }
 
@@ -197,52 +247,19 @@ onMounted(() => {
             box-sizing: border-box;
             align-items: start;
 
-            .pai {
-                border-top-left-radius: 16px;
-                border-top-right-radius: 16px;
-                color: #464646;
-                background-color: #eee;
-                position: relative;
-                display: inline-block;
-                width: 30vw;
-                font-size: .8rem;
-                height: 100px;
-                text-align: center;
-                box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
 
-
-                &::after {
-                    content: '';
-                    position: absolute;
-                    top: 100%;
-                    left: 0;
-                    border-width: 15vw;
-                    border-style: solid;
-                    border-color: #eee transparent transparent transparent;
-                }
-
-                .name {
-                    font-size: 1.1rem;
-                    font-weight: bold;
-                }
-
-                .ser {
-                    border-top-left-radius: 16px;
-                    border-top-right-radius: 16px;
-                }
-
-                &.no1 .ser {
-                    background-color: #FAC900;
-                }
-
-                &.no2 .ser {
-                    background-color: #C9C9C9;
-                }
-
-                &.no3 .ser {
-                    background-color: #FFA722;
-                }
+            .no1 {
+                .arrow-effect(#FAC900);
             }
+
+            .no2 {
+                .arrow-effect(#C9C9C9);
+            }
+
+            .no3 {
+                .arrow-effect(#FFA722);
+            }
+
 
         }
     }
@@ -263,7 +280,7 @@ onMounted(() => {
         border-top-left-radius: 14px;
         border-top-right-radius: 14px;
         box-sizing: border-box;
-        background-color: #fff;
+        background-color: #ccc;
 
         .pilot {
             display: flex;
