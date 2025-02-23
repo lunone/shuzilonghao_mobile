@@ -27,35 +27,34 @@ import useUserStore from '@/store/user.store';
 import { collectDescendantIds, convertToTree } from '@/utils/tools';
 const store = useUserStore();
 const stat = ref({ all: 0, wx: 0, fx: 0 })
-const fetchData = async () => {
-    try {
-        const dept = await store.getDepartments();
-        const staff = await store.getStaff();
-        const tree = convertToTree(dept);
-        // 找到tree[0].children里面名字叫做维修工程部的id,且他的子孙辈节点的所有id,汇总成一个数组
-        const wxIds = collectDescendantIds(tree, '维修工程部');
-        const fgIds = collectDescendantIds(tree, '飞行技术管理部');
-        const fxIds = collectDescendantIds(tree, '飞行部');
-        const temp = { all: 0, wx: 0, fx: 0 };
-        for (let userId in staff) {
-            const user = staff[userId];
-            if (wxIds.includes(+user.department)) {
-                temp.wx++;
-            }
-            if (fgIds.includes(+user.department) || fxIds.includes(+user.department)) {
-                temp.fx++;
-            }
-            if (user.status < 1) {
-                temp.all++;
-            }
+watch([() => store.departments, () => store.staff], () => {
+    const dept = store.departments;
+    const staff = store.staff;
+    const tree = convertToTree(dept);
+    // 找到tree[0].children里面名字叫做维修工程部的id,且他的子孙辈节点的所有id,汇总成一个数组
+    const wxIds = collectDescendantIds(tree, '维修工程部');
+    const fgIds = collectDescendantIds(tree, '飞行技术管理部');
+    const fxIds = collectDescendantIds(tree, '飞行部');
+    const temp = { all: 0, wx: 0, fx: 0 };
+    for (let userId in staff) {
+        const user = staff[userId];
+        if (wxIds.includes(+user.department)) {
+            temp.wx++;
         }
-        stat.value = temp;
-        console.log('统计', staff, tree, temp);
-    } catch (err) { console.log(err) }
-};
+        if (fgIds.includes(+user.department) || fxIds.includes(+user.department)) {
+            temp.fx++;
+        }
+        if (user.status < 1) {
+            temp.all++;
+        }
+    }
+    stat.value = temp;
+    console.log('统计', staff, tree, temp);
+})
 
 onMounted(() => {
-    fetchData();
+    store.getDepartments()
+    store.getStaff()
 })
 </script>
 

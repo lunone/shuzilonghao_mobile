@@ -1,5 +1,5 @@
 <template>
-    <div class="profile">
+    <div class="profile-wrapper">
         <div class="header">
             <div class="avatar">
                 <img :src="employee2?.avatar" alt="Avatar" />
@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, Ref, ref } from 'vue';
+import { computed, onMounted, Ref, ref, watch } from 'vue';
 import CONFIG from '@/config';
 import api from '@/utils/api';
 import { UserItem } from '@/interface';
@@ -70,11 +70,16 @@ const employee2: Ref<UserItem> = ref();
 let departments = ref([]);
 const depName = ref('');
 const fetchEmployee = async () => {
-    const res = await api(CONFIG.url.userProfile, { userId: props.userId });
-    const deps = await store.getDepartments(); departments.value = deps;
-    depName.value = getDepartmentPath(deps, +res.department);
-    employee2.value = res;
+    employee2.value = await api(CONFIG.url.userProfile, { userId: props.userId });
+    store.getDepartments();
 };
+
+watch([() => store.departments, () => employee2], () => {
+    departments.value = store.departments;
+    if (departments.value.length && employee2.value.department) {
+        depName.value = getDepartmentPath(departments.value, +employee2.value.department);
+    }
+}, { deep: true })
 
 const current = ref(0);
 const onClickkv = (e) => {
@@ -98,11 +103,12 @@ interface Department {
 @import "@/css/base.less";
 @import "@/css/kv.less";
 
-.profile {
+.profile-wrapper {
     padding: 20px;
     height: 40vh;
     overflow-y: scroll;
-
+    font-size: 1rem;
+    
     .header {
         display: flex;
         align-items: flex-start;

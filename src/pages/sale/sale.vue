@@ -180,7 +180,7 @@ const optionPie = ref({
 });
 </script>
 
-<style scoped>
+<style scoped lang="less">
 .sales-overview {
     display: flex;
     flex-direction: column;

@@ -6,6 +6,7 @@ import { DepartmenItem, UserItem } from '@/interface';
 
 export default defineStore('user', {
     state: () => ({
+        isStaffFatching: false,
         staff: {},
         departments: [] as DepartmenItem[],
         self: {} as UserItem,
@@ -32,15 +33,19 @@ export default defineStore('user', {
             return this.self;
         },
         async getStaff(): Promise<Record<string, UserItem>> {
+            if(this.isStaffFatching){
+                return
+            }
+            this.isStaffFatching = true;
             if (!Object.keys(this.staff).length) {
                 const res = await api(CONFIG.url.staff) as UserItem[];
-                console.log('renyuanyuanshi',res)
                 const obj = {}
                 if (res.length) {
                     for (let user of res) {
                         obj[user.userId] = user
                     }
                 }
+                this.isStaffFatching = false;
                 this.staff = obj;
             }
             return this.staff;

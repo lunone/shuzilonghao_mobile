@@ -36,9 +36,8 @@ const props = defineProps({
     gender: { type: Number, default: 2 },
 });
 
-const users: Ref<Record<string, UserItem>> = ref({});
+const user = ref({}) as Ref<UserItem>;
 const userName = ref('');
-
 
 const genderClass = computed(() => {
     if (props.gender === 0) return 'woman';
@@ -46,21 +45,10 @@ const genderClass = computed(() => {
     return '';
 });
 
-
 const showProfile = ref(false);
-// todo:从store获取信息
-const fetchUsers = async () => {
-    try {
-        const res = await store.getStaff();
-        // console.log(res);
-        users.value = res;
-    } catch (err) {
-    } finally {
-    }
-};
 const toggleProfile = () => {
     if (!props.isLink) {
-        if (users.value[props.userId]) {
+        if (user.value.userId) {
             showProfile.value = !showProfile.value;
         } else {
             uni.showToast({ title: `暂无${props.userId}信息`, icon: 'none' });
@@ -71,11 +59,18 @@ const toggleProfile = () => {
 };
 
 
-watch(() => props, async () => {
-    await fetchUsers();
+watch([() => props.userId, () => props.error, () => store.staff], async () => {
+    // 订阅store.staff变化
+    const users = store.staff;
     // 优先id的name,如果没有就是props.name,最后实在不行就是工号
-    userName.value = users.value[props.userId]?.name || props.error || props.userId || '未知';
-},{immediate:true,deep:true});
+    userName.value = users[props.userId]?.name || props.error || props.userId || '未知';
+    if (users[props.userId]) {
+        user.value = users[props.userId];
+    }
+}, { immediate: true, deep: true });
+onMounted(() => {
+    store.getStaff();
+});
 </script>
 
 <style lang="less" scoped>

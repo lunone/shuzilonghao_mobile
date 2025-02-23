@@ -153,7 +153,7 @@ const barOption = computed(() => {
 })
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 @import "@/css/base.less";
 
 .maintenance-container {

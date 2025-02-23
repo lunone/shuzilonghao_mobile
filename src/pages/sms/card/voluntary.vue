@@ -3,7 +3,7 @@
         <div class="ask">
             <div class="user">
                 <i class="icon zl-icon-user" />
-                <UserCardVue :userId="data.userId" error="匿名" class="name" />
+                <UserCardVue :userId="data.userId" error="匿名"  />
             </div>
             <div class="content">
                 <div class="desc">{{ data.content }}</div>
@@ -20,7 +20,7 @@
                 </div>
                 <div class="user">
                     <i class="icon zl-icon-user" />
-                    <UserCardVue :userId="answer.userId" :error="answer.userName" class="name" />
+                    <UserCardVue :userId="answer.userId" :error="answer.userName" />
                 </div>
             </div>
         </template>

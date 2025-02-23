@@ -7,10 +7,7 @@
             <van-calendar :first-day-of-week="1"  v-model:show="showCalendar" :min-date="minDate" :max-date="maxDate" type="range"
                 :max-range="62" @confirm="dateRangeChange" /> -->
 
-            <div class="summary">
-                <span class="counter">{{ summary.participantCount }}</span>人飞了
-                <span class="hour">{{ summary.totalFlightHours }}</span>小时
-            </div>
+          
 
             <!-- <VanNoticeBar left-icon="info-o" text="点击下方条目可查看飞行员轨迹" /> -->
             <rank-list-vue :data="pilotsStat" @select="showPilotDetails" />
@@ -61,43 +58,9 @@ const dateRangeText = computed(() => {
     return `${formatDate(start)} - ${formatDate(end)}`;
 });
 
-// 定义统计数据
-const summary = ref({
-    participantCount: 0,
-    totalFlightHours: 0,
-    avgFlightHoursPerDay: 0,
-});
 
 const pilotsStat = ref<any[]>([]);
 
-// 获取统计数据和飞行员排名
-const fetchStatsAndRankings = async (startDate: string, endDate: string) => {
-    try {
-        const res = await api(CONFIG.url.statCrewFh, { startDate, endDate }) as any[];
-        // console.log(res);
-        const stat = res.map((pilot: any) => ({
-            rank: -1,
-            userId: pilot.userId,
-            name: pilot.name,
-            totalFlightHours: +(pilot.minutes / 60).toFixed(2),
-            avgFlightHours: +(pilot.avgMinutes / 60).toFixed(2),
-        }));
-
-        const sortStat = stat.sort((a, b) => b.totalFlightHours - a.totalFlightHours);
-        sortStat.map((pilot, index) => {
-            pilot.rank = index + 1;
-        })
-        // 计算参与飞行人数、总参与飞行小时和每日人均飞行小时
-        summary.value.participantCount = stat.length;
-        summary.value.totalFlightHours = parseFloat(stat.reduce((sum, pilot) => sum + pilot.totalFlightHours, 0).toFixed(2));
-        // const totalDays = dayjs(endDate).diff(dayjs(startDate), 'day') + 1;
-        // summary.value.avgFlightHoursPerDay = parseFloat((summary.value.totalFlightHours / (pilotsStat.length  )).toFixed(2));
-        pilotsStat.value = sortStat;
-        // 排序飞行员
-    } catch (err) {
-        error.value = '获取统计数据和飞行员排名失败';
-    }
-};
 
 
 
@@ -107,7 +70,7 @@ const dateRangeChange = (dates: [Date, Date]) => {
     dateRange.value = dates;
     const startDate = dayjs(dates[0]).format('YYYY-MM-DD');
     const endDate = dayjs(dates[1]).format('YYYY-MM-DD');
-    fetchStatsAndRankings(startDate, endDate);
+    // fetchStatsAndRankings(startDate, endDate);
 };
 
 // 显示飞行员轨迹
@@ -120,7 +83,7 @@ const showPilotDetails = (pilot: any) => {
 onMounted(() => {
     const startDate = dayjs(dateRange.value[0]).format('YYYY-MM-DD');
     const endDate = dayjs(dateRange.value[1]).format('YYYY-MM-DD');
-    fetchStatsAndRankings(startDate, endDate);
+    // fetchStatsAndRankings(startDate, endDate);
 });
 </script>
 
