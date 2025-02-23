@@ -45,8 +45,6 @@ const isDep: Ref<boolean> = ref(false);
 const airlineStats = ref({}) as Ref<Res>;
 const airports = ref({}) as Ref<Record<string, AirportItem>>;
 
-// const startDate = ref(dayjs().add(-11, 'day').format('YYYY-MM-DD'))
-// const endDate = ref(dayjs().add(-1, 'day').format('YYYY-MM-DD'))
 const dateRange = ref([
     dayjs().add(-11, 'day').toDate(),
     dayjs().add(-1, 'day').toDate()
@@ -70,7 +68,7 @@ const filterStation = computed(() => {
     }
     return temp;
 });
-const fetchData = async (startDate: string, endDate: string) => {
+const fetchData = async (startDate: Date, endDate: Date) => {
     loading.value = true;
     error.value = '';
     try {
@@ -88,8 +86,7 @@ const fetchData = async (startDate: string, endDate: string) => {
 };
 watch(() => dateRange.value, () => {
     const [startDate, endDate] = dateRange.value
-
-    fetchData(dayjs(startDate).format('YYYY-MM-DD'), dayjs(endDate).format('YYYY-MM-DD'));
+    fetchData(startDate, endDate);
 }, { immediate: true, deep: true })
 
 </script>

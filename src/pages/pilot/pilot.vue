@@ -68,9 +68,6 @@ const pilotsStat = ref<any[]>([]);
 const dateRangeChange = (dates: [Date, Date]) => {
     showCalendar.value = false;
     dateRange.value = dates;
-    const startDate = dayjs(dates[0]).format('YYYY-MM-DD');
-    const endDate = dayjs(dates[1]).format('YYYY-MM-DD');
-    // fetchStatsAndRankings(startDate, endDate);
 };
 
 // 显示飞行员轨迹
@@ -81,9 +78,7 @@ const showPilotDetails = (pilot: any) => {
 
 // 组件挂载时初始化
 onMounted(() => {
-    const startDate = dayjs(dateRange.value[0]).format('YYYY-MM-DD');
-    const endDate = dayjs(dateRange.value[1]).format('YYYY-MM-DD');
-    // fetchStatsAndRankings(startDate, endDate);
+
 });
 </script>
 

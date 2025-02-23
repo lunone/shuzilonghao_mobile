@@ -8,8 +8,8 @@ import { ref, watch } from 'vue';
 const props = defineProps({
     title: { type: String, default: '', },
     date: { type: String, default: '', },
-    startDate: { type: String, default: '', },
-    endDate: { type: String, default: '', },
+    startDate: { type: Date, default: new Date(), },
+    endDate: { type: Date, default: new Date(), },
     lunar: { type: Boolean, default: false, },
     insert: { type: Boolean, default: false, },
     range: { type: Boolean, default: false, },

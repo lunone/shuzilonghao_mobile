@@ -104,8 +104,8 @@ type Res = Record<string, { stations: string[], stat: statItem }>
 const fetchData = async () => {
     loading.value = true;
     error.value = '';
-    const startDate = '2025-02-09';
-    const endDate = '2025-02-18';
+    const startDate = dayjs('2025-02-09').toDate();
+    const endDate = dayjs('2025-02-18').toDate();
     try {
         const res = await api(CONFIG.url.statByAircraft, { startDate, endDate }) as Res;
         console.log('飞机', res);

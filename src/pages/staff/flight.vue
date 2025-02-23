@@ -54,9 +54,10 @@
 
 	const flights = ref<FlightItem[]>([]);
 	const fetchFlights = async () => {
-		const today = dayjs().format('YYYY-MM-DD');
+		const startDate = dayjs().startOf('day').toDate();
+        const endDate = dayjs().endOf('day').toDate();
 		try {
-			const res = await api(CONFIG.url.flightsDate, { startDate: today, endDate: today }) as FlightItem[];
+			const res = await api(CONFIG.url.flightsDate, { startDate , endDate  }) as FlightItem[];
 			flights.value = res;
 		} catch (err) {
 			console.error('获取航班信息失败', err);

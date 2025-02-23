@@ -30,7 +30,6 @@ import CONFIG from '@/config';
 import ucharts from '@/components/ucharts/ucharts.vue';
 import eventsVue from '@/pages/sms/events.vue';
 import voluntarysVue from './voluntarys.vue';
-import { format } from 'path';
 
 // 定义 loading 和 error 状态
 const loading = ref(false);
@@ -47,15 +46,13 @@ const stats = ref({}) as Ref<Record<string, { events, voluntarys }>>;
 const tabCurrent = ref(0);
 const onClickItem = e => tabCurrent.value = tabCurrent != e.currentIndex ? e.currentIndex : tabCurrent.value;
 
-const startDate = dayjs().subtract(1, 'year').startOf('month').format('YYYY-MM-DD');
-const endDate = dayjs().format('YYYY-MM-DD');
+const startDate = dayjs().subtract(1, 'year').startOf('month').toDate();
+const endDate = dayjs().toDate();
 
-// const selectStartDate = ref(dayjs().startOf('month').format('YYYY-MM-DD'));
-// const selectEndDate = ref(dayjs().format('YYYY-MM-DD'));
 const selectRange = ref([
-    dayjs().startOf('month').format('YYYY-MM-DD'),
-    dayjs().format('YYYY-MM-DD')
-]) as Ref<[string, string]>;
+    dayjs().startOf('month').toDate(),
+    dayjs().toDate()
+]) as Ref<[Date, Date]>;
 const getOption = (res) => {
     months.value = Object.keys(res);
     const events2 = [];
@@ -150,8 +147,8 @@ function showTip(chart, event) {
         ]
     });
     selectRange.value = [
-        dayjs(`20${month}/01`).format('YYYY-MM-DD'),
-        dayjs(`20${month}/01`).add(1, 'month').subtract(1, 'day').format('YYYY-MM-DD')
+        dayjs(`20${month}/01`).toDate(),
+        dayjs(`20${month}/01`).add(1, 'month').subtract(1, 'day').toDate()
     ];
     select.value.events = value.events;
     select.value.voluntarys = value.voluntarys;

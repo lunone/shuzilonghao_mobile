@@ -43,8 +43,8 @@ const events: Ref<EventItem[]> = ref([]);
 const current = ref(0);
 const onClickItem = e => current.value = current != e.currentIndex ? e.currentIndex : current.value;
 
-const endDate = dayjs().format('YYYY-MM-DD');
-const startDate = dayjs().subtract(1, 'month').format('YYYY-MM-DD');
+const endDate = dayjs().toDate();
+const startDate = dayjs().subtract(1, 'month').toDate();
 // 获取事件列表
 const fetchData = async () => {
     loading.value = true;

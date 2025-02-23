@@ -49,9 +49,9 @@
         <div class="remark" v-if="props.range == 'year'">
             <!-- <van-icon name="info" /> -->
             <i class="icon zl-icon-info" />
-            今年:{{ dayjs(DateStr.firstDayOfYear).format('YYYY/M/D') }}-{{ dayjs(DateStr.now).format('YYYY/M/D') }},
-            去年:{{ dayjs(DateStr.firstDayOfLastYear).format('YYYY/M/D') }}-{{
-                dayjs(DateStr.dayBeforeOneYear).format('YYYY/M/D') }}
+            今年:{{ dayjs(dates.firstDayOfYear).format('YYYY/M/D') }}-{{ dayjs(dates.now).format('YYYY/M/D') }},
+            去年:{{ dayjs(dates.firstDayOfLastYear).format('YYYY/M/D') }}-{{
+                dayjs(dates.dayBeforeOneYear).format('YYYY/M/D') }}
         </div>
     </div>
 </template>
@@ -67,17 +67,17 @@ const props = defineProps({
     range: { type: String as PropType<string>, default: 'year' },
 })
 
-const DateStr = {
+const dates = {
     // day的
-    today: dayjs().startOf('day').format('YYYY-MM-DD HH:mm:ss'),
-    yesterday: dayjs().subtract(1, 'day').startOf('day').format('YYYY-MM-DD HH:mm:ss'),
-    theDayBeforeYesterday: dayjs().subtract(2, 'day').startOf('day').format('YYYY-MM-DD HH:mm:ss'),
+    today: dayjs().startOf('day').toDate(),
+    yesterday: dayjs().subtract(1, 'day').startOf('day').toDate(),
+    theDayBeforeYesterday: dayjs().subtract(2, 'day').startOf('day').toDate(),
 
     // year的
-    now: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-    dayBeforeOneYear: dayjs().subtract(1, 'year').format('YYYY-MM-DD HH:mm:ss'),
-    firstDayOfYear: dayjs().startOf('year').format('YYYY-MM-DD HH:mm:ss'),
-    firstDayOfLastYear: dayjs().subtract(1, 'year').startOf('year').format('YYYY-MM-DD HH:mm:ss'),
+    now: dayjs().toDate(),
+    dayBeforeOneYear: dayjs().subtract(1, 'year').toDate(),
+    firstDayOfYear: dayjs().startOf('year').toDate(),
+    firstDayOfLastYear: dayjs().subtract(1, 'year').startOf('year').toDate(),
 
 }
 
@@ -121,11 +121,11 @@ const rate = computed(() => {
 // 先渲染一遍数据，挂载完成再获取资源，避免页面跳变。
 onMounted(async () => {
     if (props.range == 'year') {
-        thisYearRes.value = await api(CONFIG.url.statPeriod, { startDate: DateStr.firstDayOfYear, endDate: DateStr.now }) as Stat;
-        lastYearRes.value = await api(CONFIG.url.statPeriod, { startDate: DateStr.firstDayOfLastYear, endDate: DateStr.dayBeforeOneYear }) as Stat;
+        thisYearRes.value = await api(CONFIG.url.statPeriod, { startDate: dates.firstDayOfYear, endDate: dates.now }) as Stat;
+        lastYearRes.value = await api(CONFIG.url.statPeriod, { startDate: dates.firstDayOfLastYear, endDate: dates.dayBeforeOneYear }) as Stat;
     } else {
-        thisYearRes.value = await api(CONFIG.url.statPeriod, { startDate: DateStr.yesterday, endDate: DateStr.today }) as Stat;
-        lastYearRes.value = await api(CONFIG.url.statPeriod, { startDate: DateStr.theDayBeforeYesterday, endDate: DateStr.yesterday }) as Stat;
+        thisYearRes.value = await api(CONFIG.url.statPeriod, { startDate: dates.yesterday, endDate: dates.today }) as Stat;
+        lastYearRes.value = await api(CONFIG.url.statPeriod, { startDate: dates.theDayBeforeYesterday, endDate: dates.yesterday }) as Stat;
     }
 });
 

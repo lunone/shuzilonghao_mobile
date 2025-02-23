@@ -111,9 +111,7 @@ watch(() => dateRange, async () => {
         // 计算参与飞行人数、总参与飞行小时和每日人均飞行小时
         summary.value.participantCount = stat.length;
         summary.value.totalFlightHours = parseFloat(stat.reduce((sum, pilot) => sum + pilot.totalFlightHours, 0).toFixed(2));
-        // const totalDays = dayjs(endDate).diff(dayjs(startDate), 'day') + 1;
-        // summary.value.avgFlightHoursPerDay = parseFloat((summary.value.totalFlightHours / (pilotsStat.length  )).toFixed(2));
-
+       
         first.value = sortStat.shift();
         second.value = sortStat.shift();
         third.value = sortStat.shift();

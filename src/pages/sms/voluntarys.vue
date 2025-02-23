@@ -17,12 +17,10 @@ import voluntary from './card/voluntary.vue';
 import useUserStore from '@/store/user.store';
 const store = useUserStore();
 const props = defineProps({
-    // startDate: { type: String, default: dayjs().add(-1, 'month').format('YYYY-MM-DD') },
-    // endDate: { type: String, default: dayjs().format('YYYY-MM-DD') },
     range: {
-        type: Object as PropType<[string, string]>, default: () => [
-            dayjs().add(-11, 'day').format('YYYY-MM-DD'),
-            dayjs().add(-1, 'day').format('YYYY-MM-DD'),
+        type: Object as PropType<[Date, Date]>, default: () => [
+            dayjs().add(-11, 'day').toDate(),
+            dayjs().add(-1, 'day').toDate(),
         ]
     }
 });

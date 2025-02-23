@@ -17,8 +17,8 @@ const dayLenth = 22;
 const flights: Ref<Record<string, Record<string, number>>> = ref({});
 const option = ref();
 const fetchFlishgts = async () => {
-    const startDate = dayjs().add(0, 'day').format('YYYY-MM-DD');
-    const endDate = dayjs().add(dayLenth, 'day').format('YYYY-MM-DD');
+    const startDate = dayjs().add(0, 'day').toDate();
+    const endDate = dayjs().add(dayLenth, 'day').toDate();
     try {
         const res = await api(CONFIG.url.flightPlan, { startDate, endDate });
         flights.value = res;

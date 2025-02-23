@@ -56,7 +56,7 @@ const flights = ref<Record<string, FlightItem[]>>({});
 const store = usebasisStore();
 
 // 获取飞行员轨迹
-const fetchFlightTracks = async (startDate: string, endDate: string, userId: string) => {
+const fetchFlightTracks = async (startDate: Date, endDate: Date, userId: string) => {
     try {
         const res = await api(CONFIG.url.crewFlights, { startDate, endDate, userId }) as FlightItem[];
         // 这里给res加上arrName,depName;
@@ -74,8 +74,8 @@ const fetchFlightTracks = async (startDate: string, endDate: string, userId: str
     }
 };
 watch(() => [props.userId, props.dateRange], (userId) => {
-    const startDate = dayjs(props.dateRange[0]).format('YYYY-MM-DD');
-    const endDate = dayjs(props.dateRange[1]).format('YYYY-MM-DD');
+    const startDate = dayjs(props.dateRange[0]).toDate();
+    const endDate = dayjs(props.dateRange[1]).toDate();
     fetchFlightTracks(startDate, endDate, props.userId);
 }, { deep: true, immediate: true });
 // 获取机场信息

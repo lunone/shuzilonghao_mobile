@@ -40,8 +40,8 @@ export default defineStore('basis', {
                     B73: 'B737', B74: 'B747', A32: 'A320', A31: 'A319'
                 }
                 res.map(aircraft => {
-                    aircraft.startDate = dayjs(aircraft.startDate).format('YYYY-MM-DD');
-                    aircraft.endDate = aircraft.endDate ? dayjs(aircraft.endDate).format('YYYY-MM-DD') : undefined;
+                    aircraft.startDate = dayjs(aircraft.startDate).toDate();
+                    aircraft.endDate = aircraft.endDate ? dayjs(aircraft.endDate).toDate() : undefined;
                     aircraft.acTypeLong = acTypeShortTranslate[aircraft.acTypeLong] || aircraft.acType;
                 })
                 this.aircrafts = res.reduce((acc, cur) => ({ ...acc, [cur.acReg]: cur }), {})
