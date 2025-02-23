@@ -10,11 +10,11 @@
           
 
             <!-- <VanNoticeBar left-icon="info-o" text="点击下方条目可查看飞行员轨迹" /> -->
-            <rank-list-vue :data="pilotsStat" @select="showPilotDetails" />
+            <rank-list-vue   />
 
             <van-dialog v-model:show="showTrack" :title="`${selectedPilot?.name}(${selectedPilot?.userId})`"
                 show-cancel-button :showConfirmButton="false">
-                <track-vue :data="selectedPilot?.flightTracks" v-if="selectedPilot" :date-range="dateRange"
+                <track-vue :data="selectedPilot?.flightTracks" v-if="selectedPilot"  
                     :user-id="selectedPilot?.userId" />
             </van-dialog>
             <van-back-top></van-back-top>
@@ -44,37 +44,37 @@ const selectedPilot = ref<any>(null);
 const minDate = new Date(new Date().setFullYear(new Date().getFullYear() - 3));
 const maxDate = new Date();
 
-const dateRange = ref<[Date, Date]>([
-    dayjs().startOf('month').subtract(1, 'month').toDate(),
-    dayjs().startOf('month').subtract(1, 'day').toDate()
-]);
+// const dateRange = ref<[Date, Date]>([
+//     dayjs().startOf('month').subtract(1, 'month').toDate(),
+//     dayjs().startOf('month').subtract(1, 'day').toDate()
+// ]);
 
-const formatDate = (date: Date) => {
-    return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
-};
+// const formatDate = (date: Date) => {
+//     return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
+// };
 
-const dateRangeText = computed(() => {
-    const [start, end] = dateRange.value;
-    return `${formatDate(start)} - ${formatDate(end)}`;
-});
-
-
-const pilotsStat = ref<any[]>([]);
+// const dateRangeText = computed(() => {
+//     const [start, end] = dateRange.value;
+//     return `${formatDate(start)} - ${formatDate(end)}`;
+// });
 
 
+// const pilotsStat = ref<any[]>([]);
 
 
-// 日历选择确认事件
-const dateRangeChange = (dates: [Date, Date]) => {
-    showCalendar.value = false;
-    dateRange.value = dates;
-};
 
-// 显示飞行员轨迹
-const showPilotDetails = (pilot: any) => {
-    selectedPilot.value = pilot;
-    showTrack.value = true;
-};
+
+// // 日历选择确认事件
+// const dateRangeChange = (dates: [Date, Date]) => {
+//     showCalendar.value = false;
+//     dateRange.value = dates;
+// };
+
+// // 显示飞行员轨迹
+// const showPilotDetails = (pilot: any) => {
+//     selectedPilot.value = pilot;
+//     showTrack.value = true;
+// };
 
 // 组件挂载时初始化
 onMounted(() => {

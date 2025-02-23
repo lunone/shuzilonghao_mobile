@@ -47,7 +47,7 @@ const stats = ref({}) as Ref<Record<string, statItem>>;
 
 const dateRange = ref([
     dayjs().add(-2, 'year').startOf('year').toDate(),
-    dayjs().add(-1, 'day').toDate()
+    dayjs().add(-1, 'day').endOf('day').toDate()
 ]) as Ref<[Date, Date]>;
 const fetchData = async (startDate: Date, endDate: Date) => {
     loading.value = true;

@@ -47,7 +47,7 @@ const airports = ref({}) as Ref<Record<string, AirportItem>>;
 
 const dateRange = ref([
     dayjs().add(-11, 'day').toDate(),
-    dayjs().add(-1, 'day').toDate()
+    dayjs().add(-1, 'day').endOf('day').toDate()
 ]) as Ref<[Date, Date]>;
 const code4City = (code4: string) => airports.value[code4]?.city || code4;
 const currentStation = ref('');
