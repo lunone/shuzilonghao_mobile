@@ -25,9 +25,9 @@ export default defineStore('user', {
         },
         async getMyself(refresh = false) {
             // if (refresh) {
-            const self = await api(CONFIG.url.init) as UserItem;
-            if (self?.id) {
-                this.self = self;
+            const mySelf = await api(CONFIG.url.init) as UserItem;
+            if (mySelf?.id) {
+                this.self = mySelf;
             }
             // }
             return this.self;
