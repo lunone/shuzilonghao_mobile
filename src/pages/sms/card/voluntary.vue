@@ -1,9 +1,9 @@
 <template>
-    <div class="item">
+    <div class="voluntary-wrapper">
         <div class="ask">
             <div class="user" @click="showProfile(data.userId)">
                 <i class="icon zl-icon-user" />
-                {{ data.userName }}
+                <div class="name">{{ data.userName }}</div>
             </div>
             <div class="content">
                 <div class="desc">{{ data.content }}</div>
@@ -20,7 +20,7 @@
                 </div>
                 <div class="user" @click="showProfile(answer.userId)">
                     <i class="icon zl-icon-user" />
-                    {{ answer.userName }} 
+                    <div class="name">{{ answer.userName }}</div>
                 </div>
             </div>
         </template>
@@ -39,7 +39,9 @@ const showProfile = inject('showProfile') as Function;
 @color-ask: #c2e7b0;
 @color-answer: #dfdfdf;
 
-.item {
+
+
+.voluntary-wrapper {
     display: flex;
     flex-direction: column;
     background-color: @color-background;
@@ -56,8 +58,16 @@ const showProfile = inject('showProfile') as Function;
         margin-bottom: 16px;
         align-items: flex-start;
 
+        .anonymous {
+            .icon {
+                color: #eee;
+            }
+        }
+
         .user {
+            .column;
             align-self: flex-start;
+            align-items: center ;
             width: 40px;
             font-size: 12px;
 
@@ -69,12 +79,6 @@ const showProfile = inject('showProfile') as Function;
             .name {
                 color: #666;
                 text-align: center;
-            }
-        }
-
-        .anonymous {
-            .icon {
-                color: #eee;
             }
         }
 
