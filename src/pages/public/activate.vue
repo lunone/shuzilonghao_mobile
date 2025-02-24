@@ -33,7 +33,7 @@ const activate = async () => {
         if (res) {
             store.getToken(res);
             // 跳转到首页
-            uni.redirectTo({ url: '/pages/Index?activate=true' });
+            uni.redirectTo({ url: '/pages/index?activate=true' });
         } else {
             return error('激活失败');
         }

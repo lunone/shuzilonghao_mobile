@@ -38,7 +38,7 @@ export default {
         register: '/pages/public/public'
     },
     key: { token: 'Authorization', },
-    css: { splash: { duration: 3e3, } },
+    css: { splash: { duration: 2e3, } },
     chart: {
         color: {
             ZHCC: '#91CB74',
