@@ -1,9 +1,9 @@
 <template>
     <div class="item">
         <div class="ask">
-            <div class="user">
+            <div class="user" @click="showProfile(data.userId)">
                 <i class="icon zl-icon-user" />
-                <UserCardVue :userId="data.userId" error="匿名"  />
+                {{ data.userName }}
             </div>
             <div class="content">
                 <div class="desc">{{ data.content }}</div>
@@ -18,9 +18,9 @@
                     </div>
                     <div class="date">{{ dayjs(answer.date).format('M月D日') }}</div>
                 </div>
-                <div class="user">
+                <div class="user" @click="showProfile(answer.userId)">
                     <i class="icon zl-icon-user" />
-                    <UserCardVue :userId="answer.userId" :error="answer.userName" />
+                    {{ answer.userName }} 
                 </div>
             </div>
         </template>
@@ -28,8 +28,9 @@
 </template>
 <script lang="ts" setup>
 import dayjs from 'dayjs';
-import UserCardVue from '@/pages/hr/userCard.vue';
+import { inject } from 'vue';
 const props = defineProps<{ data: Record<string, any> }>();
+const showProfile = inject('showProfile') as Function;
 </script>
 <style lang="less" scoped>
 @import '@/css/base.less';

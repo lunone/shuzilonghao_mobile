@@ -9,9 +9,10 @@
         <div class="crews" v-if="data.crews?.length">
             <div class="title">机组</div>
             <div class="value">
-                <template v-for="crew in data.crews" :key="crew.name">
-                    <UserCardVue :userId="crew.userId" :error="crew.name" />
-                </template>
+                <span v-for="crew in data.crews" :key="crew.name" @click="showProfile(crew.userId)">
+                    <!-- <UserCardVue :userId="crew.userId" :error="crew.name" /> -->
+                    {{ crew.name }}
+                </span>
             </div>
         </div>
         <div class="desc">
@@ -21,17 +22,20 @@
             <div>
                 <div class="time-name">
                     <div class="time">{{ data.reportDate }}</div>
-                    <UserCardVue :userId="data.reporter" v-if="data.reporter" />
-                    <div v-else>none</div>
+                    <!-- <UserCardVue :userId="data.reporter" v-if="data.reporter" /> -->
+                    <!-- <div v-else>none</div> -->
+                    <div class="name" @click="showProfile(data.reporterId)">{{ data.reporter }}</div>
                 </div>
                 <span>提交事件</span>
-            </div>
+            </div>  
             <div class="step" v-for="(value, key) in data.status" :key="key">
+        
                 <div class="time-name">
                     <div class="time">{{ value.updateTime }}</div>
-                    <template>
-                        <UserCardVue :userId="value.updater" />
-                    </template>
+                    <!-- <template> -->
+                        <!-- <UserCardVue :userId="value.updater" /> -->
+                        <div class="name" @click="showProfile(value.updaterId)">{{ value.updater }}</div>
+                    <!-- </template> -->
                 </div>
                 <span v-if="value.reason && value.reason != data.status[key - 1]?.reason">
                     填写了原因：{{ value.reason }}
@@ -49,10 +53,12 @@
 </template>
 <script lang="ts" setup>
 import dayjs from 'dayjs';
-import UserCardVue from '@/pages/hr/userCard.vue';
+// import UserCardVue from '@/pages/hr/userCard.vue';
 import { call } from '@/utils/tools';
+import { inject, onMounted, watch } from 'vue';
 const props = defineProps<{ data: Record<string, any> }>();
 // 拨打电话的方法
+const showProfile = inject('showProfile') as Function;
 
 </script>
 <style lang="less" scoped>

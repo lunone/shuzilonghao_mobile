@@ -45,12 +45,12 @@ const fetchData = async (currentPage: number) => {
                 newCrews.push({ userId, name: crew, });
             }
             // 举报人
-            event.reporter = nameToUserId[event.reporter] || event.reporter;
+            event.reporterId = nameToUserId[event.reporter];
             for (let s of event.status) {
-                s.creator = nameToUserId[s.creator] || s.creator;
+                s.creatorId = nameToUserId[s.creator];
                 // 状态更新人
-                s.updater = nameToUserId[s.updater] || s.updater;
-                s.reporter = nameToUserId[s.reporter] || s.reporter;
+                s.updaterId = nameToUserId[s.updater];
+                s.reporterId = nameToUserId[s.reporter];
             }
             event.crews = newCrews;
             event.acReg = (acReg || '').replace('-', '');

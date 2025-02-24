@@ -1,8 +1,7 @@
 <template>
-    <!-- <view v-if="voluntarys.length === 0">暂无主动报告</view> -->
+    <!-- <view v-if="voluntarys.length === 0">暂无主动报告</view> v-model="loading" :finished="finished" :load="loadMore"-->
     <view class="report-list" style="height: 800px;">
-        <press-list v-model="loading" :finished="finished" :immediate-check="false" finished-text="没有更多了"
-            :load="loadMore">
+        <press-list :immediate-check="false" finished-text="没有更多了">
             <voluntary v-for="(voluntary, index) in voluntarys" :key="index" :data="voluntary" />
         </press-list>
     </view>
@@ -24,35 +23,39 @@ const props = defineProps({
         ]
     }
 });
-
+const emits = defineEmits(['loading', 'finished'])
 const voluntarys: Ref<any[]> = ref([]);
-const loading = ref(false);
-const finished = ref(false);
+// const loading = ref(false);
+// const finished = ref(false);
 const page = ref(1);
 // const size = 300;
 
 
 // 获取事件列表
 const fetchData = async (currentPage: number = 1) => {
-    loading.value = true;
+    // loading.value = true;
     // page.value++;
+    emits('loading', true);
     try {
         const [startDate, endDate] = props.range;
         const resVoluntary = await api(CONFIG.url.smsVoluntarys, { startDate, endDate });
-        console.log(`resVoluntary`)
+        console.log(`resVoluntary`,resVoluntary)
         const nameToUserId = await store.getNameToUserId();
         // 给answer的添加userId;
         for (let voluntary of resVoluntary) {
+            voluntary.userId = nameToUserId[voluntary?.userName];
             for (let answer of voluntary.answers) {
                 answer.userId = nameToUserId[answer?.userName];
             }
         }
         voluntarys.value = voluntarys.value.concat(resVoluntary);
-        loading.value = false;
+        // loading.value = false;
+
     } catch (err) {
         console.error('获取事件列表失败', err);
     } finally {
-        loading.value = false;
+        // loading.value = false;
+        emits('loading', false);
     }
 };
 

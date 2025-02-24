@@ -1,38 +1,38 @@
 <template>
-    <!-- <nav-vue title="安全管理" text="主页" url='/home' /> -->
-    <view v-if="loading" class="loading">加载中...</view>
-    <view v-else-if="error" class="error">{{ error }}</view>
-    <view v-else>
+    <div class="sms-wrapper">
         <div class="title">安全趋势</div>
         <ucharts :option="pieOption" @select="showTip" :height="200" />
         <press-divider contentPosition="center">{{ title }} 详情</press-divider>
         <press-tabs :active="tabCurrent" @change="onClickItem">
             <press-tab :title="`主动报告(${select.voluntarys})`">
-                <voluntarysVue :range="selectRange" />
+                <voluntarysVue :range="selectRange" @loading="loading2" />
             </press-tab>
             <press-tab :title="`事件(${select.events})`">
                 <eventsVue :range="selectRange" />
             </press-tab>
 
         </press-tabs>
-
-    </view>
-
-
+    </div>
+    <press-action-sheet :show="showProfile" title="员工信息" @close="showProfile = false">
+        <Profile :userId="selectUserId" v-if="showProfile" />
+    </press-action-sheet>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, Ref } from 'vue';
+import { ref, computed, onMounted, Ref, provide } from 'vue';
 // import NavVue from '@/components/Nav.vue';
 import api from '@/utils/api';
 import dayjs from 'dayjs';
 import CONFIG from '@/config';
 import ucharts from '@/components/ucharts/ucharts.vue';
 import eventsVue from '@/pages/sms/events.vue';
-import voluntarysVue from './voluntarys.vue';
-
+import voluntarysVue from '@/pages/sms/voluntarys.vue';
+import Profile from '@/pages/hr/profile.vue';
 // 定义 loading 和 error 状态
 const loading = ref(false);
+const showProfile = ref(false);
+const selectUserId = ref('');
+const subLoading = ref(false);
 const error = ref('');
 const title = ref(dayjs().format('YY年MM月'));
 const pieOption = ref({});
@@ -53,6 +53,28 @@ const selectRange = ref([
     dayjs().startOf('month').toDate(),
     dayjs().toDate()
 ]) as Ref<[Date, Date]>;
+const loading2 = status => {
+    console.log('loading2', status)
+    subLoading.value = status;
+    // error.value = '';
+    if (status) {
+        uni.showToast({
+            title: '加载中...',
+            icon: 'loading',
+            duration: 2000
+        });
+    } else {
+        uni.hideToast();
+    }
+}
+
+provide("showProfile", (userId: string) => {
+    console.log('geiwosou', userId)
+    if (userId) {
+        showProfile.value = true;
+        selectUserId.value = userId;
+    }
+})
 const getOption = (res) => {
     months.value = Object.keys(res);
     const events2 = [];
@@ -136,7 +158,9 @@ const fetchData = async () => {
 };
 
 function showTip(chart, event) {
-
+    if (subLoading.value) {
+        return console.log('子组件还在加载呢');
+    }
     const item = chart.getCurrentDataIndex(event);
     const month = months.value[item.index];
     const value = stats.value[month];

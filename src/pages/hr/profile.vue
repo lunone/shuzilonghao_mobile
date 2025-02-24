@@ -70,10 +70,10 @@ const employee2: Ref<UserItem> = ref();
 let departments = ref([]);
 const depName = ref('');
 const fetchEmployee = async () => {
-    employee2.value = await api(CONFIG.url.userProfile, { userId: props.userId });
     store.getDepartments();
+    employee2.value = await api(CONFIG.url.userProfile, { userId: props.userId });
 };
-
+// watch
 watch([() => store.departments, () => employee2], () => {
     departments.value = store.departments;
     if (departments.value.length && employee2.value.department) {
@@ -87,7 +87,7 @@ const onClickkv = (e) => {
         current.value = e.currentIndex;
     }
 }
-onMounted(() => {
+onMounted(async () => {
     fetchEmployee();
 });
 interface Department {
