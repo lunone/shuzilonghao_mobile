@@ -1,31 +1,34 @@
 <template>
     <div class="main-container">
-        
-            <!-- <header class="section header"> -->
-            <!-- <div class="logo"> -->
-            <!-- <van-notice-bar left-icon="volume-o" text="点击第二行的按钮可进入各子模块。" /> -->
 
-            <!-- </div> -->
-            <!-- <div class="user"> 
+        <!-- <header class="section header"> -->
+        <!-- <div class="logo"> -->
+        <!-- <van-notice-bar left-icon="volume-o" text="点击第二行的按钮可进入各子模块。" /> -->
+
+        <!-- </div> -->
+        <!-- <div class="user"> 
                 <VanIcon name="user" />
             </div> -->
-            <!-- </header> -->
-            <div class="section overview">
-                <StatVue class="day" :range="`day`" />
-                <StatVue class="year" />
-            </div>
-            <ShortcutVue class="shortcut" />
+        <!-- </header> -->
+        <div class="section overview">
+            <StatVue class="day" :range="`day`" />
+            <StatVue class="year" />
+        </div>
+        <ShortcutVue class="shortcut" />
+        <div class="section income">
+            <IncomeVue />
+        </div>
 
-            <div class="section asset">
-                <AircraftVue class="aircraft" />
-                <HrVue class="hr" />
-            </div>
+        <div class="section asset">
+            <AircraftVue class="aircraft" />
+            <HrVue class="hr" />
+        </div>
 
-            <FlightVue class="section flight" />
-            <PlanVue class="section plan" />
+        <FlightVue class="section flight" />
+        <PlanVue class="section plan" />
 
 
-            <dividerVue class="more">其他值得放在首页的项</dividerVue>
+        <dividerVue class="more">其他值得放在首页的项</dividerVue>
     </div>
 </template>
 
@@ -37,6 +40,7 @@ import HrVue from './hr.vue';
 import AircraftVue from './aircraft.vue';
 import PlanVue from './plan.vue';
 import dividerVue from '@/components/zl/divider.vue';
+import IncomeVue from './income.vue';
 </script>
 
 
@@ -50,11 +54,9 @@ import dividerVue from '@/components/zl/divider.vue';
 
     &>.section {
         padding: @padding-page;
-        border-radius: @radius-sm;
+        border-radius: @radius-base;
         background-color: @color-block;
         margin: 5px @margin-page;
-        // border-top-left-radius: @radius-sm;
-        // border-top-right-radius: @radius-sm;
         box-sizing: border-box;
         box-shadow: @shadow-base;
     }
@@ -97,6 +99,10 @@ import dividerVue from '@/components/zl/divider.vue';
         border-radius: 0;
         box-shadow: 0;
         padding: @padding-mini 0
+    }
+
+    &>.income {
+
     }
 
     &>.asset {

@@ -3,7 +3,7 @@
     <press-calendar />
     <div v-if="loading" class="loading">加载中...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
-    <div v-else>
+    <div  >
 
         <div class="button-group">
             <span class="btn" :class="currentStation == code4 ? `hover` : ``" v-for="code4 in stations" :key="code4"

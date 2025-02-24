@@ -152,10 +152,7 @@ interface Department {
         .hr,
         .duty,
         .exp {
-            background-image: url('https://app.airlonghao.com/sample.png');
-            /* 替换为你的图片URL */
-            background-position: top right;
-            background-repeat: no-repeat;
+            .sample;
         }
     }
 
