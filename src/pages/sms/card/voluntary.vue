@@ -1,30 +1,5 @@
 <template>
-    <div class="voluntary-wrapper">
-        <div class="ask">
-            <div class="user" @click="showProfile(data.userId)">
-                <i class="icon zl-icon-user" />
-                <div class="name">{{ data.userName }}</div>
-            </div>
-            <div class="content">
-                <div class="desc">{{ data.content }}</div>
-                <div class="date">{{ dayjs(data.date).format('M月D日') }}</div>
-            </div>
-        </div>
-        <template v-if="data.answers.length">
-            <div class="answer" v-for="(answer, index) of data.answers" :key="answer.id">
-                <div class="content">
-                    <div class="desc" :class="answer.content ? '' : 'blank'">
-                        {{ answer.content || `系统提示：用户未录入有效内容` }}
-                    </div>
-                    <div class="date">{{ dayjs(answer.date).format('M月D日') }}</div>
-                </div>
-                <div class="user" @click="showProfile(answer.userId)">
-                    <i class="icon zl-icon-user" />
-                    <div class="name">{{ answer.userName }}</div>
-                </div>
-            </div>
-        </template>
-    </div>
+
 </template>
 <script lang="ts" setup>
 import dayjs from 'dayjs';

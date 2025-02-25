@@ -14,9 +14,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, Ref } from 'vue';
-import CONFIG from '@/config';
-import Profile from '../hr/profile.vue';
-import { it } from 'node:test';
+
 const data = ref([
     { link: '/pages/analysis/year', class: 'analysis', text: '历史概况' },
     { link: '/pages/analysis/overview', class: 'health', text: '趋势分析' },

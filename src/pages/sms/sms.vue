@@ -1,17 +1,22 @@
 <template>
     <div class="sms-wrapper">
-        <div class="title">安全趋势</div>
-        <ucharts :option="pieOption" @select="showTip" :height="200" />
-        <press-divider contentPosition="center">{{ title }} 详情</press-divider>
-        <press-tabs :active="tabCurrent" @change="onClickItem">
-            <press-tab :title="`主动报告(${select.voluntarys})`">
-                <voluntarysVue :range="selectRange" @loading="loading2" />
-            </press-tab>
-            <press-tab :title="`事件(${select.events})`">
-                <eventsVue :range="selectRange" />
-            </press-tab>
-
-        </press-tabs>
+        <div class="header">
+            <div class="title">安全趋势</div>
+            <ucharts :option="pieOption" @select="showTip" :height="200" />
+        </div>
+        <div class="detail">
+            <div class="title">{{ title }} 详情</div>
+            <div class="tabs">
+                <press-tabs :active="tabCurrent" @change="onClickItem">
+                    <press-tab :title="`主动报告(${select.voluntarys})`">
+                        <voluntarysVue :range="selectRange" @loading="loading2" />
+                    </press-tab>
+                    <press-tab :title="`事件(${select.events})`">
+                        <eventsVue :range="selectRange" />
+                    </press-tab>
+                </press-tabs>
+            </div>
+        </div>
     </div>
     <press-action-sheet :show="showProfile" title="员工信息" @close="showProfile = false">
         <Profile :userId="selectUserId" v-if="showProfile" />
@@ -28,6 +33,7 @@ import ucharts from '@/components/ucharts/ucharts.vue';
 import eventsVue from '@/pages/sms/events.vue';
 import voluntarysVue from '@/pages/sms/voluntarys.vue';
 import Profile from '@/pages/hr/profile.vue';
+import color from '@/css/color';
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const showProfile = ref(false);
@@ -96,20 +102,24 @@ const getOption = (res) => {
         color: ["#91CB74", "#FAC858", "#EE6666", "#73C0DE", "#3CA272", "#FC8452", "#9A60B4", "#ea7ccc"],
         series: [
             {
-                color: "#aaaaaa",
+                // color: "#aaaaaa",
                 name: "安全事件", type: "column",
-                data: events2
+                data: events2,
                 //  yData.map(value => {
                 //     // 超过平均值20%的颜色红色，低于平均值20%的颜色暗绿色，其他的颜色为蓝色
                 //     const diff = (value - avgDay) / avgDay;
                 //     const color = diff > 0.2 ? '#d48264' : (diff < -0.2) ? '#c4ccd3' : "#91c7ae";
                 //     return { color, value }
                 // })
+                textColor: color.sms.chart.barText,
+                color: color.sms.chart.bar,
             }, {
                 name: '主动报告', type: "line",
                 // 默认太高了,裁掉一节
                 data: voluntarys2.map((value, index) => value - 30),
-                formatter: val => val + 30
+                formatter: val => val + 30,
+                textColor: color.sms.chart.lineText,
+                color: color.sms.chart.line,
             },
             // { name: '班次', type: "column", data: counters }
         ],
@@ -121,10 +131,12 @@ const getOption = (res) => {
             disableGrid: true,
             // labelCount: 8,// 这个确实会自动控制显示标签数量,但是不显示的标签的val就是''了,没办法formatter
             formatter: (val, index) => index % step != 0 ? '' : val,
+            fontColor: color.sms.chart.xText,
         },
         yAxis: {
             disabled: true,
             // disableGrid: true,
+            gridColor:color.sms.chart.yGrid,
             data: [{
                 min: 0,
                 // disabled: true,
@@ -186,40 +198,37 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
-.loading,
-.error {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.title {
-    margin: 10px;
-    font-size: 16px;
-    color: #888;
-}
-
-.summary {
-    margin-bottom: 20px;
-    padding: 10px;
-    border: 1px solid #eee;
-    border-radius: 5px;
-}
-
-.van-cell {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-}
+@import '@/css/base.less';
 
 
+.sms-wrapper {
+    background-color: @color-sms;
 
-.report-list {
-    padding: 16px;
+    .header {
+        margin: 0;
 
+        .title {
+            margin: 0 10px;
+            font-size: 16px;
+            color: #fff;
+        }
+    }
 
-}
+    .detail {
+        background-color: #fff;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
 
-/* 添加这段样式后  */
-:root:root {
-    --van-step-line-color: red;
+        .title {
+            text-align: center;
+            margin: 10px auto 0 auto;
+            padding: 6px auto;
+            font-size: 1.2rem;
+        }
+
+        .tabs {
+            padding: 10px;
+        }
+    }
 }
 </style>

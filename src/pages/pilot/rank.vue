@@ -35,8 +35,10 @@
                     </div>
                 </template>
             </div>
+
         </div>
         <div class="normal">
+            <div class="info">此页数字大约有2%的误差,但整体趋势不错,BUG修复中…… </div>
             <div v-for="pilot in data" class="pilot" :key="pilot.userId">
                 <span class="icon" :class="`no${pilot.rank}`">
                     <template> {{ pilot.rank }}</template>
@@ -156,6 +158,7 @@ onMounted(() => {
 <style lang="less" scoped>
 @import '@/css/base.less';
 
+
 .loading {
     text-align: center;
 }
@@ -197,7 +200,7 @@ onMounted(() => {
 }
 
 .rank-wrapper {
-    background-color: #f8f8f8;
+    background-color: @color-pilot;
     // background-color: #e24f4f;
     // background: linear-gradient(to bottom right, @color-primary, @color-secondary);
 
@@ -219,7 +222,7 @@ onMounted(() => {
             .left,
             .right {
                 font-size: 1.6rem;
-                color: #ffb2b2;
+                color: lighten(@color-pilot, 40%)
             }
 
             .left {
@@ -231,7 +234,7 @@ onMounted(() => {
             }
 
             .disable {
-                color: #cfcfcf;
+                color: lighten(@color-pilot, 5%);
             }
         }
 
@@ -249,29 +252,20 @@ onMounted(() => {
 
 
             .no1 {
-                .arrow-effect(#FAC900);
+                .arrow-effect(@color-no1);
             }
 
             .no2 {
-                .arrow-effect(#C9C9C9);
+                .arrow-effect(@color-no2);
             }
 
             .no3 {
-                .arrow-effect(#FFA722);
+                .arrow-effect(@color-no3);
             }
 
 
         }
     }
-
-    // .bubble {
-
-    //   background-color: #4CAF50;
-    //   color: white;
-    //   padding: 10px 20px;
-    //   border-radius: 5px;
-    // }
-
 
     .normal {
         display: flex;
@@ -280,7 +274,18 @@ onMounted(() => {
         border-top-left-radius: 14px;
         border-top-right-radius: 14px;
         box-sizing: border-box;
-        background-color: #ccc;
+        background-color: #fff;
+
+        .info {
+            color: #999;
+            text-align: center;
+            overflow: hidden;
+            margin: 4px auto;
+            padding: 4px 10px;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: .9rem;
+        }
 
         .pilot {
             display: flex;

@@ -1,81 +1,27 @@
 <template>
-    <div>
-        <div v-if="loading" class="loading">加载中...</div>
-        <div v-else-if="error" class="error">{{ error }}</div>
-        <div v-else>
-            <!-- <van-cell title="点击选择时间段" :value="dateRangeText" @click="showCalendar = true" />
-            <van-calendar :first-day-of-week="1"  v-model:show="showCalendar" :min-date="minDate" :max-date="maxDate" type="range"
-                :max-range="62" @confirm="dateRangeChange" /> -->
-
-          
-
-            <!-- <VanNoticeBar left-icon="info-o" text="点击下方条目可查看飞行员轨迹" /> -->
-            <rank-list-vue   />
-
-            <van-dialog v-model:show="showTrack" :title="`${selectedPilot?.name}(${selectedPilot?.userId})`"
-                show-cancel-button :showConfirmButton="false">
-                <track-vue :data="selectedPilot?.flightTracks" v-if="selectedPilot"  
-                    :user-id="selectedPilot?.userId" />
-            </van-dialog>
-            <van-back-top></van-back-top>
+    <div class="pilot-wrapper">
+        <div class="item" v-for="item, index in data" :key="index" @click="jump(index)">
+            <i :class="`icon zl-icon-${item.class}`" />
+            <view class="link"> {{ item.text }} </view>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
-// import zlNav from '@/components/Nav.vue';
-import api from '@/utils/api';
-import dayjs from 'dayjs';
-import CONFIG from '@/config';
-import { AirportItem, FlightItem } from '@/interface';
-import usebasisStore from '@/store/basis.store';
-import RankListVue from './rank.vue';
-import TrackVue from './track.vue';
-// 定义 loading 和 error 状态
-const loading = ref(false);
-const error = ref('');
-// 定义相关状态
-const showCalendar = ref(false);
-const showTrack = ref(false);
-
-const selectedPilot = ref<any>(null);
-// 日历最大选择范围
-const minDate = new Date(new Date().setFullYear(new Date().getFullYear() - 3));
-const maxDate = new Date();
-
-// const dateRange = ref<[Date, Date]>([
-//     dayjs().startOf('month').subtract(1, 'month').toDate(),
-//     dayjs().startOf('month').subtract(1, 'day').toDate()
-// ]);
-
-// const formatDate = (date: Date) => {
-//     return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
-// };
-
-// const dateRangeText = computed(() => {
-//     const [start, end] = dateRange.value;
-//     return `${formatDate(start)} - ${formatDate(end)}`;
-// });
-
-
-// const pilotsStat = ref<any[]>([]);
-
-
-
-
-// // 日历选择确认事件
-// const dateRangeChange = (dates: [Date, Date]) => {
-//     showCalendar.value = false;
-//     dateRange.value = dates;
-// };
-
-// // 显示飞行员轨迹
-// const showPilotDetails = (pilot: any) => {
-//     selectedPilot.value = pilot;
-//     showTrack.value = true;
-// };
-
+import { ref, computed, onMounted, watch, Ref } from 'vue';
+const data = ref([
+    { url: '/pages/pilot/rank', class: 'analysis', text: '生产排名' },
+    { url: '/pages/pilot/portrait', class: 'health', text: '人员画像' },
+    { url: '/pages/pilot/analysis', class: 'location', text: '技术分析' },
+]) as Ref<{ url: string, class: string, text: string, error?: string }[]>;
+function jump(index: number) {
+    const { url, error } = data.value[index];
+    if (!error) {
+        uni.navigateTo({ url });
+    } else {
+        uni.showToast({ title: error, icon: 'none', mask: true, duration: 2000 })
+    }
+}
 // 组件挂载时初始化
 onMounted(() => {
 
@@ -85,22 +31,41 @@ onMounted(() => {
 <style lang="less" scoped>
 @import "@/css/base.less";
 
-.loading,
-.error {
-    text-align: center;
-    margin-top: 20px;
-}
+.pilot-wrapper {
+    .column;
+ 
+    // height: 100vh;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 0 10px;
 
-.summary {
-    justify-content: space-around;
-    text-align: center;
+    .item {
+        .row;
+        background-color: antiquewhite;
+        justify-content: start;
+        box-sizing: border-box;
+        border-radius: 16px;
+        width: 100%;
+        padding: 0 10px;
+        height: 10vh;
 
-    .counter {
-        font-weight: bold;
+        margin-bottom: 10px;
+
+        &:first-child {
+            margin-top: 10px;
+        }
+
+        .icon {
+            margin-right: 10px;
+            font-size: 2rem;
+        }
+
+        .link {
+            font-size: 1.4rem;
+        }
     }
 
-    .hour {
-        font-weight: bold;
-    }
+
+
 }
 </style>

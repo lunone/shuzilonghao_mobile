@@ -1,7 +1,7 @@
 export default {
     url: {
         timeout: 30e3,
-        api: 'https://app.airlonghao.com/sz2',
+        api: 'https://app.airlonghao.com/sz',
         init: '/user/init',
         login: '/login/wx',
         activate: '/login/activate',
