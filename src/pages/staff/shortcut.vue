@@ -28,7 +28,7 @@ const data = ref([
 ]) as Ref<{ size: number, link: string, class: string, text: string, error?: string }[][]>;
 function jump(link: string, error?: string) {
     if (error) {
-        uni.showToast({ title: error, icon: 'none', mask: true, duration: 2000 })
+        uni.showToast({ title: error, icon: 'none', mask: true, duration: 1e3 })
     } else {
         uni.navigateTo({ url: link });
     }
