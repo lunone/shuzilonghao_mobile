@@ -23,9 +23,9 @@
                         <div class="ser">TOP.{{ pilot.rank }}</div>
                         <!-- {{ dateRange.join('-') + pilot?.name }} -->
                         <!-- <userCardVue :userId="pilot.userId" :error="pilot.name" /> -->
-                        <div class="name">{{ pilot.name }}</div>
+                        <div class="name" @click="showPilotProfile(pilot.userId)">{{ pilot.name }}</div>
                         <div class="data">
-                            <div class="total" @click="showPilotDetails(pilot)">
+                            <div class="total">
                                 总<span class="value">{{ `${pilot.totalFlightHours}小时` }} </span>
                             </div>
                             <div class="avg">
@@ -38,17 +38,17 @@
 
         </div>
         <div class="normal">
-            <div class="info">此页数字大约有2%的误差,但整体趋势不错,BUG修复中…… </div>
+            <!-- <div class="info">此页数字大约有2%的误差,但整体趋势不错,BUG修复中…… </div> -->
             <div v-for="pilot in data" class="pilot" :key="pilot.userId">
                 <span class="icon" :class="`no${pilot.rank}`">
                     <template> {{ pilot.rank }}</template>
                 </span>
-                <div class="name">
+                <div class="name" @click="showPilotProfile(pilot.userId)">
                     <!-- <userCardVue :userId="pilot.userId" :error="pilot.name" /> -->
                     {{ pilot.name }}
                 </div>
                 <div class="data">
-                    <div class="total" @click="showPilotDetails(pilot)">
+                    <div class="total">
                         总<span class="value">{{ `${pilot.totalFlightHours}小时` }} </span>
                     </div>
                     <div class="avg">
@@ -57,19 +57,31 @@
                 </div>
             </div>
         </div>
+        <press-action-sheet :show="showProfile" title="员工信息" @close="showProfile = false">
+            <Profile :userId="selectUserId" v-if="showProfile" />
+        </press-action-sheet>
     </div>
 </template>
 <script lang="ts" setup>
 import { ref, watch, onMounted, PropType, Ref, computed } from 'vue'
-import userCardVue from '../hr/userCard.vue';
 import dayjs from 'dayjs';
 import api from '@/utils/api';
 import CONFIG from '@/config';
+import Profile from '@/pages/hr/profile.vue';
 
 type PilotStat = { rank: number, userId: string, name: string, totalFlightHours: number, avgFlightHours: number }
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');
+const showProfile = ref(false);
+const selectUserId = ref('');
+function showPilotProfile(userId: string) {
+    console.log('showPilotProfile', userId)
+    if (userId) {
+        selectUserId.value = userId;
+        showProfile.value = true;
+    }
+}
 const data = ref([]) as Ref<PilotStat[]>;
 const dateRange = ref<[string, string]>([dayjs().format('YYYY'), dayjs().format('MM')]);
 // const dateStr = ref('');
@@ -118,7 +130,7 @@ watch(() => dateRange, async () => {
 
         // console.log('old', dayjs(startDate).format('YYYY-MM-DD'), endDate);
         const res = await api(CONFIG.url.statCrewFh, { startDate, endDate }) as any[];
-        // console.log('飞行小时', res, dateRange.value.join('-') + '-01', startDate, endDate);
+        console.log('飞行小时', res);
         const stat = res.map((pilot: any) => ({
             rank: -1,
             userId: pilot.userId,
@@ -147,10 +159,6 @@ watch(() => dateRange, async () => {
         uni.hideToast();
     }
 }, { immediate: true, deep: true })
-
-const showPilotDetails = (pilot: any) => {
-    emits('select', pilot);
-}
 
 onMounted(() => {
 })

@@ -5,7 +5,10 @@
                 <img :src="employee2?.avatar" alt="Avatar" />
             </div>
             <div class="info">
-                <div class="kv name">{{ employee2?.name }}({{ employee2?.userId }})</div>
+                <div class="kv name">
+                    {{ employee2?.name }}({{ employee2?.userId }})
+                    <span class="status">{{ employee2?.status == 2 ? '已离职' : '' }}</span>
+                </div>
                 <div class="ietm department">{{ depName }}</div>
                 <div class="kv position">
                     <div class="key">岗位</div>
@@ -108,7 +111,7 @@ interface Department {
     height: 40vh;
     overflow-y: scroll;
     font-size: 1rem;
-    
+
     .header {
         display: flex;
         align-items: flex-start;
@@ -132,6 +135,10 @@ interface Department {
             .name {
                 font-size: 20px;
                 font-weight: bold;
+
+                .status {
+                    color: #ccc;
+                }
             }
 
             .department {
