@@ -89,15 +89,15 @@ onMounted(() => {
         padding-right: 2px;
 
         .icon {
-            color: #085E7B;
+            color: @color-staff-hr-text;
             font-size: 34px;
             margin-bottom: 2px;
         }
 
         .text {
-            color: #085E7B;
+            color: @color-staff-hr-text;
             font-size: .9rem;
-            font-weight: 500;
+            margin-top: -5px;
             white-space: nowrap;
         }
     }
@@ -114,28 +114,28 @@ onMounted(() => {
             align-items: center;
             padding: 0 4px;
             margin: 0;
-            border-bottom: dashed 1px #aaa;
+            border-bottom: dashed 1px @color-staff-hr-border;
 
             &:last-child {
                 border-bottom: 0;
             }
 
             .title {
-                color: #1B4C5C;
+                color: @color-staff-hr-text;
                 font-size: 0.95rem;
                 white-space: nowrap;
                 // min-width: 2em; // 保证至少显示2个汉字
             }
 
             .value {
-                color: #C52305;
-                font-weight: bold;
                 flex: 1;
+                color: @color-staff-hr-value;
+                font-weight: bold;
                 text-align: center;
             }
 
             .unit {
-                color: #945F28;
+                color: @color-staff-hr-unit;
                 font-size: 0.85rem;
             }
         }

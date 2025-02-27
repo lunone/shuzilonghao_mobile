@@ -1,24 +1,29 @@
 <template>
-    <view class="hr-summary">
-        <view class="total">
+    <div class="hr-summary">
+        <div class="total">
             <i class="icon zl-icon-person" />
-            <view class="text">
+            <div class="text">
                 {{ stat.all }}人
-            </view>
-        </view>
-        <view class="detail">
-            <view class="section">
-                <view class="title">飞行</view>
-                <view class="value">{{ stat.fx }}</view>
-                <view class="unit">人</view>
-            </view>
-            <view class="section">
-                <view class="title">维修</view>
-                <view class="value">{{ stat.wx }}</view>
-                <view class="unit">人</view>
-            </view>
-        </view>
-    </view>
+            </div>
+        </div>
+        <div class="detail">
+            <div class="section" @click="showDetail('fx')">
+                <div class="title">飞行</div>
+                <div class="value">{{ stat.fx + stat.fg }}</div>
+                <div class="unit">人</div>
+            </div>
+            <div class="section" @click="showDetail('wx')">
+                <div class="title">维修</div>
+                <div class="value">{{ stat.wx }}</div>
+                <div class="unit">人</div>
+            </div>
+            <div class="section" @click="showDetail('yk')">
+                <div class="title">运控</div>
+                <div class="value">{{ stat.yk }}</div>
+                <div class="unit">人</div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -26,32 +31,40 @@ import { onMounted, ref, watch } from 'vue';
 import useUserStore from '@/store/user.store';
 import { collectDescendantIds, convertToTree } from '@/utils/tools';
 const store = useUserStore();
-const stat = ref({ all: 0, wx: 0, fx: 0 })
+const stat = ref({ all: 0, wx: 0, fx: 0, fg: 0, yk: 0 })
 watch([() => store.departments, () => store.staff], () => {
     const dept = store.departments;
     const staff = store.staff;
     const tree = convertToTree(dept);
     // 找到tree[0].children里面名字叫做维修工程部的id,且他的子孙辈节点的所有id,汇总成一个数组
-    const wxIds = collectDescendantIds(tree, '维修工程部');
-    const fgIds = collectDescendantIds(tree, '飞行技术管理部');
-    const fxIds = collectDescendantIds(tree, '飞行部');
-    const temp = { all: 0, wx: 0, fx: 0 };
+    const temp = { all: 0, wx: 0, fx: 0, fg: 0, yk: 0 };
+    const ids = {}
+    const map = { wx: '维修工程部', fx: '飞行部', fg: '飞行技术管理部', yk: '运行控制部' }
+    for (let key in map) {
+        ids[key] = collectDescendantIds(tree, map[key]);
+    }
     for (let userId in staff) {
         const user = staff[userId];
-        if (wxIds.includes(+user.department)) {
-            temp.wx++;
-        }
-        if (fgIds.includes(+user.department) || fxIds.includes(+user.department)) {
-            temp.fx++;
+        for (let key in map) {
+            if (ids[key].includes(+user.department)) {
+                temp[key]++;
+            }
         }
         if (user.status < 1) {
             temp.all++;
         }
     }
     stat.value = temp;
-    console.log('统计', staff, tree, temp);
 })
-
+function showDetail(type: string) {
+    if (type === 'wx') {
+        uni.showToast({ title: `维修${stat.value.wx}`, icon: 'none', mask: true, duration: 2000 });
+    } else if (type === 'fx') {
+        uni.showToast({ title: `飞行:${stat.value.fx},飞管:${stat.value.fg}`, icon: 'none', mask: true, duration: 2000 });
+    } else if (type === 'yk') {
+        uni.showToast({ title: `运控:${stat.value.yk}`, icon: 'none', mask: true, duration: 2000 });
+    }
+}
 onMounted(() => {
     store.getDepartments()
     store.getStaff()
@@ -76,15 +89,15 @@ onMounted(() => {
         padding-right: 2px;
 
         .icon {
-            color: #085E7B;
+            color: @color-staff-hr-text;
             font-size: 34px;
             margin-bottom: 2px;
         }
 
         .text {
-            color: #085E7B;
+            color: @color-staff-hr-text;
             font-size: .9rem;
-            font-weight: 500;
+            margin-top: -5px;
             white-space: nowrap;
         }
     }
@@ -99,30 +112,30 @@ onMounted(() => {
         .section {
             display: flex;
             align-items: center;
-            padding: 4px;
-            margin: 2px 0 0 0;
-            border-bottom: dashed 1px #dfdfdf;
+            padding: 0 4px;
+            margin: 0;
+            border-bottom: dashed 1px @color-staff-hr-border;
 
             &:last-child {
                 border-bottom: 0;
             }
 
             .title {
-                color: #1B4C5C;
+                color: @color-staff-hr-text;
                 font-size: 0.95rem;
                 white-space: nowrap;
                 // min-width: 2em; // 保证至少显示2个汉字
             }
 
             .value {
-                color: #C52305;
-                font-weight: bold;
                 flex: 1;
+                color: @color-staff-hr-value;
+                font-weight: bold;
                 text-align: center;
             }
 
             .unit {
-                color: #945F28;
+                color: @color-staff-hr-unit;
                 font-size: 0.85rem;
             }
         }

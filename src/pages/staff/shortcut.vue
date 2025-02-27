@@ -1,33 +1,38 @@
 <template>
-    <view class="shortcut-wrapper">
-        <view v-for="(cols, index) in data" :key="index" class="line">
-            <navigator v-for="col in cols" :key="col.link" class="item" :style="{ width: col.size * 16 + 'vw' }"
-                hover-class="navigator-hover" :url="col.link">
+    <div class="shortcut-wrapper">
+        <div v-for="(cols, index) in data" :key="index" class="line">
+            <div v-for="col in cols" :key="col.link" class="item" :style="{ width: col.size * 16 + 'vw' }"
+                hover-class="navigator-hover" @click="jump(col.link, col.error)">
                 <i :class="`icon zl-icon-${col.class}`" />
-                <view class="text">{{ col.text }}</view>
-            </navigator>
-        </view>
-    </view>
+                <div class="text">{{ col.text }}</div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { Ref, ref } from 'vue';
 
 const data = ref([
     [
         { size: 12, link: '/pages/analysis/analysis', class: 'analysis', text: '运行分析' },
         { size: 6, link: '/pages/airplane/airplane', class: 'airplane', text: '机队' },
-        { size: 6, link: '/pages/sale/sale', class: 'sale', text: '销售' },
-        { size: 6, link: '/pages/hr/Hr', class: 'person', text: '人员' },
+        { size: 6, link: '/pages/sale/sale', class: 'sale', text: '销售', error: '敬请期待' },
+        { size: 6, link: '/pages/hr/Hr', class: 'person', text: '人员', error: '敬请期待' },
     ],
     [
         { size: 8, link: '/pages/sms/sms', class: 'sms', text: '安全' },
         { size: 8, link: '/pages/pilot/pilot', class: 'pilot', text: '飞行' },
-        { size: 8, link: '/pages/maintenance/maintenance', class: 'maintenance', text: '维修' },
-
+        { size: 8, link: '/pages/maintenance/maintenance', class: 'maintenance', text: '维修', error: '敬请期待' },
     ],
-
-]);
+]) as Ref<{ size: number, link: string, class: string, text: string, error?: string }[][]>;
+function jump(link: string, error?: string) {
+    if (error) {
+        uni.showToast({ title: error, icon: 'none', mask: true, duration: 2000 })
+    } else {
+        uni.navigateTo({ url: link });
+    }
+}
 </script>
 
 <style lang="less" scoped>
@@ -70,8 +75,10 @@ const data = ref([
             .text {
                 font-size: 0.7rem;
                 color: #999;
+                margin-top: -4px;
             }
 
-        }}
-	}
+        }
+    }
+}
 </style>

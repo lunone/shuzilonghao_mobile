@@ -52,14 +52,15 @@ export type TableColumnItem = {
 export type FlightItem = {
     id?: number,
     date: string,
-
     bay: string,
+    bayarr?: string,
     lineId?: number,
     flightNo?: string,
     carrier?: string,
     abroad?: boolean,
     acReg?: string,
     acType?: string,
+    acLinkLine: number,
     flightKind?: string,
     flightType?: string,
     std?: string,
@@ -71,14 +72,19 @@ export type FlightItem = {
     cobt?: string,
     arr?: string,
     arrName?: string,
-    flagCs?: string,
-    flagPatch?: string,
-    flagVr?: string,
-    flagDelay?: string,
     dep: string,
     depName?: string,
+    isAltn: Boolean
+    isCancle: Boolean,
+    isDelay: Boolean,
+    isNoRelease: Boolean,
+    isPatch: Boolean,
+    isPrint: Boolean,
+    isRelease: Boolean,
+    isReturn: Boolean,
+    isTelegram: Boolean,
+    cancleType?: string,
     netWeightCargo?: number,
-    bayarr?: string,
 }
 
 export type CrewItem = {

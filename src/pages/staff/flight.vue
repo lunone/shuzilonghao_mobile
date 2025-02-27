@@ -1,178 +1,163 @@
 <template>
-	<view class="wrapper">
-		<view class="text">
-			<view class="summary">
-				<view class="total">
-					<text class="title">今日计划</text>
-					<text class="value">{{ flightStats.total }}</text>
-					<text class="unit">班</text>
-				</view>
-				<view class="executed">
-					<text class="title">已执行</text>
-					<text class="value">{{ flightStats.executed }}</text>
-					<text class="unit">班</text>
-				</view>
-			</view>
-			<view class="status">
-				<view class="diverted">
-					<text class="title">取消</text>
-					<text class="value">{{ flightStats.cancle }}</text>
-					<!-- <text class="unit">班</text> -->
-				</view>
-				<view class="diverted">
-					<text class="title">备降</text>
-					<text class="value">{{ flightStats.diverted }}</text>
-					<!-- <text class="unit">班</text> -->
-				</view>
-				<view class="return">
-					<text class="title">返航</text>
-					<text class="value">{{ flightStats.return }}</text>
-					<!-- <text class="unit">班</text> -->
-				</view>
-				<view class="return">
-					<text class="title">延误</text>
-					<text class="value">{{ flightStats.return }}</text>
-					<!-- <text class="unit">班</text> -->
-				</view>
-			</view>
-		</view>
-		<view class="circle">yq
-			<!--  <van-circle v-model:current-rate="executionRate" :rate="executionRate" :speed="10" :stroke-width="170"
-                :clockwise="false" :text="`${executionRate}%`" layer-color="#fff0bc" color="#c52005" size="80px" /> -->
-		</view>
-	</view>
+    <div class="flight-wrapper">
+        <div class="section summary">
+            <div class="item">
+                <div class="title">执行/计划</div>
+                <div class="value">
+                    <span class="executed"> {{ flightStats.executed }} </span>
+                    <span class="separator"> / </span>
+                    <span class="total"> {{ flightStats.total }} </span>
+                </div>
+            </div>
+        </div>
+        <div class="section today">今日</div>
+        <div class="section detail">
+            <div class="item" :class="key" v-for="(value, key) in flightStats.unnormal" @click="showDetail(key)"
+                :key="key">
+                <text class="title">{{ names[key] }}</text>
+                <text class="value" :class="value ? 'hover' : ''">{{ value }}</text>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script setup lang="ts">
-	import { ref, computed, onMounted, watch, Ref } from 'vue';
-	import api from '@/utils/api';
-	import CONFIG from '@/config';
-	import dayjs from 'dayjs';
-	import { FlightItem } from '@/interface';
+import { ref, computed, onMounted, watch, Ref } from 'vue';
+import api from '@/utils/api';
+import CONFIG from '@/config';
+import dayjs from 'dayjs';
+import { FlightItem } from '@/interface';
 
-	// const store = usebasisStore();
+const flights = ref<FlightItem[]>([]);
+const fetchFlights = async () => {
+    const startDate = dayjs().startOf('day').toDate();
+    const endDate = dayjs().endOf('day').toDate();
+    try {
+        const res = await api(CONFIG.url.flightsDate, { startDate, endDate }) as FlightItem[];
+        // console.log(res, startDate, endDate);
+        flights.value = res;
+    } catch (err) {
+        console.error('获取航班信息失败', err);
+    }
+};
+const names = {
+    cancle: '取消',
+    altn: '备降',
+    delay: '延误',
+    return: '返航',
+}
+const flightStats = computed(() => {
+    let total = 0;
+    let executed = 0;
+    // let normal = 0;
+    const unnormal = {
+        cancle: 0,
+        altn: 0,
+        delay: 0,
+        return: 0,
+    };
 
-	const flights = ref<FlightItem[]>([]);
-	const fetchFlights = async () => {
-		const startDate = dayjs().startOf('day').toDate();
-        const endDate = dayjs().endOf('day').toDate();
-		try {
-			const res = await api(CONFIG.url.flightsDate, { startDate , endDate  }) as FlightItem[];
-			flights.value = res;
-		} catch (err) {
-			console.error('获取航班信息失败', err);
-		}
-	};
+    for (let flight of flights.value) {
+        // FLG_PATCH 是否返航/备降新增段// 新增字段不处理，只处理旧有的航段
+        if (flight.isPatch) {
+            continue;
+        }
 
-	const flightStats = computed(() => {
-		const stats = {
-			total: 0,
-			executed: 0,
-			normal: 0,
-			cancle: 0,
-			diverted: 0,
-			delay: 0,
-			return: 0,
-		};
+        if (flight.atd) {// 已执行
+            executed++;
+        }
 
-		for (let flight of flights.value) {
-			// FLG_VR 返航/备降标记 R1，R2 返航新增2段，RC返航原段，V1，V2 备降新增2段，VC备降原段
-			// FLG_VR1 返航/备降补充信息，原段为VC，备降第1段为V1，第2段为V2
+        if (flight.isDelay) {// 延误
+            unnormal.delay++
+        }
 
+        if (flight.isReturn) {// 返回
+            unnormal.return++;
+        }
 
-			// ORIGIN_FLT_ID 原航段ID（在返航/备降时，用来关联最初始的航段）
-			// console.log(flight.flagPatch)
-			// FLG_PATCH 是否返航/备降新增段// 新增字段不处理，只处理旧有的航段
-			if (flight.flagPatch) {
-				continue;
-			}
+        if (flight.isAltn) {// 备降
+            unnormal.altn++;
+        }
+        if (flight.isCancle) {
+            unnormal.cancle++;
+        }
+        total++;
+    };
 
-			if (flight.atd) {// 已执行
-				stats.executed++;
-			}
+    return { total, executed, unnormal };
+});
 
-			if (flight.flagDelay == 'D') {// 延误
-				stats.delay++
-			}
-
-			if (flight.flagVr == 'R') {// 返回
-				stats.return++;
-			} if (flight.flagVr == 'V') {// 备降
-				stats.diverted++;
-			} else if (flight.flagCs) {
-				// FLG_CS 取消标记 签派员取消C，市场取消D，恢复R
-				if (flight.flagCs == 'C')
-					stats.cancle++;
-				else if (flight.flagCs == 'R')
-					stats.normal++;
-			} else {
-				stats.normal++;
-			}
-			stats.total++;
-
-		};
-
-		return stats;
-	});
-
-	const executionRate : Ref<number> = ref(0);
-	watch(flights, () => {
-		executionRate.value = flightStats.value.executed / flightStats.value.total * 100;
-	});
-
-	onMounted(() => {
-		fetchFlights();
-	});
+const executionRate: Ref<number> = ref(0);
+// watch(flights, () => {
+//     executionRate.value = flightStats.value.executed / flightStats.value.total * 100;
+// });
+function showDetail(key) {
+    // 这里弹出框
+}
+onMounted(() => {
+    fetchFlights();
+});
 </script>
 
 <style lang="less" scoped>
-	@import '@/css/base.less';
+@import '@/css/base.less';
 
-	.wrapper {
-		display: flex;
-		flex-direction: row;
+.flight-wrapper {
+    .row;
+    padding: 0 auto;
 
-		.text {
-			display: flex;
-			align-items: center;
-			flex: 1;
-			flex-direction: column;
-			justify-content: space-around;
+    .section {
+        .row;
 
+        .item {
+            .column;
 
-			.summary,
-			.status {
-				display: flex;
-				flex-direction: row;
-				width: 100%;
+            .title {
+                font-size: .8rem;
+                color: @color-staff-flight-secion-title;
+            }
 
-				.title {
-					color: #333;
-					margin-right: 5px;
-				}
+            .value {
+                padding: 2px 4px;
+                font-size: 1.4rem;
+                color: @color-staff-flight-secion-value;
 
-				.value {
-					font-size: 1rem;
-					color: #4a90e2;
-					margin-right: 5px;
-				}
+                &.hover {
+                    color: @color-staff-flight-secion-hover;
+                }
+            }
+        }
+    }
 
-				.unit {
-					color: #555;
-				}
+    .summary {
+        width: 120px;
 
-				&.status {
-					flex: 0 0 auto;
-				}
-			}
-		}
+        .separator {
+            color: @color-staff-flight-separator;
+        }
 
-		.circle {
-			// flex: 0 0 auto;
-			width: 80px;
-			// border: red solid 1px;
-			/* 调整宽度以适应内容 */
-		}
+        .value {
+            font-weight: bold;
+            color: @color-staff-flight-summary;
 
-	}
+            .total {
+                color: @color-staff-flight-summary-total;
+            }
+        }
+    }
+
+    .today {
+        writing-mode: vertical-lr;
+        padding: 10px 8px;
+        font-size: 0.7rem;
+        color: @color-staff-flight-today;
+        background-color: @color-staff-flight-today-bg;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .detail {
+        flex-grow: 1;
+    }
+}
 </style>
