@@ -104,7 +104,6 @@ instance.interceptors.response.use(response => {
 instance.interceptors.response.use((response: AxiosResponse) => {
     const { token, code, status } = response?.data || {};
     if (token) {// 返回如过携带了token,就是要更新token了.
-        console.log('更新token:', token);
         store.getToken(token);
         notLoginQweue.forEach(f => f());// 新token重试积压请求
         notLoginQweue = []; // 清空队列
