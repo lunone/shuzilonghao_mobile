@@ -1,15 +1,5 @@
 <template>
     <div class="main-container">
-
-        <!-- <header class="section header"> -->
-        <!-- <div class="logo"> -->
-        <!-- <van-notice-bar left-icon="volume-o" text="点击第二行的按钮可进入各子模块。" /> -->
-
-        <!-- </div> -->
-        <!-- <div class="user"> 
-                <VanIcon name="user" />
-            </div> -->
-        <!-- </header> -->
         <div class="section overview">
             <StatVue class="day" :range="`day`" />
             <StatVue class="year" />
@@ -24,26 +14,23 @@
             <HrVue class="hr" />
         </div>
 
-        <FlightVue class="section flight" />
+        <todayFlightVue class="section flight" />
         <PlanVue class="section plan" />
 
 
         <dividerVue class="more">其他值得放在首页的项</dividerVue>
     </div>
 </template>
-
 <script lang="ts" setup>
 import StatVue from './stat.vue';
 import ShortcutVue from './shortcut.vue';
-import FlightVue from './flight.vue';
+import todayFlightVue from './today.vue';
 import HrVue from './hr.vue';
 import AircraftVue from './aircraft.vue';
 import PlanVue from './plan.vue';
 import dividerVue from '@/components/zl/divider.vue';
 import IncomeVue from './income.vue';
 </script>
-
-
 <style lang="less" scoped>
 @import "@/css/base.less";
 

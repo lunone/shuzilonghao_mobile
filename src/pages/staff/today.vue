@@ -148,11 +148,11 @@ onMounted(() => {
 
     .today {
         writing-mode: vertical-lr;
-        padding: 10px 8px;
+        padding: 10px 4px;
         font-size: 0.7rem;
         color: @color-staff-flight-today;
         background-color: @color-staff-flight-today-bg;
-        border-radius: 8px;
+        border-radius: 4px;
         overflow: hidden;
     }
 

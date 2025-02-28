@@ -14,7 +14,7 @@
                     a. 代码算法有问题，这个发现一个解决一个<br>
                     b. 数据有问题，这个只能逐步治理
                 </div>
-                <div class="li">
+                <!-- <div class="li">
                     有需要联系我：
                     <div class="phone">
                         <span class="phone1">1314</span>
@@ -22,7 +22,7 @@
                         <span class="phone3">1314</span>
                     </div>
                     (微信同号)
-                </div>
+                </div> -->
             </div>
         </div>
         <div class="footer">

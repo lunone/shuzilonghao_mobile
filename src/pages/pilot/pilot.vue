@@ -1,14 +1,23 @@
 <template>
     <div class="pilot-wrapper">
-        <div class="item" v-for="item, index in data" :key="index" @click="jump(index)">
-            <i :class="`icon zl-icon-${item.class}`" />
-            <view class="link"> {{ item.text }} </view>
+        <!-- <rankVue @showMore="showMore" class="rank"/> -->
+        <div class="shorcut" v-if="showLink" >
+            <div class="item" v-for="item, index in data" :key="index" @click="jump(index)">
+                <i :class="`icon zl-icon-${item.class}`" />
+                <view class="link"> {{ item.text }} </view>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, Ref } from 'vue';
+import rankVue from './rank.vue';
+const showLink = ref(true);
+const showMore = () => {
+    console.log('showMore')
+    showLink.value = !showLink.value;
+};
 const data = ref([
     { url: '/pages/pilot/rank', class: 'analysis', text: '生产排名' },
     { url: '/pages/pilot/portrait', class: 'health', text: '人员画像' },
@@ -23,9 +32,7 @@ function jump(index: number) {
     }
 }
 // 组件挂载时初始化
-onMounted(() => {
-
-});
+onMounted(() => { });
 </script>
 
 <style lang="less" scoped>
@@ -33,35 +40,46 @@ onMounted(() => {
 
 .pilot-wrapper {
     .column;
- 
-    // height: 100vh;
     justify-content: flex-start;
     width: 100%;
-    padding: 0 10px;
+    background-color: @color-pilot;
 
-    .item {
-        .row;
-        background-color: antiquewhite;
-        justify-content: start;
-        box-sizing: border-box;
-        border-radius: 16px;
+    // padding: 0 10px;
+    .rank {
         width: 100%;
-        padding: 0 10px;
-        height: 10vh;
+    }
 
-        margin-bottom: 10px;
+    .shorcut {
+        width: 100%;
+        background-color: #fff;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+        padding: 10px;
 
-        &:first-child {
-            margin-top: 10px;
-        }
+        .item {
+            .row;
+            background-color: antiquewhite;
+            justify-content: start;
+            box-sizing: border-box;
+            border-radius: 16px;
+            width: 100%;
+            padding: 0 10px;
+            height: 10vh;
 
-        .icon {
-            margin-right: 10px;
-            font-size: 2rem;
-        }
+            margin-bottom: 10px;
 
-        .link {
-            font-size: 1.4rem;
+            &:first-child {
+                margin-top: 10px;
+            }
+
+            .icon {
+                margin-right: 10px;
+                font-size: 2rem;
+            }
+
+            .link {
+                font-size: 1.4rem;
+            }
         }
     }
 

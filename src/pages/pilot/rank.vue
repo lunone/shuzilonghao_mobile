@@ -1,6 +1,9 @@
 <template>
     <div class="rank-wrapper">
         <div class="top">
+            <!-- <div class="show-more" @click="showDetail">
+                显示所有
+            </div> -->
             <div class="title">月度排行</div>
             <div class="date">
                 <div class="left" :class="isEnable.left ? '' : 'disable'" @click="clac(-1)">
@@ -11,11 +14,6 @@
                     <i class="zl-icon-right" />
                 </div>
             </div>
-
-            <!-- <div class="summary">
-                <span class="counter">{{ summary.participantCount }}</span>人飞了
-                <span class="hour">{{ summary.totalFlightHours }}</span>小时
-            </div> -->
             <div class="top3">
                 <template v-for="pilot, index of [second, first, third]" :key="dateRange.join('-')+index+pilot?.name">
                     <div class="pai" v-if="pilot?.name" :class="`no${pilot.rank}`"
@@ -37,14 +35,13 @@
             </div>
 
         </div>
-        <div class="normal">
+        <div class="normal" v-if="showNormal">
             <!-- <div class="info">此页数字大约有2%的误差,但整体趋势不错,BUG修复中…… </div> -->
             <div v-for="pilot in data" class="pilot" :key="pilot.userId">
                 <span class="icon" :class="`no${pilot.rank}`">
                     <template> {{ pilot.rank }}</template>
                 </span>
                 <div class="name" @click="showPilotProfile(pilot.userId)">
-                    <!-- <userCardVue :userId="pilot.userId" :error="pilot.name" /> -->
                     {{ pilot.name }}
                 </div>
                 <div class="data">
@@ -70,10 +67,17 @@ import CONFIG from '@/config';
 import Profile from '@/pages/hr/profile.vue';
 
 type PilotStat = { rank: number, userId: string, name: string, totalFlightHours: number, avgFlightHours: number }
+
+// const props = defineProps({
+//     showMore: { type: Boolean, default: false }
+// })
+const emits = defineEmits(['showMore', 'select']);
+
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');
 const showProfile = ref(false);
+const showNormal = ref(true);
 const selectUserId = ref('');
 function showPilotProfile(userId: string) {
     console.log('showPilotProfile', userId)
@@ -81,6 +85,11 @@ function showPilotProfile(userId: string) {
         selectUserId.value = userId;
         showProfile.value = true;
     }
+}
+function showDetail() {
+    console.log('showDetail', showNormal.value)
+    showNormal.value = !showNormal.value;
+    emits('showMore')
 }
 const data = ref([]) as Ref<PilotStat[]>;
 const dateRange = ref<[string, string]>([dayjs().format('YYYY'), dayjs().format('MM')]);
@@ -95,7 +104,7 @@ const summary = ref({
     totalFlightHours: 0,
     avgFlightHoursPerDay: 0,
 });
-const emits = defineEmits(['select'])
+
 const isEnable = computed(() => {
     const old = dayjs(dateRange.value.join('-') + '-01');
     return {
@@ -130,7 +139,7 @@ watch(() => dateRange, async () => {
 
         // console.log('old', dayjs(startDate).format('YYYY-MM-DD'), endDate);
         const res = await api(CONFIG.url.statCrewFh, { startDate, endDate }) as any[];
-        console.log('飞行小时', res);
+        // console.log('飞行小时', res);
         const stat = res.map((pilot: any) => ({
             rank: -1,
             userId: pilot.userId,
@@ -270,8 +279,13 @@ onMounted(() => {
             .no3 {
                 .arrow-effect(@color-no3);
             }
+        }
 
-
+        .show-more {
+            border-radius: 4px;
+            margin: 10px;
+            border: solid 1px #464646;
+            background-color: #fff;
         }
     }
 

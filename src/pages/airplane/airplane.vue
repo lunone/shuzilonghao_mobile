@@ -1,42 +1,48 @@
 <template>
     <!-- <nav-vue title="机队统计" text="主页" url='/home' /> -->
-    <ac-summary-vue class="summary" />
-    <press-tabs :active="activeTab" @change="onSortTabClick">
-        <template v-for="aircraftGroup, groupName in aircraftSorted" :key=" groupName">
-            <press-tab :name="groupName" :title="`${aircraftGroup.name}(${aircraftGroup.aircrafts.length})`"
-                v-if="aircraftGroup.aircrafts.length > 0">
-                <div class="aircrafts">
-                    <div class="buttons">
-                        <div v-for="aircraft in aircraftGroup.aircrafts" :key="aircraft.acReg" class="button"
-                            :class="aircraft?.acReg === selectedAircraft?.acReg ? 'selected' : ''"
-                            @click="showInfo(aircraft)">
-                            {{ aircraft.acReg }}
+    <div class="airplane-wrapper">
+        <div class="top">
+            <ac-summary-vue class="summary" />
+        </div>
+        <div class="detail">
+            <div class="title"></div>
+            <press-tabs :active="activeTab" @change="onSortTabClick">
+                <template v-for="aircraftGroup, groupName in aircraftSorted" :key=" groupName">
+                    <press-tab :name="groupName" :title="`${aircraftGroup.name}(${aircraftGroup.aircrafts.length})`"
+                        v-if="aircraftGroup.aircrafts.length > 0">
+                        <div class="aircrafts">
+                            <div class="buttons">
+                                <div v-for="aircraft in aircraftGroup.aircrafts" :key="aircraft.acReg" class="button"
+                                    :class="aircraft?.acReg === selectedAircraft?.acReg ? 'selected' : ''"
+                                    @click="showInfo(aircraft)">
+                                    {{ aircraft.acReg }}
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            </press-tab>
-        </template>
-    </press-tabs>
+                    </press-tab>
+                </template>
+            </press-tabs>
 
-    <!-- 放到前一个的里面会被循环生成多个的 -->
-    <press-tabs :active="infoTab" @change="onInfoTabClick" class="info">
-        <press-tab name="detail" title="飞机参数">
-            <detail v-if="selectedAircraft" :aircraft="selectedAircraft" />
-        </press-tab>
-        <press-tab name="mel" :title="`保留单详情(${mels?.length || 0})`">
-            <mel-card-vue :acReg="selectedAircraft?.acReg" @get-mel="acRegMelUpdate" />
-        </press-tab>
-    </press-tabs>
-
+            <!-- 放到前一个的里面会被循环生成多个的 -->
+            <press-tabs :active="infoTab" @change="onInfoTabClick" class="info">
+                <press-tab name="detail" title="飞机参数">
+                    <detail v-if="selectedAircraft" :aircraft="selectedAircraft" />
+                </press-tab>
+                <press-tab name="mel" :title="`保留单详情(${mels?.length || 0})`">
+                    <mel-card-vue :acReg="selectedAircraft?.acReg" @get-mel="acRegMelUpdate" />
+                </press-tab>
+            </press-tabs>
+        </div>
+    </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, reactive, Ref } from 'vue';
+import { watch, ref, computed, onMounted, reactive, Ref } from 'vue';
 import dayjs from 'dayjs';
 
 import { AircraftItem } from '@/interface';
 import usebasisStore from '@/store/basis.store';
-import AcSummaryVue from './aircraftSummary.vue';
+import AcSummaryVue from './summary.vue';
 import MelCardVue from '../maintenance/mel/card.vue';
 import detail from './detail.vue';
 
@@ -48,14 +54,20 @@ const error = ref('');
 // 定义当前激活的 Tab，默认为 'inService'
 const activeTab = ref('inService');
 const infoTab = ref('detail');
-const onSortTabClick = e => activeTab.value = activeTab != e.currentIndex ? e.currentIndex : activeTab.value;
-const onInfoTabClick = e => infoTab.value = infoTab != e.currentIndex ? e.currentIndex : infoTab.value;
-
+const showInfo = (aircraft: any) => selectedAircraft.value = aircraft;
+const onInfoTabClick = e => infoTab.value = infoTab != e.name ? e.name : infoTab.value;
+const onSortTabClick = e => {
+    const { name } = e;
+    if (activeTab.value != name) {
+        activeTab.value = name
+        showInfo(aircraftSorted.value[name].aircrafts[0])
+    }
+}
 
 const showMoreFlags = reactive<Record<string, boolean>>({});
 
 // 定义机队数据
-const aircrafts = ref<AircraftItem[]>([]);
+// const aircrafts = ref<AircraftItem[]>([]);
 const mels = ref<any[]>([]);
 const selectedAircraft = ref<AircraftItem | null>(null);
 
@@ -67,13 +79,12 @@ const aircraftSorted = computed(() => {
         retired: { name: '退役', aircrafts: [] },
         introduced: { name: '引进中', aircrafts: [] },
     };
-    for (let aircraft of aircrafts.value) {
+    for (let aircraft of Object.values(store.aircrafts)) {
         const startDate = dayjs(aircraft.startDate || -1).startOf('day');
         const endDate = dayjs(aircraft.endDate).startOf('day');
         if (!aircraft.endDate || (startDate.isBefore(today) && endDate.isAfter(today))) {
             if (aircraft.regId.length < 6) {
                 result.inService.aircrafts.push(aircraft);
-
             } else {
                 result.introduced.aircrafts.push(aircraft);
             }
@@ -82,85 +93,73 @@ const aircraftSorted = computed(() => {
         }
     }
     return result;
-});
+})
 
-// 从store获取航班信息
-const fetchAircrafts = async () => {
-    loading.value = true;
-    error.value = '';
-    try {
-        const res = await store.getAircrafts();
-        aircrafts.value = Object.values(res);
-        console.log('飞机', res);
-    } catch (err) {
-        error.value = '获取飞机信息失败';
-    } finally {
-        loading.value = false;
-    }
-};
-// const sortChanged = (active: any) => {
-//     console.log('sortChanged', active);
-//     // 加载完成默认第一个按钮显示
-//     showInfo(aircraftSorted.value[active].aircrafts[0])
-// };
+
 
 const acRegMelUpdate = (acRegMel: any[]) => {
     console.log('acRegMelUpdate', acRegMel);
     mels.value = acRegMel;
     console.warn('++++++++++++++++++mels', mels.value, acRegMel, mels.value?.length)
 }
-const showInfo = (aircraft: any) => {
-    // console.log('showInfo###############', aircraft)
-    selectedAircraft.value = aircraft;
-};
-
 // 初始化时获取数据
-onMounted(async () => {
-    await fetchAircrafts();
-    // 加载完成默认第一个按钮显示
-    showInfo(aircraftSorted.value.inService.aircrafts[0])
+onMounted(async () => {// 加载完成默认第一个按钮显示
+    store.getAircrafts().then(() => showInfo(aircraftSorted.value[activeTab.value].aircrafts[0]));
 });
 
 
 </script>
-
 <style lang="less" scoped>
-.aircrafts {
-    display: flex;
-    flex-direction: column;
+@import '@/css/base.less';
 
-    .buttons {
-        display: block;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 10px;
-        margin-left: 10px;
-        width: 100%;
+.airplane-wrapper {
+    background-color: @color-airplane;
 
-        .button {
-            // background-color: #4a90e2;
-            border-color: #4a90e2;
-            color: #333;
-            float: left;
-            border-radius: 5px;
-            padding: 4px 10px;
-            font-size: 0.9rem;
-            // transition: background-color 0.3s, border-color 0.3s;
-            margin-right: 10px;
-
-
-
-        }
-
-        .selected {
-            background-color: #357ab8;
-            border-color: #357ab8;
-        }
+    .top {
+        height: 270px;
     }
 
-    .info {
-        width: 100%;
-    }
+    .detail {
+        background-color: #fff;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
 
+        .title {
+            height: 20px;
+            overflow: hidden;
+        }
+
+        .aircrafts {
+            display: flex;
+            flex-direction: column;
+
+            .buttons {
+                display: block;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin: 10px;
+                width: 100%;
+
+                .button {
+                    color: @color-airplane-button-text;
+                    float: left;
+                    border-radius: 2px;
+                    padding: 6px 10px;
+                    font-size: 0.9rem;
+                    margin-right: 10px;
+
+                }
+
+                .selected {
+                    background-color: @color-airplane-button-select;
+                }
+            }
+
+            .info {
+                width: 100%;
+            }
+
+        }
+    }
 }
 </style>
