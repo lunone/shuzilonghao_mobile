@@ -75,7 +75,7 @@ const loading2 = status => {
 }
 
 provide("showProfile", (userId: string) => {
-    console.log('geiwosou', userId)
+    console.log('显示人员信息', userId)
     if (userId) {
         showProfile.value = true;
         selectUserId.value = userId;
@@ -96,7 +96,7 @@ const getOption = (res) => {
     voluntarys.value = voluntarys2;
     // console.log(events2, voluntarys2);
     const step = 2;
-    return {
+    const option = {
         type: "mix",
         categories: months,
         color: ["#91CB74", "#FAC858", "#EE6666", "#73C0DE", "#3CA272", "#FC8452", "#9A60B4", "#ea7ccc"],
@@ -136,7 +136,7 @@ const getOption = (res) => {
         yAxis: {
             disabled: true,
             // disableGrid: true,
-            gridColor:color.sms.chart.yGrid,
+            gridColor: color.sms.chart.yGrid,
             data: [{
                 min: 0,
                 // disabled: true,
@@ -153,6 +153,7 @@ const getOption = (res) => {
             }
         }
     }
+    return option;
 }
 // 获取事件列表
 const fetchData = async () => {
