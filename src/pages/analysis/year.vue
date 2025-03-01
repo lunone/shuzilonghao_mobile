@@ -15,6 +15,7 @@ import _ from 'lodash';
 import CONFIG from '@/config';
 import dayjs from 'dayjs';
 import api from '@/utils/api';
+import { numberByWan } from '@/utils/tools';
 
 type StatItem = {
     counter: number;
@@ -105,7 +106,7 @@ watch(stats, (newStats, oldStats) => {
     const rawCargo = years.map(year => newStats[year].netWeightCargo);
     const rawHours = years.map(year => newStats[year].hours);
 
-    yearsRef.value = years; 
+    yearsRef.value = years;
     // console.log('years', years, rawFlights, rawCargo, rawHours);
     // 数据调整参数
     const FLIGHT_SCALE = 5;    // 航班放大倍数
@@ -130,20 +131,20 @@ watch(stats, (newStats, oldStats) => {
                 color: '#FAC858',
                 data: adjustedData.hours,
                 textColor: '#37383a',
-                formatter: (val) => val - BASE_HEIGHT // 还原小时数
+                formatter: (val) => numberByWan(val - BASE_HEIGHT) // 还原小时数
             }, {
                 name: '货运总量(吨)',
                 type: 'column',
                 color: '#1890FF',
                 data: adjustedData.cargo,
-                formatter: (val) => ((val - BASE_HEIGHT) / CARGO_SCALE).toFixed(1) // 还原并格式化
+                formatter: (val) => numberByWan(((val - BASE_HEIGHT) / CARGO_SCALE).toFixed(1)) // 还原并格式化
             }, {
                 name: '航班班次',
                 type: 'column',
                 color: '#91CB74',
                 // label: { show: false },
                 data: adjustedData.flights,
-                formatter: (val) => (val - BASE_HEIGHT) / FLIGHT_SCALE // 还原真实值
+                formatter: (val) => numberByWan((val - BASE_HEIGHT) / FLIGHT_SCALE) // 还原真实值
             }
         ],
         padding: [0, 10, 0, 10],

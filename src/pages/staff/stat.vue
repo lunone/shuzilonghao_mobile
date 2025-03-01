@@ -3,30 +3,30 @@
         <div class="lastyear">
             <div class="title"> {{ props.range == 'year' ? '去年' : '前日' }} </div>
             <div class="counter">
-                <span class="value"><zl-number :value="lastYear.counter" /></span>
+                <span class="value">{{ numberByWan(lastYear.counter) }}</span>
                 <span class="unit">班</span>
             </div>
             <div class="weight">
-                <span class="value"><zl-number :value="lastYear.weight" /></span>
+                <span class="value">{{ numberByWan(lastYear.weight) }}</span>
                 <span class="unit">吨</span>
             </div>
             <div class="hour">
-                <span class="value"><zl-number :value="lastYear.hours" /></span>
+                <span class="value">{{ numberByWan(lastYear.hours) }}</span>
                 <span class="unit">小时</span>
             </div>
         </div>
         <div class="thisyear">
             <span class="title"> {{ props.range == 'year' ? '今年' : '昨日' }} </span>
             <div class="counter">
-                <span class="value"><zl-number :value="thisYear.counter" /></span>
+                <span class="value">{{ numberByWan(thisYear.counter) }}</span>
                 <span class="unit">班</span>
             </div>
             <div class="weight">
-                <span class="value"><zl-number :value="thisYear.weight" /></span>
+                <span class="value">{{ numberByWan(thisYear.weight) }}</span>
                 <span class="unit">吨</span>
             </div>
             <div class="hour">
-                <div class="value"><zl-number :value="thisYear.hours" /></div>
+                <div class="value">{{ numberByWan(thisYear.hours) }}</div>
                 <div class="unit">小时</div>
             </div>
         </div>
@@ -61,6 +61,7 @@ import api from '@/utils/api';
 import dayjs from 'dayjs';
 import { computed, onMounted, PropType, reactive, Ref, ref } from 'vue';
 import CONFIG from '@/config';
+import { numberByWan } from '@/utils/tools';
 type Stat = { counter: number, weight: number, hours: number };
 const props = defineProps({
     text: { type: String, default: '获取' },

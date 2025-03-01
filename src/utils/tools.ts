@@ -94,3 +94,5 @@ export const collectDescendantIds = (tree: ListNode[], targetName: string): (str
     traverse(tree);
     return [...new Set(result)]; // 去重处理
 };
+
+export const numberByWan = (num: number | string) => (num + '').replace(/\B(?=(\d{4})+(?!\d))/g, ',')
