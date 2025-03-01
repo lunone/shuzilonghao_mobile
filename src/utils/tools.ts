@@ -1,7 +1,7 @@
 import { ListNode, TreeNode } from "@/interface";
 
 export const call = (phoneNumber: string) => {
-    window.location.href = `tel:${phoneNumber}`;
+    uni.makePhoneCall({ phoneNumber });
 };
 
 

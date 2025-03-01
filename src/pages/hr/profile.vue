@@ -2,29 +2,29 @@
     <div class="profile-wrapper">
         <div class="header">
             <div class="avatar">
-                <img :src="employee2?.avatar" alt="Avatar" />
+                <img :src="employee?.avatar" alt="Avatar" />
             </div>
             <div class="info">
                 <div class="kv name">
                     {{ name }}({{ userId }})
-                    <span class="status">{{ employee2?.status == 2 ? '已离职' : '' }}</span>
+                    <span class="status">{{ employee?.status == 2 ? '已离职' : '' }}</span>
                 </div>
                 <div class="ietm department">{{ depName }}</div>
                 <div class="kv position">
                     <div class="key">岗位</div>
-                    <div class="value">{{ employee2?.position }}</div>
+                    <div class="value">{{ employee?.position }}</div>
                 </div>
-                <div class="kv phone" @click="call(employee2?.mobile)">
+                <div class="kv phone" @click="call(employee?.mobile)">
                     <div class="key">电话</div>
-                    <div class="value"> {{ employee2?.mobile }}</div>
+                    <div class="value"> {{ employee?.mobile }}</div>
                 </div>
             </div>
         </div>
         <div class="details">
             <press-tabs :active="current">
                 <press-tab title="背景信息">
-                    <referenceVue :district="employee2?.district" :address="employee2?.address"
-                        :idCard="employee2?.idCard" />
+                    <referenceVue :district="employee?.district" :address="employee?.address"
+                        :idCard="employee?.idCard" />
                 </press-tab>
                 <press-tab title="个人经历">
                     <div class="exp">
@@ -69,22 +69,22 @@ const props = defineProps({
 });
 
 const active = ref(0);
-const employee2: Ref<UserItem> = ref();
+const employee: Ref<UserItem> = ref();
 let departments = ref([]);
 const depName = ref('');
 const fetchEmployee = async () => {
     store.getDepartments();
-    employee2.value = await api(CONFIG.url.userProfile, { userId: props.userId });
+    employee.value = await api(CONFIG.url.userProfile, { userId: props.userId });
 };
 // watch
-watch([() => store.departments, () => employee2], () => {
+watch([() => store.departments, () => employee], () => {
     departments.value = store.departments;
-    if (departments.value.length && employee2.value.department) {
-        depName.value = getDepartmentPath(departments.value, +employee2.value.department);
+    if (departments.value.length && employee.value.department) {
+        depName.value = getDepartmentPath(departments.value, +employee.value.department);
     }
 }, { deep: true })
 const name = computed(() => {
-    return employee2.value?.name || store.staff[props.userId]?.name || '';
+    return employee.value?.name || store.staff[props.userId]?.name || '';
 });
 const current = ref(0);
 const onClickkv = (e) => {
