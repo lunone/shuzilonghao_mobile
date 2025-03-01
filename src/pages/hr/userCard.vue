@@ -1,6 +1,6 @@
 <template>
-    <view class="user-card" @click="toggleProfile">
-        <view class="user-info">
+    <div class="user-card" @click="toggleProfile">
+        <div class="user-info">
             <slot name="icon" v-if="showIcon">
                 <i class="icon zl-icon-user" :class="genderClass" />
             </slot>
@@ -10,8 +10,8 @@
             <slot name="userId" v-if="showId">
                 <text class="user-id">{{ userId }}</text>
             </slot>
-        </view>
-    </view>
+        </div>
+    </div>
 
     <press-action-sheet :show="showProfile" title="员工信息" @close="showProfile = false">
         <!-- 加个 v-if="showProfile"防止暗戳戳的渲染一堆 -->

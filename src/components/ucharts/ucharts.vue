@@ -1,8 +1,8 @@
 <template>
-    <view class="wrapper">
+    <div class="wrapper">
         <canvas :canvas-id="id" :id="id" type="2d" :canvas2d="true" class="chart" @touchend="tap"
             :style="`height:${height}px`" />
-    </view>
+    </div>
 </template>
 
 <script lang="ts" setup>

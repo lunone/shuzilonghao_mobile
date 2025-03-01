@@ -6,24 +6,24 @@
     <van-calendar :first-day-of-week="1" title="日历" :row-height="25" :poppable="false" :show-confirm="false"
         :show-mark="true" :show-title="false" :show-subtitle="false" :min-date="dateRange[0]" :max-date="dateRange[1]">
         <template #text="{ date, text, type, topInfo, bottomInfo, className }">
-            <view class="day">
-                <view class="mark" v-if="Math.random() > 0.7">
+            <div class="day">
+                <div class="mark" v-if="Math.random() > 0.7">
                     <i class="icon zl-icon-j5duty" />
-                </view>
-                <view v-else class="">{{ text }}</view>
-            </view>
+                </div>
+                <div v-else class="">{{ text }}</div>
+            </div>
         </template>
     </van-calendar :first-day-of-week="1">
     如果是飞行员，显示航班日期:
     <van-calendar :first-day-of-week="1" title="日历" :row-height="25" :poppable="false" :show-confirm="false"
         :show-mark="true" :show-title="false" :show-subtitle="false" :min-date="dateRange[0]" :max-date="dateRange[1]">
         <template #text="{ date, text, type, topInfo, bottomInfo, className }">
-            <view class="day">
-                <view class="mark" v-if="Math.random() > 0.7">
+            <div class="day">
+                <div class="mark" v-if="Math.random() > 0.7">
                     <i class="icon zl-icon-dep" />
-                </view>
-                <view v-else class="">{{ text }}</view>
-            </view>
+                </div>
+                <div v-else class="">{{ text }}</div>
+            </div>
         </template>
     </van-calendar :first-day-of-week="1">
 </template>

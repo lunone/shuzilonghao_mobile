@@ -1,13 +1,13 @@
 <template>
-    <view class="emergency-contacts">
-        <view class="emergency-title">紧急联系人</view>
-        <!-- <view class="contact" v-for="(contact, index) in employee.emergencyContacts" :key="index">
-                        <view class="contact-name">姓名：{{ contact.name }}</view>
-                        <view class="contact-relationship">关系：{{ contact.relationship }}</view>
-                        <view class="contact-address">住址：{{ contact.address }}</view>
-                        <view class="contact-workplace">工作单位：{{ contact.workplace }}</view>
-                    </view> -->
-    </view>
+    <div class="emergency-contacts">
+        <div class="emergency-title">紧急联系人</div>
+        <!-- <div class="contact" v-for="(contact, index) in employee.emergencyContacts" :key="index">
+                        <div class="contact-name">姓名：{{ contact.name }}</div>
+                        <div class="contact-relationship">关系：{{ contact.relationship }}</div>
+                        <div class="contact-address">住址：{{ contact.address }}</div>
+                        <div class="contact-workplace">工作单位：{{ contact.workplace }}</div>
+                    </div> -->
+    </div>
 </template>
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';

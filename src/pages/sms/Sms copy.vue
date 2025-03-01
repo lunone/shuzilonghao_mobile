@@ -1,11 +1,11 @@
 <template>
     <!-- <nav-vue title="安全管理" text="主页" url='/home' /> -->
-    <view v-if="loading" class="loading">加载中...</view>
-    <view v-else-if="error" class="error">{{ error }}</view>
-    <view v-else>
-        <view class="summary">
+    <div v-if="loading" class="loading">加载中...</div>
+    <div v-else-if="error" class="error">{{ error }}</div>
+    <div v-else>
+        <div class="summary">
             最近一个月， {{ events.length }} 事件报告 ， {{ 'voluntarys.length' }} 自愿报告<br>
-        </view>
+        </div>
         <press-tabs :active="current" @change="onClickItem">
             <press-tab title="主动报告"  >
                 <voluntarys   />
@@ -17,7 +17,7 @@
         </press-tabs>
         <!-- <back-top /> -->
 
-    </view>
+    </div>
    
     
 </template>

@@ -1,9 +1,9 @@
 <template>
-    <view class="tab">
-        <view v-if="isActive()">
+    <div class="tab">
+        <div v-if="isActive()">
             <slot></slot>
-        </view>
-    </view>
+        </div>
+    </div>
 </template>
 <script lang="ts" setup>
 import { watch, onMounted, inject, Ref, ref } from 'vue';

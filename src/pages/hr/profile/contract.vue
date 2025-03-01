@@ -1,17 +1,17 @@
 <template>
     <div class="wrapper">
-        <view class="item join-date">
+        <div class="item join-date">
             <div class="title">入职日期：</div>
             <div class="value">{{ joinDate }}</div>
-        </view>
-        <view class="item leave-date">
+        </div>
+        <div class="item leave-date">
             <div class="title">离职日期：</div>
             <div class="value">{{ leaveDate }}</div>
-        </view>
-        <view class="item contract-expiry">
+        </div>
+        <div class="item contract-expiry">
             <div class="title">合同到期：</div>
             <div class="value">{{ contractExpiry }}</div>
-        </view>
+        </div>
     </div>
 </template>
 

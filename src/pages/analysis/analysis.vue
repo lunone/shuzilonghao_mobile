@@ -4,11 +4,9 @@
         <div class="item" v-for="item in data" :key="item.link">
             <i :class="`icon zl-icon-${item.class}`" />
             <navigator :url="item.link" class="link">
-                <view class="text"> {{ item.text }} </view>
+                <div class="text"> {{ item.text }} </div>
             </navigator>
         </div>
-
-
     </div>
 </template>
 
@@ -17,7 +15,7 @@ import { ref, computed, watch, Ref } from 'vue';
 
 const data = ref([
     { link: '/pages/analysis/year', class: 'analysis', text: '历史概况' },
-    { link: '/pages/analysis/overview', class: 'health', text: '趋势分析' },
+    { link: '/pages/analysis/overdiv', class: 'health', text: '趋势分析' },
     { link: '/pages/analysis/airlines', class: 'location', text: '航线分析' },
 ]);
 </script>

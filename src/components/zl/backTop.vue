@@ -1,9 +1,9 @@
 <template>
     <!-- <page-meta background-color="red" page-style="color: green" root-font-size="16px"> -->
-        <view class="top-back" @click="topBack" v-if="isShow">
+        <div class="top-back" @click="topBack" v-if="isShow">
             <text>^</text>
             <text>顶部</text>
-        </view>
+        </div>
     <!-- </page-meta> -->
 </template>
 <script lang="ts" setup>

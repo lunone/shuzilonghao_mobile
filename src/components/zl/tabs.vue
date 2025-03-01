@@ -1,16 +1,16 @@
 <template>
-    <view class="tabs-wrapper">
-        <view class="titles">
+    <div class="tabs-wrapper">
+        <div class="titles">
             <span v-for="item in tabs" :key="item.index" class="title" :class="isActive(item) ? 'activite' : ''"
                 @click="click(item.index)">
                 <i :class="`zl-icon-${item.icon}`"> </i>
                 {{ item.title }}
             </span>
-        </view>
-        <view class="content">
+        </div>
+        <div class="content">
             <slot></slot>
-        </view>
-    </view>
+        </div>
+    </div>
 </template>
 
 <script setup lang="ts">

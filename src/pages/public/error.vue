@@ -1,10 +1,8 @@
 <template>
-    <view class="error-wrapper">
-        <view>
-            <i class="zl-icon-error" />
-        </view>
-        <view class="error-content">{{ message }}</view>
-    </view>
+    <div class="error-wrapper">
+        <i class="zl-icon-error" />
+        <div class="error-content">{{ message }}</div>
+    </div>
 </template>
 <script setup lang="ts">
 import { onLoad } from '@dcloudio/uni-app';

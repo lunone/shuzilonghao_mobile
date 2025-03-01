@@ -2,31 +2,31 @@
     <!-- <nav-vue title="人员统计" text="主页" url='/home' /> -->
 
 
-    <view class="wrapper">
-        <view class="statistics">
-            <view class="title">统计</view>
-            <view class="total">
+    <div class="wrapper">
+        <div class="statistics">
+            <div class="title">统计</div>
+            <div class="total">
                 <text>总人数: </text>
                 <text>{{ stat.totalCount }}</text>
-            </view>
-            <view class="dep">
+            </div>
+            <div class="dep">
                 <text>部门: </text>
                 <text>{{ stat.totalCount }}</text>
-            </view>
+            </div>
 
-        </view>
-        <view class="departments">
-            <view class="item" v-for="users, key in stat.departments" :key="key">
+        </div>
+        <div class="departments">
+            <div class="item" v-for="users, key in stat.departments" :key="key">
                 <text>{{ key }}: </text>
                 <text>{{ users.length }}</text>
-            </view>
-        </view>
-        <view class="recent">
-            <view class="title">近期活动</view>
-            <view class="hires" v-for="users, key in mockData.recent ">
-                <view class="subtitle">
+            </div>
+        </div>
+        <div class="recent">
+            <div class="title">近期活动</div>
+            <div class="hires" v-for="users, key in mockData.recent ">
+                <div class="subtitle">
                     {{ key == 'leaves' ? '离职' : '入职' }}
-                </view>
+                </div>
                 <ul>
                     <li v-for="user in users" :key="user.name">
                         <UserCardVue :userId="user.userId" :error="user.name" class="user" />
@@ -34,12 +34,12 @@
                         <text class="date">{{ user.date }}</text>
                     </li>
                 </ul>
-            </view>
-        </view>
-        <view class="intro">
-        </view>
+            </div>
+        </div>
+        <div class="intro">
+        </div>
 
-    </view>
+    </div>
     <!-- <van-action-sheet v-model:show="show" title="员工信息">
         <profile-vue></profile-vue>
     </van-action-sheet> -->

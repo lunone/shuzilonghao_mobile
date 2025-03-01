@@ -1,19 +1,19 @@
 <template>
-    <view class="flight-wrapper">
-        <view class="total">
+    <div class="flight-wrapper">
+        <div class="total">
             <i class="icon zl-icon-aircraft" />
-            <view class="text">
+            <div class="text">
                 {{Object.values(stat).reduce((acc, cur) => acc + cur, 0)}} 架
-            </view>
-        </view>
-        <view class="detail">
-            <view class="section" v-for="number, acTypeLong in stat" :key="acTypeLong">
+            </div>
+        </div>
+        <div class="detail">
+            <div class="section" v-for="number, acTypeLong in stat" :key="acTypeLong">
                 <text class="title">{{ acTypeLong }} </text>
                 <text class="value">{{ number }}</text>
                 <text class="unit">架</text>
-            </view>
-        </view>
-    </view>
+            </div>
+        </div>
+    </div>
 </template>
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';

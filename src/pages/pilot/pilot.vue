@@ -4,7 +4,7 @@
         <div class="shorcut" v-if="showLink" >
             <div class="item" v-for="item, index in data" :key="index" @click="jump(index)">
                 <i :class="`icon zl-icon-${item.class}`" />
-                <view class="link"> {{ item.text }} </view>
+                <div class="link"> {{ item.text }} </div>
             </div>
         </div>
     </div>
