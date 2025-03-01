@@ -6,7 +6,7 @@
             </div>
             <div class="info">
                 <div class="kv name">
-                    {{ employee2?.name }}({{ employee2?.userId }})
+                    {{ name }}({{ userId }})
                     <span class="status">{{ employee2?.status == 2 ? '已离职' : '' }}</span>
                 </div>
                 <div class="ietm department">{{ depName }}</div>
@@ -83,7 +83,9 @@ watch([() => store.departments, () => employee2], () => {
         depName.value = getDepartmentPath(departments.value, +employee2.value.department);
     }
 }, { deep: true })
-
+const name = computed(() => {
+    return employee2.value?.name || store.staff[props.userId]?.name || '';
+});
 const current = ref(0);
 const onClickkv = (e) => {
     if (current != e.currentIndex) {

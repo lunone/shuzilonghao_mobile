@@ -20,6 +20,7 @@ const margin = { left: 0, right: 0, top: 0, bottom: 0 };
 // 获取当前实例,不能放在再深层次,会导致获取不到
 const _this = getCurrentInstance();
 watch(() => props.option, val => {
+    // console.log('[uCharts]:option changed', val && Object.keys(val).length, val)
     if (val && Object.keys(val).length) {// 深拷贝防止重复触发
         draw(val)
     }
@@ -31,7 +32,8 @@ function draw(data) {
         // 在当前页面下选择第一个匹配选择器 selector 的节点，返回一个 NodesRef 对象实例，可以用于获取节点信息。
         .select('#' + id)
         // 获取节点的相关信息。第一个参数是节点相关信息配置（必选）；第二参数可选是方法的回调函数，参数是指定的相关节点信息。
-        .fields({ node: true, size: true, rect: true, scrollOffset: true })// * 此处报错是uni的ts写的有问题,把第二个回调函数搞成必须的了.实际不影响
+        // * 此处给一个参数报错是uni的ts写的有问题,把第二个回调函数搞成必须的了.实际不影响
+        .fields({ node: true, size: true, rect: true, scrollOffset: true }, _ => _)
         // 执行所有的请求。请求结果按请求次序构成数组，在 callback 的第一个参数中返回。
         .exec(res => {
             let { node, width, height, left, right, top, bottom } = res[0] || {};
@@ -47,7 +49,7 @@ function draw(data) {
                 type: "column",
                 animation: true,
                 background: "#333333",
-                color: ["#91CB74","#FAC858","#EE6666","#73C0DE","#3CA272","#FC8452","#9A60B4","#EA7CCC"],
+                color: ["#91CB74", "#FAC858", "#EE6666", "#73C0DE", "#3CA272", "#FC8452", "#9A60B4", "#EA7CCC"],
                 padding: [0, 0, 0, 0],
                 legend: { show: false },
                 xAxis: {}
@@ -80,7 +82,7 @@ function tap(e) {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    width: 100%;// 加上宽高100%,立即渲染,防止createSelectorQuery获取不到宽高
+    width: 100%; // 加上宽高100%,立即渲染,防止createSelectorQuery获取不到宽高
     height: 100%;
 
     .chart {

@@ -1,155 +1,205 @@
 <template>
-    <div class="year" v-for="stat, year in stats" :key="year">
-        <div class="title">{{ year }}年</div>
-        <div class="detail">
-            <div class="kv counter">
-                <div class="key">航班</div>
-                <div class="value"><zl-number :value="stat.counter" /> </div>
-            </div>
-            <div class="kv netWeightCargo">
-                <div class="key">总重</div>
-                <div class="value"> <zl-number :value="stat.netWeightCargo" /> </div>
-            </div>
-            <div class="kv hours">
-                <div class="key">飞行小时</div>
-                <div class="value"><zl-number :value="stat.hours" /> </div>
-            </div>
+    <div class="year-chart">
+        <div class="title" @click="backYear">
+            <div class="left">{{ title }}详情</div>
+            <div class="mid">{{ tips }}</div>
+            <!-- <i class="right zl-icon-left" /> -->
         </div>
+        <ucharts :option="option" @select="showTip" :height="200" class="chart" />
     </div>
-    月度
 </template>
 <script setup lang="ts">
-import CONFIG from '@/config';
-import api from '@/utils/api';
-import basisStore from '@/store/basis.store';
-import { AirportItem } from '@/interface';
-import dayjs from 'dayjs';
-import airline from './airline/airline.vue';
-import zlDateRangePicker from '@/components/zl/dateRangePicker.vue';
-import { Ref, ref, watch } from 'vue';
+import ucharts from '@/components/ucharts/ucharts.vue';
+import { computed, ref, watch } from 'vue';
 import _ from 'lodash';
-const store = basisStore();
-// 定义 loading 和 error 状态
+import CONFIG from '@/config';
+import dayjs from 'dayjs';
+import api from '@/utils/api';
+
+type StatItem = {
+    counter: number;
+    hours: number;
+    netWeightCargo: number;
+    month?: string;
+    values?: StatItem[];
+};
+
 const loading = ref(false);
 const error = ref('');
+const dateRange = ref<[Date, Date]>([dayjs().add(-2, 'year').startOf('year').toDate(), new Date()]);
+const selectYear = ref('');
+const stats = ref<Record<string, StatItem>>({});
+let statsYear = {} as Record<string, StatItem>;
 
-type statItem = {
-    counter: number,
-    hours: number,
-    netWeightCargo: number,
-    month?: string,
-}
-// ZHCC-ZHYC:{'B220M':{avgNEtcargo:number……}}
-type Res = Record<string, Record<string, statItem>>
-const airlineStats = ref({}) as Ref<Res>;
-const airports = ref({}) as Ref<Record<string, AirportItem>>;
-const stats = ref({}) as Ref<Record<string, statItem>>;
+const option = ref<any>();
 
-const dateRange = ref([
-    dayjs().add(-2, 'year').startOf('year').toDate(),
-    dayjs().add(-1, 'day').endOf('day').toDate()
-]) as Ref<[Date, Date]>;
-const fetchData = async (startDate: Date, endDate: Date) => {
+const yearsRef = ref([]);
+const title = computed(() => selectYear.value ? `20${selectYear.value}年` : `三年`)
+const tips = computed(() => selectYear.value ? '返回多年统计' : '点击下方柱体显示年份详情')
+// 数据获取
+async function fetchData(startDate: Date, endDate: Date) {
     loading.value = true;
-    error.value = '';
     try {
-        const res = await api(CONFIG.url.statMonth, { startDate, endDate }) as statItem[];
-        // airports.value = await store.getAirports();
-        // 按照year分组
-        const yearGroup = _.groupBy(res, (item) => item.month.slice(0, 2));
-        const yearStat = _.mapValues(yearGroup, (monthGroup) => {
-            return {
-                counter: _.sumBy(monthGroup, 'counter'),
-                hours: +(_.sumBy(monthGroup, 'hours')).toFixed(2),
-                netWeightCargo: +(_.sumBy(monthGroup, 'netWeightCargo') / 1e3).toFixed(2),
-            }
-        })
-        stats.value = yearStat;
-        console.log('统计', res, yearStat);
-        // airlineStats.value = res;
-        // stationClick(stations.value[0]);
+        const res = await api(CONFIG.url.statMonth, { startDate, endDate }) as StatItem[];
+        stats.value = stat(res);
     } catch (err) {
-        console.log(err)
-        error.value = '获取信息失败';
+        error.value = '数据加载失败';
+        console.error(err);
     } finally {
         loading.value = false;
     }
 };
-watch(() => dateRange.value, () => {
-    const [startDate, endDate] = dateRange.value
 
-    fetchData(startDate, endDate);
-}, { immediate: true, deep: true })
+// 按聚合数据
+function stat(res, year = 'year') {
+    return _.chain(res)// month 格式为 YY/MM
+        .groupBy(item => item.month.split('/')[+(year !== 'year')])
+        .mapValues(monthGroup => ({
+            month: monthGroup[0].month,
+            values: monthGroup,
+            counter: _.sumBy(monthGroup, 'counter'),
+            hours: +_.sumBy(monthGroup, 'hours').toFixed(2),
+            netWeightCargo: +(_.sumBy(monthGroup, 'netWeightCargo') / 1e3).toFixed(2)
+        }))
+        .value();
+}
+// 交互事件
+const showTip = (chart: any, event: any) => {
+    const index = chart.getCurrentDataIndex(event)?.index;
+    const year = yearsRef.value[index];
+    const month = stats.value[year]?.month;
+    const values = stats.value[year]?.values;
+
+    if (!selectYear.value) {
+        statsYear = stats.value;
+        selectYear.value = year;
+        stats.value = stat(values, 'month');
+        // console.log(stats);
+    } else {
+        chart.showToolTip(event, {
+            textList: [
+                { text: `${month}月`, color: null },
+                { text: `航班: ${stats.value[year].counter} 班`, color: '#91CB74' },
+                { text: `货运: ${stats.value[year].netWeightCargo} 吨`, color: '#1890FF' },
+                { text: `飞行: ${stats.value[year].hours} 小时`, color: '#FAC858' }
+            ]
+        });
+    }
+}
+
+// 显示年数据
+function backYear() {
+    if (selectYear.value) {
+        stats.value = statsYear;
+        selectYear.value = '';
+    }
+}
+// 监听日期范围变化
+watch(dateRange, ([start, end]) => fetchData(start, end), { immediate: true });
+// 图表配置
+watch(stats, (newStats, oldStats) => {
+    const years = Object.keys(newStats).sort();
+    if (years.length === 0) return;
+    // 原始数据提取
+    const rawFlights = years.map(year => newStats[year].counter);
+    const rawCargo = years.map(year => newStats[year].netWeightCargo);
+    const rawHours = years.map(year => newStats[year].hours);
+
+    yearsRef.value = years; 
+    // console.log('years', years, rawFlights, rawCargo, rawHours);
+    // 数据调整参数
+    const FLIGHT_SCALE = 5;    // 航班放大倍数
+    const CARGO_SCALE = 0.6;   // 货运量缩小系数
+    const BASE_HEIGHT = 100;   // 基准高度
+
+    // 生成调整后数据
+    const adjustedData = {
+        flights: rawFlights.map(v => v * FLIGHT_SCALE + BASE_HEIGHT),
+        cargo: rawCargo.map(v => v * CARGO_SCALE + BASE_HEIGHT),
+        hours: rawHours.map(v => v + BASE_HEIGHT)
+    };
+
+    option.value = {
+        type: "column",
+        categories: years,
+        dataLabel: !selectYear.value, // 数据
+        series: [
+            {
+                name: '飞行小时',
+                type: 'column',
+                color: '#FAC858',
+                data: adjustedData.hours,
+                textColor: '#37383a',
+                formatter: (val) => val - BASE_HEIGHT // 还原小时数
+            }, {
+                name: '货运总量(吨)',
+                type: 'column',
+                color: '#1890FF',
+                data: adjustedData.cargo,
+                formatter: (val) => ((val - BASE_HEIGHT) / CARGO_SCALE).toFixed(1) // 还原并格式化
+            }, {
+                name: '航班班次',
+                type: 'column',
+                color: '#91CB74',
+                // label: { show: false },
+                data: adjustedData.flights,
+                formatter: (val) => (val - BASE_HEIGHT) / FLIGHT_SCALE // 还原真实值
+            }
+        ],
+        padding: [0, 10, 0, 10],
+        legend: {
+            show: true,
+            position: 'top',
+            float: 'center'
+        },
+        xAxis: {
+            disableGrid: true,
+            boundaryGap: 'center',
+            formatter: (val: string) => val
+        },
+        yAxis: {
+            disabled: true,
+            data: [{
+                min: 0,
+                max: Math.max(...Object.values(adjustedData).flat()) * 1.2,
+                formatter: (val) => val - BASE_HEIGHT // Y轴显示原始值
+            }],
+        },
+        extra: {
+            column: {
+                // width: 30,
+                categoryGap: 2
+            }
+        }
+    };
+}, { immediate: true, deep: true });
+
 </script>
 <style lang="less" scoped>
-@primary-color: #C52305;
-@secondary-color: #943928;
-@accent-color: #085E7B;
-@text-color: #333;
+@import '@/css/base.less';
 
-.year {
-    background-color: #f9f9f9;
+.year-chart {
+    background: white;
     border-radius: 8px;
-    margin: 16px;
-    padding: 12px;
-    /* 减小内边距 */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-
-    @media (max-width: 768px) {
-        margin: 8px;
-        padding: 8px;
-    }
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 
     .title {
-        font-size: 20px;
-        /* 减小字体大小 */
-        font-weight: bold;
-        color: @primary-color;
-        /* 使用主色 */
-        margin-bottom: 12px;
-        /* 减小间距 */
+        .row;
+        margin: 0;
+        overflow: hidden;
+        background-color: #eee;
+        padding: 5px 10px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
 
-        @media (max-width: 768px) {
-            font-size: 18px;
+        .left {}
+
+        .mid {
+            color: #aaa;
+            font-size: .8rem;
         }
-    }
 
-    .detail {
-        display: flex;
-        flex-wrap: wrap;
-        width: 100%;
-
-        .kv {
-            flex: 1 1 30%;
-            margin-bottom: 12px;
-            /* 减小间距 */
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-
-            @media (max-width: 768px) {
-                flex: 1 1 45%;
-            }
-
-            .key {
-                font-size: 14px;
-                /* 减小字体大小 */
-                color: @secondary-color;
-                /* 使用辅助色 */
-                margin-bottom: 4px;
-            }
-
-            .value {
-                font-size: 16px;
-                /* 减小字体大小 */
-                font-weight: bold;
-                color: @text-color;
-                /* 使用文本颜色 */
-            }
-        }
+        .right {}
     }
 }
 </style>

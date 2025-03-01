@@ -4,7 +4,7 @@
             <StatVue class="day" :range="`day`" />
             <StatVue class="year" />
         </div>
-        <ShortcutVue class="shortcut" />
+        <zl-shortcut class="shortcut" :links="links" />
         <div class="section income">
             <IncomeVue />
         </div>
@@ -16,20 +16,30 @@
 
         <todayFlightVue class="section flight" />
         <PlanVue class="section plan" />
-
-
         <dividerVue class="more">其他值得放在首页的项</dividerVue>
     </div>
 </template>
 <script lang="ts" setup>
 import StatVue from './stat.vue';
-import ShortcutVue from './shortcut.vue';
 import todayFlightVue from './today.vue';
 import HrVue from './hr.vue';
 import AircraftVue from './aircraft.vue';
 import PlanVue from './plan.vue';
 import dividerVue from '@/components/zl/divider.vue';
 import IncomeVue from './income.vue';
+const links = [
+    [
+        { size: 12, link: '/pages/analysis/analysis', class: 'analysis', text: '运行分析' },
+        { size: 6, link: '/pages/airplane/airplane', class: 'airplane', text: '机队' },
+        { size: 6, link: '/pages/sale/sale', class: 'sale', text: '销售', error: '敬请期待' },
+        { size: 6, link: '/pages/hr/Hr', class: 'person', text: '人员', error: '敬请期待' },
+    ],
+    [
+        { size: 8, link: '/pages/sms/sms', class: 'sms', text: '安全' },
+        { size: 8, link: '/pages/pilot/pilot', class: 'pilot', text: '飞行' },
+        { size: 8, link: '/pages/maintenance/maintenance', class: 'maintenance', text: '维修', error: '敬请期待' },
+    ],
+];
 </script>
 <style lang="less" scoped>
 @import "@/css/base.less";
@@ -88,9 +98,7 @@ import IncomeVue from './income.vue';
         padding: @padding-mini 0
     }
 
-    &>.income {
-
-    }
+    &>.income {}
 
     &>.asset {
         .row;

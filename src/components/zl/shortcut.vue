@@ -1,7 +1,7 @@
 <template>
     <div class="shortcut-wrapper">
-        <div v-for="(cols, index) in data" :key="index" class="line">
-            <div v-for="col in cols" :key="col.link" class="item" :style="{ width: col.size * 16 + 'vw' }"
+        <div v-for="(cols, index) in links" :key="index" class="line">
+            <div v-for="col in cols" :key="col.link" class="item" :style="{ width: col.size * 16 + '%' }"
                 hover-class="navigator-hover" @click="jump(col.link, col.error)">
                 <i :class="`icon zl-icon-${col.class}`" />
                 <div class="text">{{ col.text }}</div>
@@ -11,21 +11,12 @@
 </template>
 
 <script lang="ts" setup>
-import { Ref, ref } from 'vue';
+import { PropType, Ref, ref } from 'vue';
+type Link = { size: number, link: string, class: string, text: string, error?: string }
+const props = defineProps({
+    links: { type: Object as PropType<Link[][]>, default: () => [] }
+})
 
-const data = ref([
-    [
-        { size: 12, link: '/pages/analysis/analysis', class: 'analysis', text: '运行分析' },
-        { size: 6, link: '/pages/airplane/airplane', class: 'airplane', text: '机队' },
-        { size: 6, link: '/pages/sale/sale', class: 'sale', text: '销售', error: '敬请期待' },
-        { size: 6, link: '/pages/hr/Hr', class: 'person', text: '人员', error: '敬请期待' },
-    ],
-    [
-        { size: 8, link: '/pages/sms/sms', class: 'sms', text: '安全' },
-        { size: 8, link: '/pages/pilot/pilot', class: 'pilot', text: '飞行' },
-        { size: 8, link: '/pages/maintenance/maintenance', class: 'maintenance', text: '维修', error: '敬请期待' },
-    ],
-]) as Ref<{ size: number, link: string, class: string, text: string, error?: string }[][]>;
 function jump(link: string, error?: string) {
     if (error) {
         uni.showToast({ title: error, icon: 'none', mask: true, duration: 1e3 })
@@ -43,13 +34,12 @@ function jump(link: string, error?: string) {
 @active-border-color: #bbb; // 激活时的边框颜色
 
 .shortcut-wrapper {
-    display: flex;
-    flex-direction: column;
+    .column;
+    width: 100%;
 
     .line {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
+        .row;
+        width: 100%;
         height: 14vw;
         margin: 4px 0;
 
