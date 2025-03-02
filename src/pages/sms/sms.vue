@@ -1,8 +1,11 @@
 <template>
     <div class="sms-wrapper">
         <div class="header">
-            <div class="title">安全趋势</div>
-            <ucharts :option="pieOption" @select="showTip" :height="200" />
+            <div class="title">
+                <div class="left">安全走势</div>
+                <div class="mid">点击月份切换</div>
+            </div>
+            <ucharts :option="pieOption" @select="showTip" :height="200" class="chart" />
         </div>
         <div class="detail">
             <div class="title">{{ title }} 详情</div>
@@ -130,8 +133,8 @@ const getOption = (res) => {
             }
         ],
         animation: false,
-        padding: [15, 0, 10, 0],
-        legend: { show: false },
+        padding: [10, 10, 2, 2],
+        legend: { show: true },
         xAxis: {
             disableGrid: true,
             formatter: (val, index) => index % step != 0 ? '' : val,
@@ -204,16 +207,36 @@ onMounted(() => {
 
 
 .sms-wrapper {
-    background-color: @color-sms;
+    // background-color: @color-sms;
+    padding: 10px;
 
     .header {
         margin: 0;
+        width: 100%;
+        box-sizing: border-box;
+        border-radius: 8px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 
         .title {
-            margin: 0 10px;
-            font-size: 16px;
-            color: #fff;
+            .row;
+            margin: 0;
+            overflow: hidden;
+            background-color: #eee;
+            padding: 5px 10px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+
+
+            .mid {
+                color: #aaa;
+                font-size: .8rem;
+            }
         }
+
+        .chart {
+            background: #aaa;
+        }
+
     }
 
     .detail {
