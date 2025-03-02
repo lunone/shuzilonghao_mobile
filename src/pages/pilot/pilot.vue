@@ -14,9 +14,9 @@ const showMore = () => {
 };
 
 const links = ref([[
-    { size: 4, url: '/pages/pilot/rank', class: 'analysis', text: '生产排名' },
-    { size: 4, url: '/pages/pilot/portrait', class: 'health', text: '人员画像' },
-    { size: 4, url: '/pages/pilot/analysis', class: 'location', text: '技术分析' },
+    { size: 4, link: '/pages/pilot/rank', class: 'analysis', text: '生产排名' },
+    { size: 4, link: '/pages/pilot/portrait', class: 'health', text: '人员画像' },
+    { size: 4, link: '/pages/pilot/analysis', class: 'location', text: '技术分析' },
 ]]);
 
 // 组件挂载时初始化
@@ -29,7 +29,7 @@ onMounted(() => { });
     .column;
     justify-content: flex-start;
     width: 100%;
-    background-color: @color-pilot;
+    // background-color: @color-pilot;
 
     .rank {
         width: 100%;
