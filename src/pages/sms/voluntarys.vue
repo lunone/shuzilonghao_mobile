@@ -4,7 +4,7 @@
             <div class="ask">
                 <div class="user" @click="showProfile(voluntary.userId)">
                     <i class="icon zl-icon-user" />
-                    <div class="name">{{ voluntary.userName }}</div>
+                    <div class="name">{{ voluntary.userName || '匿名' }}</div>
                 </div>
                 <div class="content">
                     <div class="desc">{{ voluntary.content }}</div>
@@ -21,7 +21,7 @@
                     </div>
                     <div class="user" @click="showProfile(answer.userId)">
                         <i class="icon zl-icon-user" />
-                        <div class="name">{{ answer.userName }}</div>
+                        <div class="name">{{ answer.userName || '匿名' }}</div>
                     </div>
                 </div>
             </template>
@@ -128,12 +128,13 @@ onMounted(() => { });
 
                 .icon {
                     color: #ddd;
-                    font-size: 38px;
+                    font-size: 30px;
                 }
 
                 .name {
                     color: #666;
                     text-align: center;
+                    margin-top: -4px;
                 }
             }
 

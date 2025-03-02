@@ -85,77 +85,78 @@ const getOption = (res) => {
     months.value = Object.keys(res);
     const events2 = [];
     const voluntarys2 = [];
-    let last = { events: 0, voluntarys: 0 }
+    let last = { events: 0, voluntarys: 0 };
+
+    // 提取原始数据并保留副本
+    const voluntarysOriginal = [];
     for (let month of months.value) {
-        events2.push(res[month].events);
-        voluntarys2.push(res[month].voluntarys);
-        last = { events: res[month].events, voluntarys: res[month].voluntarys }
+        const val = res[month];
+        events2.push(val.events);
+        voluntarys2.push(val.voluntarys);
+        voluntarysOriginal.push(val.voluntarys); // 存储原始值
+        last = { events: val.events, voluntarys: val.voluntarys };
     }
-    select.value = last
-    events.value = events2;
-    voluntarys.value = voluntarys2;
-    // console.log(events2, voluntarys2);
+    select.value = last;
+
+    // 动态调整算法
+    const adjustedVoluntarys = voluntarys2.map((value, index) => {
+        const currentEvent = Math.max(1, events2[index]);
+        const ratio = Math.sqrt(value / currentEvent);
+        return Math.max(value * ratio, currentEvent + 2);
+    });
+
     const step = 2;
-    const option = {
+    return {
         type: "mix",
         categories: months,
         color: ["#91CB74", "#FAC858", "#EE6666", "#73C0DE", "#3CA272", "#FC8452", "#9A60B4", "#ea7ccc"],
         series: [
             {
-                // color: "#aaaaaa",
-                name: "安全事件", type: "column",
+                name: "安全事件",
+                type: "column",
                 data: events2,
-                //  yData.map(value => {
-                //     // 超过平均值20%的颜色红色，低于平均值20%的颜色暗绿色，其他的颜色为蓝色
-                //     const diff = (value - avgDay) / avgDay;
-                //     const color = diff > 0.2 ? '#d48264' : (diff < -0.2) ? '#c4ccd3' : "#91c7ae";
-                //     return { color, value }
-                // })
                 textColor: color.sms.chart.barText,
                 color: color.sms.chart.bar,
-            }, {
-                name: '主动报告', type: "line",
-                // 默认太高了,裁掉一节
-                data: voluntarys2.map((value, index) => value - 30),
-                formatter: val => val + 30,
+            },
+            {
+                name: '主动报告',
+                type: "line",
+                style: "curve",
+                data: adjustedVoluntarys,
+                formatter: (val, index) => voluntarysOriginal[index], // 直接返回原始值
                 textColor: color.sms.chart.lineText,
                 color: color.sms.chart.line,
-            },
-            // { name: '班次', type: "column", data: counters }
+
+            }
         ],
         animation: false,
-        // background: "#FFFFFF",
         padding: [15, 0, 10, 0],
-        legend: { show: false, },
+        legend: { show: false },
         xAxis: {
             disableGrid: true,
-            // labelCount: 8,// 这个确实会自动控制显示标签数量,但是不显示的标签的val就是''了,没办法formatter
             formatter: (val, index) => index % step != 0 ? '' : val,
             fontColor: color.sms.chart.xText,
         },
         yAxis: {
             disabled: true,
-            // disableGrid: true,
             gridColor: color.sms.chart.yGrid,
             data: [{
                 min: 0,
-                // disabled: true,
             }, {
                 disabled: false,
-                min: 10, max: 50
+                min: 10,
+                max: Math.max(...adjustedVoluntarys) * 1.1
             }]
         },
         extra: {
             mix: {
                 column: {
                     width: 16
-                }
+                },
             }
         }
-    }
-    return option;
-}
-// 获取事件列表
+    };
+};// 获取事件列表
 const fetchData = async () => {
     loading.value = true;
     error.value = '';
