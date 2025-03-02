@@ -3,14 +3,15 @@ export default {
         sms: '#388F3C',
         pilot: '#D13419',
     },
-    sms: {
-        chart: {
-            bar: '#D13419',
-            barText: '#666',
-            line: '#388F3C',
-            lineText: '#666',
-            xText: '#bbb',
-            yGrid: '#cecece',
+    sms:{
+        chart:{
+            line:'#fff',
+            bar:'#D13419',
+            barText:'#FFF',
+            lineText:'#FFF',
+            xText:'#FFF',
+            yGrid:'#6a8169',
+
         }
     }
 

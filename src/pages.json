@@ -4,7 +4,7 @@
             "path": "pages/index",
             "style": {
                 "navigationBarTitleText": "数字龙浩",
-                // "navigationBarBackgroundColor": "#ffffff"
+                "navigationBarBackgroundColor": "#ffffff"
             }
         },
         {
@@ -47,7 +47,7 @@
             "path": "pages/sms/sms",
             "style": {
                 "navigationBarTitleText": "安全数据",
-                // "navigationBarBackgroundColor": "#388F3C"
+                "navigationBarBackgroundColor": "#388F3C"
             }
         },
         // 飞行色系#D13419
@@ -55,34 +55,34 @@
             "path": "pages/pilot/pilot",
             "style": {
                 "navigationBarTitleText": "飞行员",
-                // "navigationBarBackgroundColor":"#D13419"
+                "navigationBarBackgroundColor":"#D13419"
             }
         },
         {
             "path": "pages/pilot/rank",
             "style": {
                 "navigationBarTitleText": "飞行排名",
-                // "navigationBarBackgroundColor": "#D13419"
+                "navigationBarBackgroundColor": "#D13419"
             }
         },
         {
             "path": "pages/pilot/portrait",
             "style": {
                 "navigationBarTitleText": "人员画像",
-                // "navigationBarBackgroundColor": "#D13419"
+                "navigationBarBackgroundColor": "#D13419"
             }
         },
         {
             "path": "pages/pilot/analysis",
             "style": {
                 "navigationBarTitleText": "技术分析",
-                // "navigationBarBackgroundColor": "#D13419"
+                "navigationBarBackgroundColor": "#D13419"
             }
         },
         {
             "path": "pages/hr/hr",
             "style": {
-                // "navigationBarTitleText": "人力资源"
+                "navigationBarTitleText": "人力资源"
             }
         }
     ],

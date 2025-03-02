@@ -207,24 +207,24 @@ onMounted(() => {
 
 
 .sms-wrapper {
-    // background-color: @color-sms;
-    padding: 10px;
+    background-color: @color-sms;
+    // padding: 10px;
 
     .header {
         margin: 0;
         width: 100%;
         box-sizing: border-box;
-        border-radius: 8px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        // border-radius: 8px;
+        // box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 
         .title {
             .row;
             margin: 0;
             overflow: hidden;
-            background-color: #eee;
+            // background-color: #eee;
             padding: 5px 10px;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
+            // border-top-left-radius: 8px;
+            // border-top-right-radius: 8px;
 
 
             .mid {
