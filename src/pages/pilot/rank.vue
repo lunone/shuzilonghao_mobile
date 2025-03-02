@@ -29,6 +29,7 @@
                             <div class="avg">
                                 日<span class="value">{{ `${pilot.avgFlightHours}小时` }}</span>
                             </div>
+                            <i class="zl-icon-magnifier" @click="jump(pilot.userId)" />
                         </div>
                     </div>
                 </template>
@@ -51,6 +52,7 @@
                     <div class="avg">
                         日<span class="value">{{ `${pilot.avgFlightHours}小时` }}</span>
                     </div>
+                    <i class="zl-icon-magnifier" @click="jump(pilot.userId)" />
                 </div>
             </div>
         </div>
@@ -86,10 +88,13 @@ function showPilotProfile(userId: string) {
         showProfile.value = true;
     }
 }
-function showDetail() {
-    console.log('showDetail', showNormal.value)
-    showNormal.value = !showNormal.value;
-    emits('showMore')
+function jump(userId: string) {
+    // console.log('showDetail', showNormal.value)
+    if (userId) {
+        uni.navigateTo({ url: `/pages/pilot/portrait?${userId}` });
+    }
+    // showNormal.value = !showNormal.value;
+    // emits('showMore')
 }
 const data = ref([]) as Ref<PilotStat[]>;
 const dateRange = ref<[string, string]>([dayjs().format('YYYY'), dayjs().format('MM')]);
@@ -293,6 +298,7 @@ onMounted(() => {
         display: flex;
         flex-direction: column;
         width: 100%;
+        padding-top: 10px;
         border-top-left-radius: 14px;
         border-top-right-radius: 14px;
         box-sizing: border-box;
@@ -319,6 +325,10 @@ onMounted(() => {
             padding: 4px;
             border-radius: 4px;
 
+            // 斑马纹效果
+            &:nth-child(even) {
+                background-color: #f5f5f599; // 浅灰色半透明
+            }
 
             .icon {
                 font-size: 1rem;

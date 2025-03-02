@@ -1,7 +1,7 @@
 <template>
     <div class="pilot-wrapper">
-        <!-- <rankVue @showMore="showMore" class="rank"/> -->
-        <zl-shortcut :links="links" class="links" />
+        <rankVue @showMore="showMore" class="rank"/>
+        <!-- <zl-shortcut :links="links" class="links" /> -->
     </div>
 </template>
 <script setup lang="ts">
@@ -13,11 +13,11 @@ const showMore = () => {
     showLink.value = !showLink.value;
 };
 
-const links = ref([[
-    { size: 4, link: '/pages/pilot/rank', class: 'analysis', text: '生产排名' },
-    { size: 4, link: '/pages/pilot/portrait', class: 'health', text: '人员画像' },
-    { size: 4, link: '/pages/pilot/analysis', class: 'location', text: '技术分析' },
-]]);
+// const links = ref([[
+//     { size: 4, link: '/pages/pilot/rank', class: 'analysis', text: '生产排名' },
+//     { size: 4, link: '/pages/pilot/portrait', class: 'health', text: '人员画像' },
+//     { size: 4, link: '/pages/pilot/analysis', class: 'location', text: '技术分析' },
+// ]]);
 
 // 组件挂载时初始化
 onMounted(() => { });
