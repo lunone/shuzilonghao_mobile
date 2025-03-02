@@ -35,7 +35,7 @@ let statsYear = {} as Record<string, StatItem>;
 const option = ref<any>();
 
 const yearsRef = ref([]);
-const title = computed(() => selectYear.value ? `20${selectYear.value}年` : `三年`)
+const title = computed(() => selectYear.value ? `${selectYear.value}年` : `三年`)
 const tips = computed(() => selectYear.value ? '返回多年统计' : '点击下方柱体显示年份详情')
 // 数据获取
 async function fetchData(startDate: Date, endDate: Date) {
@@ -54,7 +54,10 @@ async function fetchData(startDate: Date, endDate: Date) {
 // 按聚合数据
 function stat(res, year = 'year') {
     return _.chain(res)// month 格式为 YY/MM
-        .groupBy(item => item.month.split('/')[+(year !== 'year')])
+        .groupBy(item => {
+            const arr = item.month.split('/');
+            return year == 'year' ? `20${arr[0]}` : arr[1]
+        })
         .mapValues(monthGroup => ({
             month: monthGroup[0].month,
             values: monthGroup,
