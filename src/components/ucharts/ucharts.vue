@@ -47,7 +47,7 @@ function draw(data) {
             node.height = height;
             const chartOption = merge({
                 type: "column",
-                animation: true,
+                animation: false,
                 background: "#333333",
                 color: ["#91CB74", "#FAC858", "#EE6666", "#73C0DE", "#3CA272", "#FC8452", "#9A60B4", "#EA7CCC"],
                 padding: [0, 0, 0, 0],

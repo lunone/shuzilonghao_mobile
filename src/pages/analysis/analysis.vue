@@ -1,7 +1,9 @@
 <template>
     <div class="analysis-wrapper">
         <year-vue class="year" />
-        <zl-shortcut :links="links" class="links" />
+        <div class="content">
+            <zl-shortcut :links="links" class="links" />
+        </div>
     </div>
 </template>
 <script setup lang="ts">
@@ -15,12 +17,11 @@ const links = ref([[
 
 </script>
 <style lang="less" scoped>
-/* 添加样式 */
 @import "@/css/base.less";
 
 .analysis-wrapper {
     .column;
-    background-color: #fff;
+    background-color: #f8f8f8;
     justify-content: flex-start;
     width: 100%;
 
@@ -30,10 +31,19 @@ const links = ref([[
         box-sizing: border-box
     }
 
-    .links {
+    .content {
+        .column;
         width: 100%;
+        border-top-left-radius: 14px;
+        border-top-right-radius: 14px;
         box-sizing: border-box;
-        padding: 10px 4px;
+        background-color: #fff;
+
+        .links {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 4px;
+        }
     }
 }
 </style>

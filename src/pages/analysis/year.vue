@@ -188,7 +188,7 @@ watch(stats, (newStats, oldStats) => {
         .row;
         margin: 0;
         overflow: hidden;
-        background-color: #eee;
+        background-color: #ccc;
         padding: 5px 10px;
         border-top-left-radius: 8px;
         border-top-right-radius: 8px;
