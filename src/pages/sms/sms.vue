@@ -133,8 +133,12 @@ const getOption = (res) => {
             }
         ],
         animation: false,
-        padding: [10, 10, 2, 2],
-        legend: { show: true },
+        padding: [0, 10, 2, 2],
+        legend: {
+            show: true,
+            position: 'top',
+            float: 'center'
+        },
         xAxis: {
             disableGrid: true,
             formatter: (val, index) => index % step != 0 ? '' : val,

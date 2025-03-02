@@ -5,11 +5,11 @@ export default {
     },
     sms:{
         chart:{
-            line:'#fff',
+            line:'#ccc',
             bar:'#D13419',
-            barText:'#FFF',
+            barText:'#D23217',
             lineText:'#FFF',
-            xText:'#FFF',
+            xText:'#333',
             yGrid:'#6a8169',
 
         }
