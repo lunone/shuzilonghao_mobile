@@ -83,9 +83,9 @@ const showTip = (chart: any, event: any) => {
         chart.showToolTip(event, {
             textList: [
                 { text: `${month}月`, color: null },
-                { text: `航班: ${stats.value[year].counter} 班`, color: '#91CB74' },
-                { text: `货运: ${stats.value[year].netWeightCargo} 吨`, color: '#1890FF' },
-                { text: `飞行: ${stats.value[year].hours} 小时`, color: '#FAC858' }
+                { text: `航班: ${numberByWan(stats.value[year].counter)} 班`, color: '#91CB74' },
+                { text: `货运: ${numberByWan(stats.value[year].netWeightCargo)} 吨`, color: '#1890FF' },
+                { text: `飞行: ${numberByWan(stats.value[year].hours)} 小时`, color: '#FAC858' }
             ]
         });
     }
