@@ -19,9 +19,8 @@
                     <div class="pai" v-if="pilot?.name" :class="`no${pilot.rank}`"
                         :style="`margin-top: ${pilot.rank * 6}px;`">
                         <div class="ser">TOP.{{ pilot.rank }}</div>
-                        <!-- {{ dateRange.join('-') + pilot?.name }} -->
-                        <!-- <userCardVue :userId="pilot.userId" :error="pilot.name" /> -->
-                        <div class="name" @click="showPilotProfile(pilot.userId)">{{ pilot.name }}
+                        <div class="name-wrapper" @click="showPilotProfile(pilot.userId)">
+                            <span class="name">{{ pilot.name }}</span>
                             <span v-for="tech of techName(pilot.userId)"
                                 :key="pilot.userId + tech.acType + tech.techName" class="tech" :class="tech.techName">
                                 {{ tech.techName }}
@@ -217,9 +216,6 @@ onMounted(() => {
     text-align: center;
 }
 
-
-
-
 // 定义生成气泡底部箭头的mixin
 .arrow-effect(@color) {
     border-top-left-radius: 16px;
@@ -234,10 +230,16 @@ onMounted(() => {
     text-align: center;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
 
-    .name {
-        font-size: 1.1rem;
-        font-weight: bold;
-        align-items: flex-start
+    .name-wrapper {
+        .row;
+        justify-content: center;
+        align-items: flex-start;
+
+        .name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            align-items: flex-start
+        }
     }
 
     .ser {
