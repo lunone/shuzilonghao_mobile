@@ -285,3 +285,9 @@ export type ListNode = Record<string, any> & {
     name?: string,
     parentId: number,
 }
+export type PilotItem = {
+    name: string,
+    id: number,
+    code: string,
+    techs: { acType: string, techNo: string, techName: string }[],
+}

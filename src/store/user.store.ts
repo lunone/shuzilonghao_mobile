@@ -1,13 +1,15 @@
 import { defineStore } from 'pinia';
 import api from '@/utils/api';
 import CONFIG from '@/config';
-import { DepartmenItem, UserItem } from '@/interface';
+import { DepartmenItem, PilotItem, UserItem } from '@/interface';
 
 
 export default defineStore('user', {
     state: () => ({
         isStaffFatching: false,
-        staff: {},
+        isPilotsFatching: false,
+        staff: {} as Record<string, UserItem>,
+        pilots: {} as Record<string, PilotItem>,
         departments: [] as DepartmenItem[],
         self: {} as UserItem,
         token: '' as string,
@@ -33,7 +35,7 @@ export default defineStore('user', {
             return this.self;
         },
         async getStaff(): Promise<Record<string, UserItem>> {
-            if(this.isStaffFatching){
+            if (this.isStaffFatching) {
                 return
             }
             this.isStaffFatching = true;
@@ -49,6 +51,15 @@ export default defineStore('user', {
                 this.staff = obj;
             }
             return this.staff;
+        },
+        async getPilots(): Promise<Record<string, PilotItem>> {
+            if (this.isPilotsFatching) return;
+            if (!Object.keys(this.pilots).length) {
+                const res = await api(CONFIG.url.pilots) as Record<string, PilotItem>;
+                this.isPilotsFatching = false;
+                this.pilots = Object.keys(res).length ? res : {};
+            }
+            return this.pilots;
         },
         async getDepartments() {
             if (!this.departments.length) {

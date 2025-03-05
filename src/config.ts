@@ -1,7 +1,7 @@
 export default {
     url: {
         timeout: 30e3,
-        api: 'https://app.airlonghao.com/sz',
+        api: 'https://app.airlonghao.com/sz2',
         init: '/user/init',
         login: '/login/wx',
         activate: '/login/activate',
@@ -30,6 +30,8 @@ export default {
         //
         staff: '/user/staff',
         userProfile: '/user/profile',
+        pilot: '/user/pilot',
+        pilots: '/user/pilots',
         departments: '/department/list',
     },
     page: {

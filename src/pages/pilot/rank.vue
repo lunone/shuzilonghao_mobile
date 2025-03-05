@@ -21,7 +21,12 @@
                         <div class="ser">TOP.{{ pilot.rank }}</div>
                         <!-- {{ dateRange.join('-') + pilot?.name }} -->
                         <!-- <userCardVue :userId="pilot.userId" :error="pilot.name" /> -->
-                        <div class="name" @click="showPilotProfile(pilot.userId)">{{ pilot.name }}</div>
+                        <div class="name" @click="showPilotProfile(pilot.userId)">{{ pilot.name }}
+                            <span v-for="tech of techName(pilot.userId)"
+                                :key="pilot.userId + tech.acType + tech.techName" class="tech" :class="tech.techName">
+                                {{ tech.techName }}
+                            </span>
+                        </div>
                         <div class="data">
                             <div class="total">
                                 总<span class="value">{{ `${pilot.totalFlightHours}小时` }} </span>
@@ -37,13 +42,16 @@
 
         </div>
         <div class="normal" v-if="showNormal">
-            <!-- <div class="info">此页数字大约有2%的误差,但整体趋势不错,BUG修复中…… </div> -->
             <div v-for="pilot in data" class="pilot" :key="pilot.userId">
                 <span class="icon" :class="`no${pilot.rank}`">
                     <template> {{ pilot.rank }}</template>
                 </span>
                 <div class="name" @click="showPilotProfile(pilot.userId)">
                     {{ pilot.name }}
+                    <span v-for="tech of techName(pilot.userId)" :key="pilot.userId + tech.acType + tech.techName"
+                        class="tech" :class="tech.techName">
+                        {{ tech.techName }}
+                    </span>
                 </div>
                 <div class="data">
                     <div class="total">
@@ -67,7 +75,8 @@ import dayjs from 'dayjs';
 import api from '@/utils/api';
 import CONFIG from '@/config';
 import Profile from '@/pages/hr/profile.vue';
-
+import useUserStore from '@/store/user.store';
+const store = useUserStore();
 type PilotStat = { rank: number, userId: string, name: string, totalFlightHours: number, avgFlightHours: number }
 
 // const props = defineProps({
@@ -134,6 +143,31 @@ function clac(num: number) {
     console.log('new', newDate, newDate.split('-'));
     dateRange.value = newDate.split('-') as [string, string];
 }
+function techName(userId: string) {
+    const pilots = store.pilots;
+    const pilot = pilots[userId];
+    const techs = pilot?.techs;
+
+    if (!techs) return [];
+    const oreder = ["F0", "FR", "F1", "F2", "F3", "F4", "F5", "F6", "C0", "C1", "C2", "C3", "TA", "TB", "TC"];
+    const sorted = [...techs].sort((a, b) => oreder.indexOf(b.techName) - oreder.indexOf(a.techName));
+
+    // 去重并保留最高优先级
+    const res = [];
+    const seen = new Set();
+    for (const tech of sorted) {
+        const key = tech.acType.slice(0, 2);
+        if (!seen.has(key)) {
+            seen.add(key);
+            res.push({
+                acType: tech.acType,
+                techName: tech.techName,
+            });
+        }
+    }
+    return res;
+}
+
 // 获取统计数据和飞行员排名
 watch(() => dateRange, async () => {
     try {
@@ -141,10 +175,7 @@ watch(() => dateRange, async () => {
         uni.showToast({ title: '加载中...', icon: 'loading', mask: true, duration: 33000 })
         const startDate = dayjs(dateRange.value.join('-') + '-01').toDate();
         const endDate = dayjs(startDate).endOf('month').toDate();
-
-        // console.log('old', dayjs(startDate).format('YYYY-MM-DD'), endDate);
         const res = await api(CONFIG.url.statCrewFh, { startDate, endDate }) as any[];
-        // console.log('飞行小时', res);
         const stat = res.map((pilot: any) => ({
             rank: -1,
             userId: pilot.userId,
@@ -175,15 +206,45 @@ watch(() => dateRange, async () => {
 }, { immediate: true, deep: true })
 
 onMounted(() => {
+    store.getPilots();
 })
 </script>
 <style lang="less" scoped>
 @import '@/css/base.less';
-
+@color-pilot-serial: #1890FF;
 
 .loading {
     text-align: center;
 }
+
+// 添加在样式文件顶部
+@color-tech-begin: #1890ff; // 起始颜色
+@color-tech-end: #ff0000;   // 结束颜色
+ 
+.tech {
+    border: solid 1px #eee;
+    // background-color: #eee;
+    border: auto 1px;
+    border-radius: 2px;
+    font-size: .8rem;
+
+    // 循环生成颜色类（修改参数格式）
+    .tech-color-loop(@tech-list, @index: 0) when (@index < length(@tech-list)) {
+        @tech: extract(@tech-list, @index + 1);
+        // 添加括号明确除法运算
+        @mix-ratio: percentage((@index / (length(@tech-list) - 1)));
+        
+        &.@{tech} {
+            color: mix(@color-tech-end, @color-tech-begin, @mix-ratio);
+        }
+
+        .tech-color-loop(@tech-list, @index + 1);
+    }
+
+    @tech-list: F0, FR, F1, F2, F3, F4, F5, F6, C0, C1, C2, C3, TA, TB, TC;  
+    .tech-color-loop(@tech-list);
+}
+ 
 
 // 定义生成气泡底部箭头的mixin
 .arrow-effect(@color) {
