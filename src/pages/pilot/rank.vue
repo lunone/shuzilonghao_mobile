@@ -217,34 +217,8 @@ onMounted(() => {
     text-align: center;
 }
 
-// 添加在样式文件顶部
-@color-tech-begin: #1890ff; // 起始颜色
-@color-tech-end: #ff0000;   // 结束颜色
- 
-.tech {
-    border: solid 1px #eee;
-    // background-color: #eee;
-    border: auto 1px;
-    border-radius: 2px;
-    font-size: .8rem;
 
-    // 循环生成颜色类（修改参数格式）
-    .tech-color-loop(@tech-list, @index: 0) when (@index < length(@tech-list)) {
-        @tech: extract(@tech-list, @index + 1);
-        // 添加括号明确除法运算
-        @mix-ratio: percentage((@index / (length(@tech-list) - 1)));
-        
-        &.@{tech} {
-            color: mix(@color-tech-end, @color-tech-begin, @mix-ratio);
-        }
 
-        .tech-color-loop(@tech-list, @index + 1);
-    }
-
-    @tech-list: F0, FR, F1, F2, F3, F4, F5, F6, C0, C1, C2, C3, TA, TB, TC;  
-    .tech-color-loop(@tech-list);
-}
- 
 
 // 定义生成气泡底部箭头的mixin
 .arrow-effect(@color) {
@@ -263,6 +237,7 @@ onMounted(() => {
     .name {
         font-size: 1.1rem;
         font-weight: bold;
+        align-items: flex-start
     }
 
     .ser {
@@ -432,5 +407,33 @@ onMounted(() => {
             }
         }
     }
+}
+
+// 添加在样式文件顶部
+@color-tech-begin: #1890ff; // 起始颜色
+@color-tech-end: #ff0000; // 结束颜色
+
+.tech {
+    // border: solid 1px #eee;
+    // background-color: #eee;
+    // border: auto 1px;
+    // border-radius: 2px;
+    font-size: .8rem;
+
+    // 循环生成颜色类（修改参数格式）
+    .tech-color-loop(@tech-list, @index: 0) when (@index < length(@tech-list)) {
+        @tech: extract(@tech-list, @index + 1);
+        // 添加括号明确除法运算
+        @mix-ratio: percentage((@index / (length(@tech-list) - 1)));
+
+        &.@{tech} {
+            color: mix(@color-tech-end, @color-tech-begin, @mix-ratio);
+        }
+
+        .tech-color-loop(@tech-list, @index + 1);
+    }
+
+    @tech-list: F0, FR, F1, F2, F3, F4, F5, F6, C0, C1, C2, C3, TA, TB, TC;
+    .tech-color-loop(@tech-list);
 }
 </style>
