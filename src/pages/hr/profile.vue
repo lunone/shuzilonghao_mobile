@@ -53,7 +53,7 @@ import CONFIG from '@/config';
 import api from '@/utils/api';
 import { UserItem } from '@/interface';
 import {useUserStore} from '@/store/user.store';
-import useDepartmentStore from '@/store/department.store';
+import {useDepartmentStore} from '@/store/department.store';
 import Salary from './profile/salary.vue';
 import experienceVue from './profile/experience.vue';
 import dutyVue from './profile/duty.vue';
@@ -69,7 +69,7 @@ const props = defineProps({
 });
 
 const employee: Ref<UserItem> = ref();
-const depName = computed(() => departmentStore.departmentPath(+employee.value?.department));
+const depName = computed(() => departmentStore.getPath(+employee.value?.department));
 const fetchEmployee = async () => {
     employee.value = await api(CONFIG.url.userProfile, { userId: props.userId });
 };
@@ -83,7 +83,7 @@ const onClickkv = (e) => {
     }
 }
 onMounted(async () => {
-    departmentStore.getDepartments();
+    departmentStore.fetchDepartments();
     fetchEmployee();
 });
 
