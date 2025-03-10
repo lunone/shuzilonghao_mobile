@@ -49,7 +49,7 @@ export const useDepartmentStore = defineStore('department', () => {
     // 获取目标名称的所有子部门ID
     const getSubIds = computed(() => {
         return (targetName: string): (string | number)[] => {
-            const deptMap = getDeptMap.value;
+            // const deptMap = getDeptMap.value;
             const childMap = getChildMap.value;
             const result = new Set<string | number>();
             const queue: (string | number)[] = [];
