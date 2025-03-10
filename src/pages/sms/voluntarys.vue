@@ -2,7 +2,7 @@
     <div class="voluntary-wrapper">
         <div class="voluntary" v-for="(voluntary, index) in voluntarys" :key="index">
             <div class="ask">
-                <div class="user" @click="showProfile(voluntary.userId)">
+                <div class="user" @click="showProfile(voluntary.userName)">
                     <i class="icon zl-icon-user" />
                     <div class="name">{{ voluntary.userName || '匿名' }}</div>
                 </div>
@@ -19,7 +19,7 @@
                         </div>
                         <div class="date">{{ dayjs(answer.date).format('M月D日') }}</div>
                     </div>
-                    <div class="user" @click="showProfile(answer.userId)">
+                    <div class="user" @click="showProfile(answer.userName)">
                         <i class="icon zl-icon-user" />
                         <div class="name">{{ answer.userName || '匿名' }}</div>
                     </div>
@@ -33,8 +33,7 @@ import api from '@/utils/api';
 import { inject, onMounted, PropType, ref, Ref, watch } from 'vue';
 import CONFIG from '@/config';
 import dayjs from 'dayjs';
-import useUserStore from '@/store/user.store';
-const store = useUserStore();
+
 const props = defineProps({
     range: {
         type: Object as PropType<[Date, Date]>, default: () => [
@@ -47,6 +46,7 @@ const showProfile = inject('showProfile') as Function;
 const emits = defineEmits(['loading', 'finished'])
 const voluntarys: Ref<any[]> = ref([]);
 const page = ref(1);
+
 // 获取事件列表
 const fetchData = async (currentPage: number = 1) => {
     emits('loading', true);
@@ -54,16 +54,14 @@ const fetchData = async (currentPage: number = 1) => {
         const [startDate, endDate] = props.range;
         const resVoluntary = await api(CONFIG.url.smsVoluntarys, { startDate, endDate });
         console.log(`resVoluntary`, resVoluntary)
-        const nameToUserId = await store.getNameToUserId();
         // 给answer的添加userId;
-        for (let voluntary of resVoluntary) {
-            voluntary.userId = nameToUserId[voluntary?.userName];
-            for (let answer of voluntary.answers) {
-                answer.userId = nameToUserId[answer?.userName];
-            }
-        }
+        // for (let voluntary of resVoluntary) {
+        //     voluntary.userId = staffByName[voluntary?.userName];
+        //     for (let answer of voluntary.answers) {
+        //         answer.userId = staffByName[answer?.userName];
+        //     }
+        // }
         voluntarys.value = voluntarys.value.concat(resVoluntary);
-
     } catch (err) {
         console.error('获取事件列表失败', err);
     } finally {

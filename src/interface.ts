@@ -102,6 +102,7 @@ export type AirportItem = {
     name?: string,
     code3?: string,
     alais?: string,
+    abbr?: string,
     englishName?: string,
 }
 

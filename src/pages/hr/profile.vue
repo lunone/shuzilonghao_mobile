@@ -59,7 +59,7 @@ import experienceVue from './profile/experience.vue';
 import dutyVue from './profile/duty.vue';
 import referenceVue from './profile/reference.vue';
 import education from './profile/education.vue';
-import { call, getDepartmentPath } from '@/utils/tools';
+import { call } from '@/utils/tools';
 import Performance from './profile/performance.vue';
 import Contract from './profile/contract.vue';
 const store = useUserStore();
@@ -68,24 +68,14 @@ const props = defineProps({
     userId: { type: String, default: '' }
 });
 
-const active = ref(0);
 const employee: Ref<UserItem> = ref();
-let departments = ref([]);
-const depName = ref('');
+const depName = computed(() => store.departmentPath(+employee.value?.department));
 const fetchEmployee = async () => {
-    store.getDepartments();
     employee.value = await api(CONFIG.url.userProfile, { userId: props.userId });
 };
-// watch
-watch([() => store.departments, () => employee], () => {
-    departments.value = store.departments;
-    if (departments.value.length && employee.value.department) {
-        depName.value = getDepartmentPath(departments.value, +employee.value.department);
-    }
-}, { deep: true })
-const name = computed(() => {
-    return employee.value?.name || store.staff[props.userId]?.name || '';
-});
+
+
+const name = computed(() => employee.value?.name || store.staff[props.userId]?.name || '');
 const current = ref(0);
 const onClickkv = (e) => {
     if (current != e.currentIndex) {
@@ -93,6 +83,7 @@ const onClickkv = (e) => {
     }
 }
 onMounted(async () => {
+    store.getDepartments();
     fetchEmployee();
 });
 interface Department {

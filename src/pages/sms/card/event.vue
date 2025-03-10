@@ -4,14 +4,13 @@
             <span class="date">{{ data.date }}</span>
             <span class="flightno">航班号:{{ data.flightNo }}</span>
             <span class="acreg">飞机号:{{ data.acReg }}</span>
-            <span class="way">{{ data.dep }} - {{ data.arr }}</span>
+            <span class="way">{{ cityName(data.dep) }} - {{ cityName(data.arr) }}</span>
         </div>
         <div class="crews" v-if="data.crews?.length">
             <div class="title">机组</div>
             <div class="value">
-                <span v-for="crew in data.crews" :key="crew.name" @click="showProfile(crew.userId)">
-                    <!-- <UserCardVue :userId="crew.userId" :error="crew.name" /> -->
-                    {{ crew.name }}
+                <span v-for="crew in data.crews" :key="crew" @click="showProfile(crew)">
+                    {{ crew }}
                 </span>
             </div>
         </div>
@@ -22,20 +21,15 @@
             <div>
                 <div class="time-name">
                     <div class="time">{{ data.reportDate }}</div>
-                    <!-- <UserCardVue :userId="data.reporter" v-if="data.reporter" /> -->
-                    <!-- <div v-else>none</div> -->
-                    <div class="name" @click="showProfile(data.reporterId)">{{ data.reporter }}</div>
+                    <div class="name" @click="showProfile(data.reporter)">{{ data.reporter }}</div>
                 </div>
                 <span>提交事件</span>
-            </div>  
+            </div>
             <div class="step" v-for="(value, key) in data.status" :key="key">
-        
+
                 <div class="time-name">
                     <div class="time">{{ value.updateTime }}</div>
-                    <!-- <template> -->
-                        <!-- <UserCardVue :userId="value.updater" /> -->
-                        <div class="name" @click="showProfile(value.updaterId)">{{ value.updater }}</div>
-                    <!-- </template> -->
+                    <div class="name" @click="showProfile(value.updater)">{{ value.updater }}</div>
                 </div>
                 <span v-if="value.reason && value.reason != data.status[key - 1]?.reason">
                     填写了原因：{{ value.reason }}
@@ -53,13 +47,18 @@
 </template>
 <script lang="ts" setup>
 import dayjs from 'dayjs';
-// import UserCardVue from '@/pages/hr/userCard.vue';
-import { call } from '@/utils/tools';
 import { inject, onMounted, watch } from 'vue';
+import useBasisStore from '@/store/basis.store';
+const basisStore = useBasisStore();
 const props = defineProps<{ data: Record<string, any> }>();
 // 拨打电话的方法
 const showProfile = inject('showProfile') as Function;
-
+function cityName(code: string) {
+    return basisStore.airportsCode3[code]?.city || code;
+}
+onMounted(() => {
+    basisStore.getAirports();
+});
 </script>
 <style lang="less" scoped>
 .event-wrapper {

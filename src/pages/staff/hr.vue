@@ -27,21 +27,17 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import useUserStore from '@/store/user.store';
-import { collectDescendantIds, convertToTree } from '@/utils/tools';
+// import { collectDescendantIds } from '@/utils/tools';
 const store = useUserStore();
-const stat = ref({ all: 0, wx: 0, fx: 0, fg: 0, yk: 0 })
-watch([() => store.departments, () => store.staff], () => {
-    const dept = store.departments;
+const stat = computed(() => {
     const staff = store.staff;
-    const tree = convertToTree(dept);
-    // 找到tree[0].children里面名字叫做维修工程部的id,且他的子孙辈节点的所有id,汇总成一个数组
     const temp = { all: 0, wx: 0, fx: 0, fg: 0, yk: 0 };
     const ids = {}
     const map = { wx: '维修工程部', fx: '飞行部', fg: '飞行技术管理部', yk: '运行控制部' }
     for (let key in map) {
-        ids[key] = collectDescendantIds(tree, map[key]);
+        ids[key] = store.departmentSubIds(map[key]);
     }
     for (let userId in staff) {
         const user = staff[userId];
@@ -54,7 +50,7 @@ watch([() => store.departments, () => store.staff], () => {
             temp.all++;
         }
     }
-    stat.value = temp;
+    return temp;
 })
 function showDetail(type: string) {
     if (type === 'wx') {

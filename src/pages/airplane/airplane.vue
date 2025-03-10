@@ -79,7 +79,7 @@ const aircraftSorted = computed(() => {
         retired: { name: '退役', aircrafts: [] },
         introduced: { name: '引进中', aircrafts: [] },
     };
-    for (let aircraft of Object.values(store.aircrafts)) {
+    for (let aircraft of Object.values(store.aircraftsArr)) {
         const startDate = dayjs(aircraft.startDate || -1).startOf('day');
         const endDate = dayjs(aircraft.endDate).startOf('day');
         if (!aircraft.endDate || (startDate.isBefore(today) && endDate.isAfter(today))) {

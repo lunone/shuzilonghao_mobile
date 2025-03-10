@@ -15,15 +15,12 @@ import useBasisStore from '@/store/basis.store';
 import dayjs from 'dayjs';
 
 const store = useBasisStore();
-// const pieOption = ref({});
-// 定义机队数据
-const aircrafts = computed(() => Object.values(store.aircrafts));
 
 const pieOption = computed(() => {
     const today = dayjs().startOf('day');
     const stat: Record<string, number> = {}
     let all = 0;
-    for (let aircraft of aircrafts.value) {
+    for (let aircraft of store.aircraftsArr) {
         const startDate = dayjs(aircraft.startDate || -1).startOf('day');
         const endDate = dayjs(aircraft.endDate).startOf('day');
         if (!aircraft.endDate || (startDate.isBefore(today) && endDate.isAfter(today))) {
@@ -44,8 +41,6 @@ const pieOption = computed(() => {
             value
         }
     }
-    // console.log('-------------', data);
-    // return stat;
     return {
         type: "ring",
         animation: false,

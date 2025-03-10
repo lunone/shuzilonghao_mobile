@@ -6,35 +6,45 @@ import CONFIG from '@/config';
 
 export default defineStore('basis', {
     state: () => ({
+        isLoding: { airport: false, aircraft: false },
         airportsCode4: {} as Record<string, AirportItem>,
-        airportsCode3: {} as Record<string, AirportItem>,
-        aircrafts: {} as Record<string, AircraftItem>,
+        aircraftsArr: {} as AircraftItem[],
     }),
     getters: {
+        airportsCode3: (state) => {
+            const airportsCode4 = state.airportsCode4;
+            const code3 = {}
+            for (const code4 in airportsCode4) {
+                if (airportsCode4[code4].code3) {
+                    code3[airportsCode4[code4].code3] = airportsCode4[code4];
+                }
+            }
+            return code3;
+        },
+        airports: (state) => state.airportsCode4,
+        city: function (state) {
+            const that = this;
+            return function (code: string, type: string = 'abbr'): string {
+                const airportsCode3 = that.airportsCode3;
+                const airportsCode4 = state.airportsCode4;
+                const src = code.length === 4 ? airportsCode4 : airportsCode3;
+                return src[code][type] || code;
+            }
+        },
+        aircraftsObj: (state) => state.aircraftsArr.reduce((acc, cur) => ({ ...acc, [cur.acReg]: cur }), {}),
     },
     actions: {
         async getAirports() {
+            if (this.isLoding.airport) return;
             if (!this.airportsCode4['ZHCC']) {
                 const res = await api(CONFIG.url.airports) as Record<string, AirportItem>;
                 this.airportsCode4 = res;
             }
-            return this.airportsCode4;
         },
-        async getAirportsCode3() {
-            if (!this.airportsCode3['CGO']) {
-                const res = await this.getAirports();
-                const code3 = {}
-                for (const key in res) {
-                    if (res[key].code3) {
-                        code3[res[key].code3] = res[key];
-                    }
-                }
-                this.airportsCode3 = code3;
-            }
-            return this.airportsCode3;
-        },
+
         async getAircrafts() {
-            if (!Object.keys(this.aircrafts).length) {
+            if (this.isLoding.aircraft) return;
+            if (!this.aircraftsArr.length) {
                 const res = await api(CONFIG.url.aircrafts) as AircraftItem[];
                 const acTypeShortTranslate: Record<string, string> = {
                     B73: 'B737', B74: 'B747', A32: 'A320', A31: 'A319'
@@ -44,9 +54,8 @@ export default defineStore('basis', {
                     aircraft.endDate = aircraft.endDate ? dayjs(aircraft.endDate).toDate() : undefined;
                     aircraft.acTypeLong = acTypeShortTranslate[aircraft.acTypeLong] || aircraft.acType;
                 })
-                this.aircrafts = res.reduce((acc, cur) => ({ ...acc, [cur.acReg]: cur }), {})
+                this.aircraftsArr = res;
             }
-            return this.aircrafts;
         },
     }
 })

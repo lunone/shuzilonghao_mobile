@@ -30,9 +30,13 @@ export default {
         //
         staff: '/user/staff',
         userProfile: '/user/profile',
-        pilot: '/user/pilot',
-        pilots: '/user/pilots',
         departments: '/department/list',
+        //
+        pilots: '/pilot/list',
+        pilotProfile: '/pilot/profile',
+        pilotDuty: '/pilot/duty',
+        pilotAbsence: '/pilot/absence',
+        pilotTraining: '/pilot/training',
     },
     page: {
         index: '/pages/index',
