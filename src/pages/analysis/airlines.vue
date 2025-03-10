@@ -73,7 +73,7 @@ const fetchData = async (startDate: Date, endDate: Date) => {
     error.value = '';
     try {
         const res = await api(CONFIG.url.statByAirline, { startDate, endDate }) as Res;
-        airports.value = await store.getAirports();
+        airports.value = await store.fetchAirports();
         console.log('统计', res);
         airlineStats.value = res;
         stationClick(stations.value[0]);

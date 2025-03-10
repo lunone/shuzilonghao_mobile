@@ -4,7 +4,7 @@
             <span class="date">{{ data.date }}</span>
             <span class="flightno">航班号:{{ data.flightNo }}</span>
             <span class="acreg">飞机号:{{ data.acReg }}</span>
-            <span class="way">{{ cityName(data.dep) }} - {{ cityName(data.arr) }}</span>
+            <span class="way">{{ getCity(data.dep) }} - {{ getCity(data.arr) }}</span>
         </div>
         <div class="crews" v-if="data.crews?.length">
             <div class="title">机组</div>
@@ -53,11 +53,9 @@ const basisStore = useBasisStore();
 const props = defineProps<{ data: Record<string, any> }>();
 // 拨打电话的方法
 const showProfile = inject('showProfile') as Function;
-function cityName(code: string) {
-    return basisStore.airportsCode3[code]?.city || code;
-}
+const getCity = basisStore.getCity;
 onMounted(() => {
-    basisStore.getAirports();
+    basisStore.fetchAirports();
 });
 </script>
 <style lang="less" scoped>

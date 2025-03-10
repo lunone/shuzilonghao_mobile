@@ -1,71 +1,79 @@
 import { defineStore } from 'pinia';
+import { ref, computed, Ref } from 'vue';
 import api from '@/utils/api';
 import CONFIG from '@/config';
 import { PilotItem, UserItem } from '@/interface';
 
+export default defineStore('user', () => {
+    const isLoading = { staff: false, pilot: false };
+    const staff = ref<Record<string, UserItem>>({});
+    const pilots = ref<Record<string, PilotItem>>({});
+    const self = ref({}) as Ref<UserItem>;
+    const token = ref('');
 
-export default defineStore('user', {
-    state: () => ({
-        isLoading: { staff: false, pilot: false },
-        staff: {} as Record<string, UserItem>,
-        pilots: {} as Record<string, PilotItem>,
-        self: {} as UserItem,
-        token: '' as string,
-    }),
-    getters: {
-        staffObj: (state) => state.staff,
-        getToken: (state) => {
-            return state.token
-        },
-        // 按name为key的所有用户对象
-        staffByName: (state): Record<string, UserItem> => {
-            const userObj = state.staff;
-            const staffByName = {}
-            for (let userId in userObj) {
-                const name = userObj[userId].name;
-                staffByName[name] = userObj[userId];
-            }
-            return staffByName;
-        },
+    const getToken = computed(() => token.value);
+    
+    const getStaffObj = computed(() => staff.value);
+    const getStaffByName = computed(() => {
+        const userObj = staff.value;
+        const staffByName: Record<string, UserItem> = {};
+        for (let userId in userObj) {
+            const name = userObj[userId].name;
+            staffByName[name] = userObj[userId];
+        }
+        return staffByName;
+    });
 
-    },
-    actions: {
-        setToken(token?: string) {
-            if (token) {
-                this.token = token;
-            }
-        },
-        async getMyself(refresh = false) {
-            const mySelf = await api(CONFIG.url.init) as UserItem;
-            if (mySelf?.id) {
-                this.self = mySelf;
-            }
-            return this.self;
-        },
-        async getStaff(): Promise<Record<string, UserItem>> {
-            if (this.isLoading.staff) return
-            this.isLoading.staff = true;
-            if (!Object.keys(this.staff).length) {
-                const res = await api(CONFIG.url.staff) as UserItem[];
-                const obj = {}
-                if (res.length) {
-                    for (let user of res) {
-                        obj[user.userId] = user
-                    }
+    const getPilots = computed(() => pilots.value);
+    const setToken = (newToken?: string) => {
+        if (newToken) {
+            token.value = newToken;
+        }
+    };
+
+    const getMyself = async (refresh = false) => {
+        const mySelf = await api(CONFIG.url.init) as UserItem;
+        if (mySelf?.id) {
+            self.value = mySelf;
+        }
+        return self.value;
+    };
+
+    const fetchStaff = async () => {
+        if (isLoading.staff) return;
+        isLoading.staff = true;
+        if (!Object.keys(staff.value).length) {
+            const res = await api(CONFIG.url.staff) as UserItem[];
+            const obj: Record<string, UserItem> = {};
+            if (res.length) {
+                for (let user of res) {
+                    obj[user.userId] = user;
                 }
-                this.isLoading.staff = false;
-                this.staff = obj;
             }
-        },
-        async getPilots(): Promise<Record<string, PilotItem>> {
-            if (this.isLoading.pilot) return;
-            this.isLoading.pilot = true;
-            if (!Object.keys(this.pilots).length) {
-                const res = await api(CONFIG.url.pilots) as Record<string, PilotItem>;
-                this.pilots = Object.keys(res).length ? res : {};
-                this.isLoading.pilot = false;
-            }
-        },
+            staff.value = obj;
+        }
+        isLoading.staff = false;
+    };
 
-    }
-})
+    const fetchPilots = async () => {
+        if (isLoading.pilot) return;
+        isLoading.pilot = true;
+        if (!Object.keys(pilots.value).length) {
+            const res = await api(CONFIG.url.pilots) as Record<string, PilotItem>;
+            pilots.value = Object.keys(res).length ? res : {};
+        }
+        isLoading.pilot = false;
+    };
+
+    return {
+        self,
+        setToken,
+        getStaffObj,
+        getToken,
+        getStaffByName,
+        getMyself,
+        getPilots,
+        fetchPilots,
+        fetchStaff,
+    };
+});

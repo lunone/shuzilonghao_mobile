@@ -47,7 +47,7 @@ import userStore from '@/store/user.store';
 import useBasisStore from '@/store/basis.store';
 const store = userStore();
 const basisStore = useBasisStore();
-const city = basisStore.city;
+// const city = basisStore.city;
 const userId = ref('');
 const pilot = ref({}) as Ref<Record<string, any>>;
 const startDate = dayjs()
@@ -59,7 +59,7 @@ const dayLength = 14;
 // 技术等级
 const techs = computed(() => {
     if (!userId.value) return;
-    const techs = store.pilots[userId.value]?.techs;
+    const techs = store.getPilots[userId.value]?.techs;
     console.log(techs);
     return techs || []
 })
@@ -105,9 +105,8 @@ function showDetail(day: { name: string, className: string, data: any }) {
             icon: 'none', duration: 2e3,
             title: day.data.map((d: any) => {
                 const time = `${dayjs(d.atd || d.std).format('HH:mm')}-${dayjs(d.ata || d.sta).format('HH:mm')}`;
-                console.log('----------', city(d.dep));
-                const dep = basisStore.airportsCode3[d.dep]?.abbr || basisStore.airportsCode3[d.dep]?.city || d.dep;
-                const arr = basisStore.airportsCode3[d.arr]?.abbr || basisStore.airportsCode3[d.arr]?.city || d.arr;
+                const dep = basisStore.getCity(d.dep);
+                const arr = basisStore.getCity(d.arr);
                 return `${d.flightNo}(${time})${dep} - ${arr}`
             }).join('|')
         })
@@ -119,7 +118,7 @@ onLoad(e => {
     const userData = { userId: e.code, idType: 'code' }
     const dateData = { startDate: startDate.toDate(), endDate: endDate.toDate() }
     Promise.allSettled([
-        store.getPilots(), basisStore.getAirports(),
+        store.fetchPilots(), basisStore.fetchAirports(),
         api(CONFIG.url.pilotProfile, userData).then(res => pilot.value = res || {}),
         api(CONFIG.url.pilotTraining, { code: e.code, ...dateData }).then(res => trainings.value = res || []),
         api(CONFIG.url.pilotDuty, { ...userData, ...dateData }).then(res => duties.value = res || []),

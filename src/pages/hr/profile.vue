@@ -75,7 +75,7 @@ const fetchEmployee = async () => {
 };
 
 
-const name = computed(() => employee.value?.name || userStore.staffObj[props.userId]?.name || '');
+const name = computed(() => employee.value?.name || userStore.getStaffObj[props.userId]?.name || '');
 const current = ref(0);
 const onClickkv = (e) => {
     if (current != e.currentIndex) {

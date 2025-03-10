@@ -54,13 +54,7 @@ const fetchData = async (currentPage: number = 1) => {
         const [startDate, endDate] = props.range;
         const resVoluntary = await api(CONFIG.url.smsVoluntarys, { startDate, endDate });
         console.log(`resVoluntary`, resVoluntary)
-        // 给answer的添加userId;
-        // for (let voluntary of resVoluntary) {
-        //     voluntary.userId = staffByName[voluntary?.userName];
-        //     for (let answer of voluntary.answers) {
-        //         answer.userId = staffByName[answer?.userName];
-        //     }
-        // }
+
         voluntarys.value = voluntarys.value.concat(resVoluntary);
     } catch (err) {
         console.error('获取事件列表失败', err);

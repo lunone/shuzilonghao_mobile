@@ -44,7 +44,7 @@ const fetchAirports = async () => {
     loading.value = true;
     error.value = '';
     try {
-        const res = await store.getAirports();
+        const res = store.getAirportsCode4;
         airports.value = res;
         pieOption.value = getOption();
     } catch (err) {
@@ -119,7 +119,7 @@ function getOption() {
 function showTip(chart, event) {
     const index = chart.getCurrentDataIndex(event);
     const item = pieData[index];
-     chart.showToolTip(event, {
+    chart.showToolTip(event, {
         textList: [
             { text: item.labelText, color: null },
             { text: `重量:${(item.value / 1e3).toFixed(2)}吨`, color: "#1890FF" },

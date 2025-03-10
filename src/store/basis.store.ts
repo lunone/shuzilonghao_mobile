@@ -1,65 +1,75 @@
 import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
 import api from '@/utils/api';
-import { AircraftItem, AirportItem, UserItem } from '@/interface';
 import dayjs from 'dayjs';
 import CONFIG from '@/config';
+import { AircraftItem, AirportItem } from '@/interface';
 
-export default defineStore('basis', {
-    state: () => ({
-        isLoding: { airport: false, aircraft: false },
-        airportsCode4: {} as Record<string, AirportItem>,
-        aircraftsArr: [] as AircraftItem[],
-    }),
-    getters: {
-        airportsCode3: (state) => {
-            const airportsCode4 = state.airportsCode4;
-            const airportsCode3 = {}
-            for (const code4 in airportsCode4) {
-                if (airportsCode4[code4].code3) {
-                    airportsCode3[airportsCode4[code4].code3] = airportsCode4[code4];
-                }
-            }
-            return airportsCode3;
-        },
-        // airports: (state) => state.airportsCode4,
-        city: function (state) {
-            const that = this;
-            return function (code: string, type: string = 'abbr'): string {
-                const airportsCode3 = that.airportsCode3;
-                const airportsCode4 = state.airportsCode4;
-                const src = code.length === 4 ? airportsCode4 : airportsCode3;
-                return src[code][type] || code;
-            }
-        },
-        aircraftsObj: (state) => state.aircraftsArr.reduce((acc, cur) => ({ ...acc, [cur.acReg]: cur }), {}),
-    },
-    actions: {
-        async getAirports() {
-            if (this.isLoding.airport) return;
-            this.isLoding.airport = true;
-            if (!this?.airportsCode4['ZHCC']) {
-                const res = await api(CONFIG.url.airports) as Record<string, AirportItem>;
-                this.airportsCode4 = res;
-                this.isLoding.airport = false;
-            }
-        },
+export default defineStore('basis', () => {
+    const isLoding = { airport: false, aircraft: false };
+    const airportsCode4 = ref<Record<string, AirportItem>>({});
+    const getAircraftsArr = ref<AircraftItem[]>([]);
 
-        async getAircrafts() {
-            if (this.isLoding.aircraft) return;
-            this.isLoding.aircraft = true;
-            if (!this.aircraftsArr.length) {
-                const res = await api(CONFIG.url.aircrafts) as AircraftItem[];
-                const acTypeShortTranslate: Record<string, string> = {
-                    B73: 'B737', B74: 'B747', A32: 'A320', A31: 'A319'
-                }
-                res.map(aircraft => {
-                    aircraft.startDate = dayjs(aircraft.startDate).toDate();
-                    aircraft.endDate = aircraft.endDate ? dayjs(aircraft.endDate).toDate() : undefined;
-                    aircraft.acTypeLong = acTypeShortTranslate[aircraft.acTypeLong] || aircraft.acType;
-                })
-                this.aircraftsArr = res;
-                this.isLoding.aircraft = false;
+    const getAirportsCode3 = computed(() => {
+        const airportsCode4Value = airportsCode4.value;
+        const airportsCode3: Record<string, AirportItem> = {};
+        for (const code4 in airportsCode4Value) {
+            if (airportsCode4Value[code4].code3) {
+                airportsCode3[airportsCode4Value[code4].code3] = airportsCode4Value[code4];
             }
-        },
-    }
-})
+        }
+        return airportsCode3;
+    });
+    const getAirportsCode4 = computed(() => airportsCode4.value);
+
+    const getCity = computed(() => {
+        return (code: string, type: string = 'abbr'): string => {
+            const airportsCode3Value = getAirportsCode3.value;
+            const airportsCode4Value = airportsCode4.value;
+            const src = code.length === 4 ? airportsCode4Value : airportsCode3Value;
+            return src[code]?.[type] || code;
+        };
+    });
+
+    const getAircraftsObj = computed(() => {
+        return getAircraftsArr.value.reduce((acc, cur) => ({ ...acc, [cur.acReg]: cur }), {});
+    });
+
+    const fetchAirports = async () => {
+        if (isLoding.airport) return;
+        isLoding.airport = true;
+        if (!airportsCode4.value['ZHCC']) {
+            const res = await api(CONFIG.url.airports) as Record<string, AirportItem>;
+            airportsCode4.value = res;
+        }
+        isLoding.airport = false;
+    };
+
+    const fetchAircrafts = async () => {
+        if (isLoding.aircraft) return;
+        isLoding.aircraft = true;
+        if (!getAircraftsArr.value.length) {
+            const res = await api(CONFIG.url.aircrafts) as AircraftItem[];
+            const acTypeShortTranslate: Record<string, string> = {
+                B73: 'B737', B74: 'B747', A32: 'A320', A31: 'A319'
+            };
+            res.forEach(aircraft => {
+                aircraft.startDate = dayjs(aircraft.startDate).toDate();
+                aircraft.endDate = aircraft.endDate ? dayjs(aircraft.endDate).toDate() : undefined;
+                aircraft.acTypeLong = acTypeShortTranslate[aircraft.acTypeLong] || aircraft.acType;
+            });
+            getAircraftsArr.value = res;
+        }
+        isLoding.aircraft = false;
+    };
+
+    return {
+        getCity,
+        getAirportsCode3,
+        getAirportsCode4,
+        getAircraftsArr,
+        getAircraftsObj,
+        fetchAirports,
+        fetchAircrafts,
+    };
+});

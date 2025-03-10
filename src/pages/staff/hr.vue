@@ -34,7 +34,7 @@ import useDepartmentStore from '@/store/department.store';
 const userStore = useUserStore();
 const departmentStore = useDepartmentStore();
 const stat = computed(() => {
-    const staff = userStore.staffObj;
+    const staff = userStore.getStaffObj;
     const temp = { all: 0, wx: 0, fx: 0, fg: 0, yk: 0 };
     const ids = {}
     const map = { wx: '维修工程部', fx: '飞行部', fg: '飞行技术管理部', yk: '运行控制部' }
@@ -65,7 +65,7 @@ function showDetail(type: string) {
 }
 onMounted(() => {
     departmentStore.getDepartments()
-    userStore.getStaff()
+    userStore.fetchStaff()
 })
 </script>
 

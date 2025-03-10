@@ -143,7 +143,7 @@ function clac(num: number) {
     dateRange.value = newDate.split('-') as [string, string];
 }
 function techName(userId: string) {
-    const pilots = store.pilots;
+    const pilots = store.getPilots;
     const pilot = pilots[userId];
     const techs = pilot?.techs;
 
@@ -206,7 +206,7 @@ watch(() => dateRange, async () => {
 }, { immediate: true, deep: true })
 
 onMounted(() => {
-    store.getPilots();
+    store.fetchPilots();
 })
 </script>
 <style lang="less" scoped>
