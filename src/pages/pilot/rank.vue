@@ -74,7 +74,7 @@ import dayjs from 'dayjs';
 import api from '@/utils/api';
 import CONFIG from '@/config';
 import Profile from '@/pages/hr/profile.vue';
-import useUserStore from '@/store/user.store';
+import {useUserStore} from '@/store/user.store';
 const store = useUserStore();
 type PilotStat = { rank: number, code: string, userId: string, name: string, totalFlightHours: number, avgFlightHours: number }
 

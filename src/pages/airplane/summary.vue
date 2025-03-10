@@ -4,23 +4,23 @@
             <span class="title">{{ acType }} </span>
             <span class="value">{{ number }}</span>
             <span class="unit">架</span>
-        </div>
+        </div>F
     </div> -->
     <!-- 饼图组件 -->
     <ucharts :option="pieOption" :height="250" />
 </template>
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
-import useBasisStore from '@/store/basis.store';
+import { useAircraftStore } from '@/store/aircarft.store';
 import dayjs from 'dayjs';
 
-const store = useBasisStore();
+const aircraftStore = useAircraftStore();
 
 const pieOption = computed(() => {
     const today = dayjs().startOf('day');
     const stat: Record<string, number> = {}
     let all = 0;
-    for (let aircraft of store.getAircraftsArr) {
+    for (let aircraft of aircraftStore.getArr) {
         const startDate = dayjs(aircraft.startDate || -1).startOf('day');
         const endDate = dayjs(aircraft.endDate).startOf('day');
         if (!aircraft.endDate || (startDate.isBefore(today) && endDate.isAfter(today))) {
@@ -76,7 +76,7 @@ const pieOption = computed(() => {
 
 // 初始化时获取数据
 onMounted(() => {
-    store.fetchAircrafts();
+    aircraftStore.fetchAircrafts();
 });
 
 </script>

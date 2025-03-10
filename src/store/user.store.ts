@@ -4,7 +4,7 @@ import api from '@/utils/api';
 import CONFIG from '@/config';
 import { PilotItem, UserItem } from '@/interface';
 
-export default defineStore('user', () => {
+export const useUserStore = defineStore('user', () => {
     const isLoading = { staff: false, pilot: false };
     const staff = ref<Record<string, UserItem>>({});
     const pilots = ref<Record<string, PilotItem>>({});
@@ -12,7 +12,7 @@ export default defineStore('user', () => {
     const token = ref('');
 
     const getToken = computed(() => token.value);
-    
+
     const getStaffObj = computed(() => staff.value);
     const getStaffByName = computed(() => {
         const userObj = staff.value;

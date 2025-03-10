@@ -37,7 +37,7 @@ import eventsVue from '@/pages/sms/events.vue';
 import voluntarysVue from '@/pages/sms/voluntarys.vue';
 import Profile from '@/pages/hr/profile.vue';
 import color from '@/css/color';
-import useUserStore from '@/store/user.store';
+import {useUserStore} from '@/store/user.store';
 const store = useUserStore();
 // 定义 loading 和 error 状态
 const loading = ref(false);

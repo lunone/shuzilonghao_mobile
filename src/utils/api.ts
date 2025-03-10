@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
-import useUserStore from '@/store/user.store';
+import {useUserStore} from '@/store/user.store';
 import CONFIG from '@/config';
 
 const store = useUserStore();

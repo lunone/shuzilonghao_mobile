@@ -43,11 +43,10 @@ import api from '@/utils/api';
 import { computed, Ref, ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import dayjs from 'dayjs';
-import userStore from '@/store/user.store';
-import useBasisStore from '@/store/basis.store';
-const store = userStore();
-const basisStore = useBasisStore();
-// const city = basisStore.city;
+import { useUserStore } from '@/store/user.store';
+import { useAirportStore } from '@/store/airport.store';
+const store = useUserStore();
+const airportStore = useAirportStore();
 const userId = ref('');
 const pilot = ref({}) as Ref<Record<string, any>>;
 const startDate = dayjs()
@@ -105,8 +104,8 @@ function showDetail(day: { name: string, className: string, data: any }) {
             icon: 'none', duration: 2e3,
             title: day.data.map((d: any) => {
                 const time = `${dayjs(d.atd || d.std).format('HH:mm')}-${dayjs(d.ata || d.sta).format('HH:mm')}`;
-                const dep = basisStore.getCity(d.dep);
-                const arr = basisStore.getCity(d.arr);
+                const dep = airportStore.getCity(d.dep);
+                const arr = airportStore.getCity(d.arr);
                 return `${d.flightNo}(${time})${dep} - ${arr}`
             }).join('|')
         })
@@ -118,7 +117,7 @@ onLoad(e => {
     const userData = { userId: e.code, idType: 'code' }
     const dateData = { startDate: startDate.toDate(), endDate: endDate.toDate() }
     Promise.allSettled([
-        store.fetchPilots(), basisStore.fetchAirports(),
+        store.fetchPilots(), airportStore.fetchAirports(),
         api(CONFIG.url.pilotProfile, userData).then(res => pilot.value = res || {}),
         api(CONFIG.url.pilotTraining, { code: e.code, ...dateData }).then(res => trainings.value = res || []),
         api(CONFIG.url.pilotDuty, { ...userData, ...dateData }).then(res => duties.value = res || []),

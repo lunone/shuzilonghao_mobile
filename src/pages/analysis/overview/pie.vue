@@ -13,7 +13,7 @@
 <script lang="ts" setup>
 import { onMounted, PropType, ref } from 'vue'
 import ucharts from '@/components/ucharts/ucharts.vue';
-import usebasisStore from '@/store/basis.store';
+import {useAirportStore} from '@/store/airport.store';
 import { AirportItem } from '@/interface';
 
 // 定义组件props
@@ -25,7 +25,7 @@ const props = defineProps({
 // 定义 airports 数据，用于存储机场信息
 const airports = ref<Record<string, AirportItem>>({});
 
-const store = usebasisStore();
+const airportStore = useAirportStore();
 
 // 定义 loading 和 error 状态
 const loading = ref(false);
@@ -44,7 +44,7 @@ const fetchAirports = async () => {
     loading.value = true;
     error.value = '';
     try {
-        const res = store.getAirportsCode4;
+        const res = airportStore.getCode4;
         airports.value = res;
         pieOption.value = getOption();
     } catch (err) {

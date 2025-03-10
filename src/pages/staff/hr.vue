@@ -28,9 +28,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
-import useUserStore from '@/store/user.store';
+import {useUserStore} from '@/store/user.store';
 import useDepartmentStore from '@/store/department.store';
-// import { collectDescendantIds } from '@/utils/tools';
 const userStore = useUserStore();
 const departmentStore = useDepartmentStore();
 const stat = computed(() => {

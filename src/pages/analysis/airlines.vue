@@ -3,12 +3,12 @@
     <press-calendar />
     <div v-if="loading" class="loading">加载中...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
-    <div  >
+    <div>
 
         <div class="button-group">
             <span class="btn" :class="currentStation == code4 ? `hover` : ``" v-for="code4 in stations" :key="code4"
                 @click="stationClick(code4)">
-                {{ code4City(code4) }}
+                {{ getCity(code4) }}
             </span>
         </div>
         <div class="way">
@@ -19,7 +19,7 @@
 
         <div class="airlines">
             <airline v-for="(stats, code4) in filterStation" :key="code4" :stats="stats"
-                :dep="code4City(isDep ? currentStation : code4)" :arr="code4City(!isDep ? currentStation : code4)" />
+                :dep="getCity(isDep ? currentStation : code4)" :arr="getCity(!isDep ? currentStation : code4)" />
         </div>
 
     </div>
@@ -28,29 +28,28 @@
 import { ref, computed, watch, Ref, onMounted } from 'vue';
 import CONFIG from '@/config';
 import api from '@/utils/api';
-import basisStore from '@/store/basis.store';
-import { AirportItem, statItem } from '@/interface';
+import { useAirportStore } from '@/store/airport.store';
+import { statItem } from '@/interface';
 import dayjs from 'dayjs';
 import airline from './airline/airline.vue';
 import zlDateRangePicker from '@/components/zl/dateRangePicker.vue';
-const store = basisStore();
+const airportStore = useAirportStore();
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');
 
 
+const currentStation = ref('');
 // ZHCC-ZHYC:{'B220M':{avgNEtcargo:number……}}
 type Res = Record<string, Record<string, statItem>>
 const isDep: Ref<boolean> = ref(false);
 const airlineStats = ref({}) as Ref<Res>;
-const airports = ref({}) as Ref<Record<string, AirportItem>>;
 
 const dateRange = ref([
     dayjs().add(-11, 'day').toDate(),
     dayjs().add(-1, 'day').endOf('day').toDate()
 ]) as Ref<[Date, Date]>;
-const code4City = (code4: string) => airports.value[code4]?.city || code4;
-const currentStation = ref('');
+const getCity = code => airportStore.getCity(code, 'city');
 const stationClick = (name: string) => currentStation.value = name;
 const stations = computed(() => {
     if (!airlineStats.value) return [];
@@ -73,7 +72,7 @@ const fetchData = async (startDate: Date, endDate: Date) => {
     error.value = '';
     try {
         const res = await api(CONFIG.url.statByAirline, { startDate, endDate }) as Res;
-        airports.value = await store.fetchAirports();
+        // airports.value = await 
         console.log('统计', res);
         airlineStats.value = res;
         stationClick(stations.value[0]);
@@ -87,6 +86,7 @@ const fetchData = async (startDate: Date, endDate: Date) => {
 watch(() => dateRange.value, () => {
     const [startDate, endDate] = dateRange.value
     fetchData(startDate, endDate);
+    airportStore.fetchAirports();
 }, { immediate: true, deep: true })
 
 </script>

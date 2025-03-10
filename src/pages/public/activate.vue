@@ -14,9 +14,9 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import api from '@/utils/api';
-import userStore from '@/store/user.store';
+import {useUserStore} from '@/store/user.store';
 import CONFIG from '@/config';
-const store = userStore();
+const store = useUserStore();
 const disable = ref(false);
 const activationCode = ref('');
 const activate = async () => {

@@ -48,14 +48,14 @@
 <script lang="ts" setup>
 import dayjs from 'dayjs';
 import { inject, onMounted, watch } from 'vue';
-import useBasisStore from '@/store/basis.store';
-const basisStore = useBasisStore();
+import {useAirportStore} from '@/store/airport.store';
+const airportStore = useAirportStore();
 const props = defineProps<{ data: Record<string, any> }>();
 // 拨打电话的方法
 const showProfile = inject('showProfile') as Function;
-const getCity = basisStore.getCity;
+const getCity = airportStore.getCity;
 onMounted(() => {
-    basisStore.fetchAirports();
+    airportStore.fetchAirports();
 });
 </script>
 <style lang="less" scoped>

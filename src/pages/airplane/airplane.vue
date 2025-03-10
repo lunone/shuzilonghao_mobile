@@ -41,12 +41,12 @@ import { watch, ref, computed, onMounted, reactive, Ref } from 'vue';
 import dayjs from 'dayjs';
 
 import { AircraftItem } from '@/interface';
-import usebasisStore from '@/store/basis.store';
+import { useAircraftStore } from '@/store/aircarft.store';
 import AcSummaryVue from './summary.vue';
 import MelCardVue from '../maintenance/mel/card.vue';
 import detail from './detail.vue';
 
-const store = usebasisStore();
+const aircraftStore = useAircraftStore();
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');
@@ -79,7 +79,7 @@ const aircraftSorted = computed(() => {
         retired: { name: '退役', aircrafts: [] },
         introduced: { name: '引进中', aircrafts: [] },
     };
-    for (let aircraft of Object.values(store.getAircraftsArr)) {
+    for (let aircraft of aircraftStore.getArr) {
         const startDate = dayjs(aircraft.startDate || -1).startOf('day');
         const endDate = dayjs(aircraft.endDate).startOf('day');
         if (!aircraft.endDate || (startDate.isBefore(today) && endDate.isAfter(today))) {
@@ -104,7 +104,7 @@ const acRegMelUpdate = (acRegMel: any[]) => {
 }
 // 初始化时获取数据
 onMounted(async () => {// 加载完成默认第一个按钮显示
-    store.fetchAircrafts().then(() => showInfo(aircraftSorted.value[activeTab.value].aircrafts[0]));
+    aircraftStore.fetchAircrafts().then(() => showInfo(aircraftSorted.value[activeTab.value].aircrafts[0]));
 });
 
 

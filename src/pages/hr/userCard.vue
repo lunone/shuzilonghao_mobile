@@ -22,7 +22,7 @@
 import { ref, computed, onMounted, Ref, watch } from 'vue';
 import Profile from '@/pages/hr/profile.vue';
 import { UserItem } from '@/interface';
-import useUserStore from '@/store/user.store';
+import {useUserStore} from '@/store/user.store';
 
 const store = useUserStore();
 const props = defineProps({
