@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import api from '@/utils/api';
 import CONFIG from '@/config';
-import { DepartmenItem, ListNode, PilotItem, UserItem } from '@/interface';
+import { PilotItem, UserItem } from '@/interface';
 
 
 export default defineStore('user', {
@@ -15,18 +15,17 @@ export default defineStore('user', {
     getters: {
         staffObj: (state) => state.staff,
         getToken: (state) => {
-            // 可以在此添加验证逻辑或自动续期检查
             return state.token
         },
         // 按name为key的所有用户对象
         staffByName: (state): Record<string, UserItem> => {
             const userObj = state.staff;
-            const nameToUserId = {}
+            const staffByName = {}
             for (let userId in userObj) {
                 const name = userObj[userId].name;
-                nameToUserId[name] = userObj[userId];
+                staffByName[name] = userObj[userId];
             }
-            return nameToUserId;
+            return staffByName;
         },
 
     },
@@ -63,8 +62,8 @@ export default defineStore('user', {
             this.isLoading.pilot = true;
             if (!Object.keys(this.pilots).length) {
                 const res = await api(CONFIG.url.pilots) as Record<string, PilotItem>;
-                this.isLoading.pilot = false;
                 this.pilots = Object.keys(res).length ? res : {};
+                this.isLoading.pilot = false;
             }
         },
 
