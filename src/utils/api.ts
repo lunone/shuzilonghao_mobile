@@ -42,7 +42,7 @@ const instance = axios.create(option)
 
 const beforeRequest = async (config) => {
     // todo:判断白名单
-    config.headers[CONFIG.key.token] = store.getToken();
+    config.headers[CONFIG.key.token] = store.getToken;
     return config
 }
 // 请求拦截器
@@ -104,7 +104,7 @@ instance.interceptors.response.use(response => {
 instance.interceptors.response.use((response: AxiosResponse) => {
     const { token, code, status } = response?.data || {};
     if (token) {// 返回如过携带了token,就是要更新token了.
-        store.getToken(token);
+        store.setToken(token);
         notLoginQweue.forEach(f => f());// 新token重试积压请求
         notLoginQweue = []; // 清空队列
         isRefreshing = false;

@@ -47,13 +47,13 @@
         </div>
     </div>
 </template>
-
 <script setup lang="ts">
 import { computed, onMounted, Ref, ref, watch } from 'vue';
 import CONFIG from '@/config';
 import api from '@/utils/api';
 import { UserItem } from '@/interface';
 import useUserStore from '@/store/user.store';
+import useDepartmentStore from '@/store/department.store';
 import Salary from './profile/salary.vue';
 import experienceVue from './profile/experience.vue';
 import dutyVue from './profile/duty.vue';
@@ -62,20 +62,20 @@ import education from './profile/education.vue';
 import { call } from '@/utils/tools';
 import Performance from './profile/performance.vue';
 import Contract from './profile/contract.vue';
-const store = useUserStore();
-
+const userStore = useUserStore();
+const departmentStore = useDepartmentStore();
 const props = defineProps({
     userId: { type: String, default: '' }
 });
 
 const employee: Ref<UserItem> = ref();
-const depName = computed(() => store.departmentPath(+employee.value?.department));
+const depName = computed(() => departmentStore.departmentPath(+employee.value?.department));
 const fetchEmployee = async () => {
     employee.value = await api(CONFIG.url.userProfile, { userId: props.userId });
 };
 
 
-const name = computed(() => employee.value?.name || store.staff[props.userId]?.name || '');
+const name = computed(() => employee.value?.name || userStore.staffObj[props.userId]?.name || '');
 const current = ref(0);
 const onClickkv = (e) => {
     if (current != e.currentIndex) {
@@ -83,18 +83,11 @@ const onClickkv = (e) => {
     }
 }
 onMounted(async () => {
-    store.getDepartments();
+    departmentStore.getDepartments();
     fetchEmployee();
 });
-interface Department {
-    id: string | number;
-    parentId?: string | number | null;
-    name: string;
-}
-
 
 </script>
-
 <style lang="less" scoped>
 @import "@/css/base.less";
 @import "@/css/kv.less";

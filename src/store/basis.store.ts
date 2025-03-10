@@ -8,7 +8,7 @@ export default defineStore('basis', {
     state: () => ({
         isLoding: { airport: false, aircraft: false },
         airportsCode4: {} as Record<string, AirportItem>,
-        aircraftsArr: {} as AircraftItem[],
+        aircraftsArr: [] as AircraftItem[],
     }),
     getters: {
         airportsCode3: (state) => {
@@ -36,7 +36,7 @@ export default defineStore('basis', {
     actions: {
         async getAirports() {
             if (this.isLoding.airport) return;
-            if (!this.airportsCode4['ZHCC']) {
+            if (!this?.airportsCode4['ZHCC']) {
                 const res = await api(CONFIG.url.airports) as Record<string, AirportItem>;
                 this.airportsCode4 = res;
             }

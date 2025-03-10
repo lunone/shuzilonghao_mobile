@@ -14,9 +14,9 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import api from '@/utils/api';
-import usebasisStore from '@/store/user.store';
+import userStore from '@/store/user.store';
 import CONFIG from '@/config';
-const store = usebasisStore();
+const store = userStore();
 const disable = ref(false);
 const activationCode = ref('');
 const activate = async () => {
@@ -31,7 +31,7 @@ const activate = async () => {
         console.log('激活结果', res);
         // 激活成功返回token
         if (res) {
-            store.getToken(res);
+            store.setToken(res);
             // 跳转到首页
             uni.redirectTo({ url: '/pages/index?activate=true' });
         } else {

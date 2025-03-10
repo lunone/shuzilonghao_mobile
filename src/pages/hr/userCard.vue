@@ -61,7 +61,7 @@ const toggleProfile = () => {
 
 watch([() => props.userId, () => props.error, () => store.staff], async () => {
     // 订阅store.staff变化
-    const users = store.staff;
+    const users = store.staffObj;
     // 优先id的name,如果没有就是props.name,最后实在不行就是工号
     userName.value = users[props.userId]?.name || props.error || props.userId || '未知';
     if (users[props.userId]) {
