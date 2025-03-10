@@ -14,7 +14,7 @@ import { computed, onMounted, PropType, Ref, ref, watch } from 'vue';
 
 const props = defineProps({
     startDate: { type: Date, default: () => dayjs().toDate() },
-    endDate: { type: Date, default: () => dayjs().add(15, 'day').toDate() },
+    endDate: { type: Date, default: () => dayjs().add(14, 'day').toDate() },
     pcode: { type: String, default: '' },
 });
 const trainings = ref([]) as Ref<{ name: string, startDate: Date, endDate: Date, baseName: string }[]>;
@@ -27,7 +27,8 @@ const airportStore = useAirportStore();
 const days = computed(() => {
     const arr = [];
     const startDate = dayjs(props.startDate);
-    const dayLength = startDate.diff(props.endDate, 'day');
+    const dayLength = dayjs(props.endDate).diff(startDate, 'day');
+    // console.log('00000000000', dayLength);
     for (let i = 0; i < dayLength; i++) {
         const day = startDate.add(i, 'day').add(1, 'hour');// 加1小时是因为防止边界判断
         let className = '', index = day.format('DD'), name = index;
