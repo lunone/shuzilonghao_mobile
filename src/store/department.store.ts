@@ -10,6 +10,7 @@ export default defineStore('user', {
         departments: [] as DepartmenItem[],
     }),
     getters: {
+        // 获取部门树
         departmentsTree: (state): ListNode[] => {
             const deptMap = new Map<string | number, ListNode>();
             const tree: ListNode[] = [];
@@ -32,6 +33,7 @@ export default defineStore('user', {
 
             return tree;
         },
+        // 获取部门子节点id
         departmentSubIds: function (state) {
             return function (targetName: string): (string | number)[] {
                 const deptMap = new Map<string | number, ListNode>();  // 创建部门映射表
@@ -72,6 +74,7 @@ export default defineStore('user', {
                 return Array.from(result);
             };
         },
+        // 获取部门路径
         departmentPath: function (state) {
             return function (targetId: string | number, str: string = '/'): string {
                 if (!targetId) return '';
@@ -101,8 +104,10 @@ export default defineStore('user', {
     actions: {
         async getDepartments() {
             if (this.isLoading.department) return;
+            this.isLoading.department = true;
             if (!this.departments.length) {
                 const res = await api(CONFIG.url.departments) as Record<string, UserItem>;
+                this.isLoading.department = false;
                 this.departments = res.length ? res : [];
             }
         },

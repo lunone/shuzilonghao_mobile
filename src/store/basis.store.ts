@@ -13,15 +13,15 @@ export default defineStore('basis', {
     getters: {
         airportsCode3: (state) => {
             const airportsCode4 = state.airportsCode4;
-            const code3 = {}
+            const airportsCode3 = {}
             for (const code4 in airportsCode4) {
                 if (airportsCode4[code4].code3) {
-                    code3[airportsCode4[code4].code3] = airportsCode4[code4];
+                    airportsCode3[airportsCode4[code4].code3] = airportsCode4[code4];
                 }
             }
-            return code3;
+            return airportsCode3;
         },
-        airports: (state) => state.airportsCode4,
+        // airports: (state) => state.airportsCode4,
         city: function (state) {
             const that = this;
             return function (code: string, type: string = 'abbr'): string {
@@ -36,14 +36,17 @@ export default defineStore('basis', {
     actions: {
         async getAirports() {
             if (this.isLoding.airport) return;
+            this.isLoding.airport = true;
             if (!this?.airportsCode4['ZHCC']) {
                 const res = await api(CONFIG.url.airports) as Record<string, AirportItem>;
                 this.airportsCode4 = res;
+                this.isLoding.airport = false;
             }
         },
 
         async getAircrafts() {
             if (this.isLoding.aircraft) return;
+            this.isLoding.aircraft = true;
             if (!this.aircraftsArr.length) {
                 const res = await api(CONFIG.url.aircrafts) as AircraftItem[];
                 const acTypeShortTranslate: Record<string, string> = {
@@ -55,6 +58,7 @@ export default defineStore('basis', {
                     aircraft.acTypeLong = acTypeShortTranslate[aircraft.acTypeLong] || aircraft.acType;
                 })
                 this.aircraftsArr = res;
+                this.isLoding.aircraft = false;
             }
         },
     }

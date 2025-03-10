@@ -6,7 +6,7 @@ import { DepartmenItem, ListNode, PilotItem, UserItem } from '@/interface';
 
 export default defineStore('department', {
     state: () => ({
-        isLoading: { staff: false, pilot: false, department: false },
+        isLoading: { staff: false, pilot: false },
         staff: {} as Record<string, UserItem>,
         pilots: {} as Record<string, PilotItem>,
         self: {} as UserItem,
@@ -18,6 +18,7 @@ export default defineStore('department', {
             // 可以在此添加验证逻辑或自动续期检查
             return state.token
         },
+        // 按name为key的所有用户对象
         staffByName: (state): Record<string, UserItem> => {
             const userObj = state.staff;
             const nameToUserId = {}
@@ -27,27 +28,24 @@ export default defineStore('department', {
             }
             return nameToUserId;
         },
-       
+
     },
     actions: {
         setToken(token?: string) {
             if (token) {
                 this.token = token;
             }
-            return this.token;
         },
         async getMyself(refresh = false) {
-            // if (refresh) {
             const mySelf = await api(CONFIG.url.init) as UserItem;
             if (mySelf?.id) {
                 this.self = mySelf;
             }
-            // }
             return this.self;
         },
         async getStaff(): Promise<Record<string, UserItem>> {
             if (this.isLoading.staff) return
-            this.isStaffFatching = true;
+            this.isLoading.staff = true;
             if (!Object.keys(this.staff).length) {
                 const res = await api(CONFIG.url.staff) as UserItem[];
                 const obj = {}
@@ -56,15 +54,16 @@ export default defineStore('department', {
                         obj[user.userId] = user
                     }
                 }
-                this.isStaffFatching = false;
+                this.isLoading.staff = false;
                 this.staff = obj;
             }
         },
         async getPilots(): Promise<Record<string, PilotItem>> {
             if (this.isLoading.pilot) return;
+            this.isLoading.pilot = true;
             if (!Object.keys(this.pilots).length) {
                 const res = await api(CONFIG.url.pilots) as Record<string, PilotItem>;
-                this.isPilotsFatching = false;
+                this.isLoading.pilot = false;
                 this.pilots = Object.keys(res).length ? res : {};
             }
         },
