@@ -6,7 +6,7 @@ import CONFIG from '@/config';
 import { AircraftItem, AirportItem } from '@/interface';
 
 export const useAircraftStore = defineStore('aircraft', () => {
-    const isLoding = { airport: false, aircraft: false };
+    const isLoding = {   aircraft: false };
     const getAircraftsArr = ref<AircraftItem[]>([]);
 
  

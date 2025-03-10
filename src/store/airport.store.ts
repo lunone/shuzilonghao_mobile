@@ -6,7 +6,7 @@ import CONFIG from '@/config';
 import { AircraftItem, AirportItem } from '@/interface';
 
 export const useAirportStore = defineStore('airport', () => {
-    const isLoding = { airport: false, aircraft: false };
+    const isLoding = { airport: false  };
     const airportsCode4 = ref<Record<string, AirportItem>>({});
 
     const getCode3 = computed(() => {
