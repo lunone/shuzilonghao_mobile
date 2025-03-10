@@ -1,71 +1,70 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import api from '@/utils/api';
-import CONFIG from '@/config';
-import { DepartmenItem, ListNode, PilotItem, UserItem } from '@/interface';
+import api from '@/utils/api'; // 导入API工具函数
+import CONFIG from '@/config'; // 导入配置文件
+import { DepartmenItem, ListNode, PilotItem, UserItem } from '@/interface'; // 导入接口定义
 
+// 定义部门存储模块
 export const useDepartmentStore = defineStore('department', () => {
+    // 加载状态
     const isLoading = { department: false };
+
+    // 部门列表，使用ref进行响应式管理
     const departments = ref<DepartmenItem[]>([]);
+
+    // 创建部门ID到部门对象的映射
+    const getDeptMap = computed(() => new Map(departments.value.map(dept => [dept.id, dept])));
+
+    // 创建父ID到子部门列表的映射
+    const getChildMap = computed(() => {
+        const map = new Map<string | number, DepartmenItem[]>();
+        departments.value.forEach(dept => {
+            const parentKey = dept.parentId ?? 'root'; // 如果没有parentId则设为'root'
+            if (!map.has(parentKey)) map.set(parentKey, []);
+            map.get(parentKey)!.push(dept);
+        });
+        return map;
+    });
+
+    // 获取部门列表
     const getList = computed(() => departments.value);
+
+    // 构建部门树结构
     const getTree = computed(() => {
-        const deptMap = new Map<string | number, ListNode>();
         const tree: ListNode[] = [];
-        const departmentsValue = departments.value;
+        const childMap = getChildMap.value;
 
-        // 初始化deptMap
-        departmentsValue.forEach(dept => {
-            dept['children'] = []; // 初始化子节点数组
-            deptMap.set(dept.id, dept);
-        });
+        // 递归构建树节点
+        const buildTree = (node: DepartmenItem, parentArray: ListNode[]) => {
+            const treeNode = { ...node, children: [] };
+            parentArray.push(treeNode);
+            (childMap.get(node.id) || []).forEach(child => buildTree(child, treeNode.children));
+        };
 
-        // 构建树形结构
-        departmentsValue.forEach(dept => {
-            if (dept.parentId !== null && deptMap.has(dept.parentId)) {
-                const parent = deptMap.get(dept.parentId)!;
-                parent.children.push(dept);
-            } else {
-                tree.push(dept); // 如果没有parentId或找不到父节点，则为根节点
-            }
-        });
-
+        // 从根节点开始构建树
+        (childMap.get('root') || []).forEach(root => buildTree(root, tree));
         return tree;
     });
 
+    // 获取目标名称的所有子部门ID
     const getSubIds = computed(() => {
         return (targetName: string): (string | number)[] => {
-            const deptMap = new Map<string | number, ListNode>();  // 创建部门映射表
-            const childMap = new Map<string | number, ListNode[]>();  // 父子关系映射
-
-            // 初始化映射关系
-            departments.value.forEach(dept => {
-                deptMap.set(dept.id, dept);
-                if (!childMap.has(dept.parentId)) {
-                    childMap.set(dept.parentId, []);
-                }
-                childMap.get(dept.parentId)!.push(dept);
-            });
-
+            const deptMap = getDeptMap.value;
+            const childMap = getChildMap.value;
             const result = new Set<string | number>();
-
-            // 广度优先遍历
             const queue: (string | number)[] = [];
 
-            // 先找到所有匹配名称的根节点
+            // 将匹配的目标名称部门ID加入队列
             departments.value
                 .filter(dept => dept.name === targetName)
                 .forEach(dept => queue.push(dept.id));
 
+            // 广度优先搜索获取所有子部门ID
             while (queue.length > 0) {
                 const currentId = queue.shift()!;
                 result.add(currentId);
-
-                // 获取当前节点的直接子节点
-                const children = childMap.get(currentId) || [];
-                children.forEach(child => {
-                    if (!result.has(child.id)) {
-                        queue.push(child.id);
-                    }
+                (childMap.get(currentId) || []).forEach(child => {
+                    if (!result.has(child.id)) queue.push(child.id);
                 });
             }
 
@@ -73,41 +72,43 @@ export const useDepartmentStore = defineStore('department', () => {
         };
     });
 
+    // 获取目标ID的路径
     const getPath = computed(() => {
         return (targetId: string | number, str: string = '/'): string => {
             if (!targetId) return '';
-            // 创建哈希映射提升查询效率
-            const deptMap = new Map<string | number, ListNode>();
-            const departmentsValue = departments.value;
-            departmentsValue.forEach(dept => deptMap.set(dept.id, dept));
-
+            const deptMap = getDeptMap.value;
             const path: string[] = [];
             let currentId: string | number | undefined = targetId;
-            const visited = new Set<string | number>(); // 防止循环引用
-            while (currentId && deptMap.has(currentId)) {
-                if (visited.has(currentId)) break; // 检测到循环立即终止
+            const visited = new Set<string | number>();
+
+            // 追溯部门路径
+            while (currentId && deptMap.has(currentId as number)) {
+                if (visited.has(currentId)) break; // 防止循环引用
                 visited.add(currentId);
 
-                const currentDept = deptMap.get(currentId)!;
-                path.unshift(currentDept.name); // 从头部插入保证层级顺序
-
-                currentId = currentDept.parentId;
+                const currentDept = deptMap.get(currentId as number)!;
+                path.unshift(currentDept.name); // 将当前部门名添加到路径开头
+                currentId = currentDept.parentId; // 移动到父部门
             }
-            // 因为root是中原龙浩,所以得裁掉一段
-            return path.slice(1).join(str);
+
+            return path.slice(1).join(str); // 返回路径字符串
         };
     });
 
+    // 异步获取部门数据
     const fetchDepartments = async () => {
-        if (isLoading.department) return;
-        isLoading.department = true;
+        if (isLoading.department) return; // 如果正在加载则直接返回
+        isLoading.department = true; // 标记为正在加载
+
         if (!departments.value.length) {
             const res = await api(CONFIG.url.departments) as DepartmenItem[];
-            departments.value = res.length ? res : [];
+            departments.value = res.length ? res : []; // 更新部门列表
         }
-        isLoading.department = false;
+
+        isLoading.department = false; // 加载完成
     };
 
+    // 返回公共方法和属性
     return {
         getList,
         getTree,
