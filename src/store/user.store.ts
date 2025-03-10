@@ -4,7 +4,7 @@ import CONFIG from '@/config';
 import { DepartmenItem, ListNode, PilotItem, UserItem } from '@/interface';
 
 
-export default defineStore('department', {
+export default defineStore('user', {
     state: () => ({
         isLoading: { staff: false, pilot: false },
         staff: {} as Record<string, UserItem>,
