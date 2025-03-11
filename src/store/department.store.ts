@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import api from '@/utils/api'; // 导入API工具函数
 import CONFIG from '@/config'; // 导入配置文件
-import { DepartmenItem, ListNode, PilotItem, UserItem } from '@/interface'; // 导入接口定义
+import { DepartmenItem, ListNode } from '@/interface'; // 导入接口定义
 
 // 定义部门存储模块
 export const useDepartmentStore = defineStore('department', () => {
@@ -25,9 +25,6 @@ export const useDepartmentStore = defineStore('department', () => {
         });
         return map;
     });
-
-    // 获取部门列表
-    const list = computed(() => departments.value);
 
     // 构建部门树结构
     const tree = computed(() => {
@@ -105,7 +102,7 @@ export const useDepartmentStore = defineStore('department', () => {
 
     // 返回公共方法和属性
     return {
-        list,
+        list: computed(() => departments.value),
         tree,
         getSubIds,
         getPath,

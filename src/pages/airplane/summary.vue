@@ -20,7 +20,7 @@ const pieOption = computed(() => {
     const today = dayjs().startOf('day');
     const stat: Record<string, number> = {}
     let all = 0;
-    for (let aircraft of aircarftStore.aircraftArr) {
+    for (let aircraft of aircarftStore.arr) {
         const startDate = dayjs(aircraft.startDate || -1).startOf('day');
         const endDate = dayjs(aircraft.endDate).startOf('day');
         if (!aircraft.endDate || (startDate.isBefore(today) && endDate.isAfter(today))) {

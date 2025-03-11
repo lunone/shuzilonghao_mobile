@@ -25,8 +25,8 @@ const store = useAircraftStore();
 const stat = computed(() => {// todo:页面变更飞机变0
     const today = dayjs().startOf('day');
     const stat: Record<string, number> = {}
-    if (!store.aircraftArr.length) return stat;
-    for (let aircraft of store.aircraftArr) {
+    if (!store.arr.length) return stat;
+    for (let aircraft of store.arr) {
         const startDate = dayjs(aircraft.startDate || -1).startOf('day');
         const endDate = dayjs(aircraft.endDate).startOf('day');
         if (!aircraft.endDate || (startDate.isBefore(today) && endDate.isAfter(today))) {

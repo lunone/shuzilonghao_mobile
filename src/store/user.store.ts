@@ -25,7 +25,7 @@ export const useUserStore = defineStore('user', () => {
             return Object.values(staff.value).find(user => user.name === userId) || {} as UserItem;
         }
     });
-    
+
     const myself = async (refresh = false) => {
         const mySelf = await api(CONFIG.url.init) as UserItem;
         if (mySelf?.id) {
@@ -61,11 +61,10 @@ export const useUserStore = defineStore('user', () => {
     };
 
     return {
-        self,
         staffObj,
-        pilots,
+        pilots: computed(() => pilots.value),
+        token: computed(() => token.value),
         myself,
-        token,
         getStaff,
         setToken,
         fetchPilots,
