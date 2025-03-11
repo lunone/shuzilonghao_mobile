@@ -6,7 +6,7 @@ import CONFIG from '@/config';
 import { AircraftItem, AirportItem } from '@/interface';
 
 export const useAircraftStore = defineStore('aircraft', () => {
-    const isLoding = { aircraft: false };
+    const isLoading = { aircraft: false };
     const aircraftsArr = ref<AircraftItem[]>([]);
 
 
@@ -18,8 +18,8 @@ export const useAircraftStore = defineStore('aircraft', () => {
     const aircraftArr = computed(() => aircraftsArr.value);
 
     const fetchAircrafts = async () => {
-        if (isLoding.aircraft) return;
-        isLoding.aircraft = true;
+        if (isLoading.aircraft) return;
+        isLoading.aircraft = true;
         if (!aircraftsArr.value.length) {
             const res = await api(CONFIG.url.aircrafts) as AircraftItem[];
             const acTypeShortTranslate: Record<string, string> = {
@@ -32,7 +32,7 @@ export const useAircraftStore = defineStore('aircraft', () => {
             });
             aircraftsArr.value = res;
         }
-        isLoding.aircraft = false;
+        isLoading.aircraft = false;
     };
 
     return {

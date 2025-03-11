@@ -17,7 +17,7 @@
 </template>
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
-import { useAircraftStore } from '@/store/aircarft.store';
+import { useAircraftStore } from '@/store/aircraft.store';
 import dayjs from 'dayjs';
 
 const store = useAircraftStore();

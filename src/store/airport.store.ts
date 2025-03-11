@@ -6,7 +6,7 @@ import CONFIG from '@/config';
 import { AircraftItem, AirportItem } from '@/interface';
 
 export const useAirportStore = defineStore('airport', () => {
-    const isLoding = { airport: false };
+    const isLoading = { airport: false };
     const airportsCode4 = ref<Record<string, AirportItem>>({});
 
     const code3 = computed(() => {
@@ -30,13 +30,13 @@ export const useAirportStore = defineStore('airport', () => {
         };
     });
     const fetchAirports = async () => {
-        if (isLoding.airport) return;
-        isLoding.airport = true;
+        if (isLoading.airport) return;
+        isLoading.airport = true;
         if (!airportsCode4.value['ZHCC']) {
             const res = await api(CONFIG.url.airports) as Record<string, AirportItem>;
             airportsCode4.value = res;
         }
-        isLoding.airport = false;
+        isLoading.airport = false;
     };
 
 

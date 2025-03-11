@@ -41,7 +41,7 @@ import { watch, ref, computed, onMounted, reactive, Ref } from 'vue';
 import dayjs from 'dayjs';
 
 import { AircraftItem } from '@/interface';
-import { useAircraftStore } from '@/store/aircarft.store';
+import { useAircraftStore } from '@/store/aircraft.store';
 import AcSummaryVue from './summary.vue';
 import MelCardVue from '../maintenance/mel/card.vue';
 import detail from './detail.vue';

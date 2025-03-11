@@ -78,9 +78,6 @@ import { useUserStore } from '@/store/user.store';
 const userStore = useUserStore();
 type PilotStat = { rank: number, pcode: string, userId: string, name: string, totalFlightHours: number, avgFlightHours: number }
 
-// const props = defineProps({
-//     showMore: { type: Boolean, default: false }
-// })
 const emits = defineEmits(['showMore', 'select']);
 
 // 定义 loading 和 error 状态
@@ -97,16 +94,12 @@ function showPilotProfile(userId: string) {
     }
 }
 function jump(userId: string, code: string) {
-    // console.log('showDetail', showNormal.value)
     if (userId) {
         uni.navigateTo({ url: `/pages/pilot/portrait?userid=${userId}&pcode=${code}` });
     }
-    // showNormal.value = !showNormal.value;
-    // emits('showMore')
 }
 const data = ref([]) as Ref<PilotStat[]>;
 const dateRange = ref<[string, string]>([dayjs().format('YYYY'), dayjs().format('MM')]);
-// const dateStr = ref('');
 const first = ref({}) as Ref<PilotStat>;
 const second = ref({}) as Ref<PilotStat>;
 const third = ref({}) as Ref<PilotStat>;
@@ -130,7 +123,6 @@ function clac(num: number) {
         return
     }
     const old = dayjs(dateRange.value.join('-') + '-01');
-    // console.log('----', old.format('YYYY-MM-DD'), dayjs().diff(old, 'month'), dayjs().add(-1, 'year').diff(old, 'month'))
     // old 和当前月份的月差值不能小于0,也和一年前不能大于0
     if (num > 0 && dayjs().diff(old, 'month') < 1) {
         return
