@@ -27,13 +27,12 @@ export const useDepartmentStore = defineStore('department', () => {
     });
 
     // 获取部门列表
-    const getList = computed(() => departments.value);
+    const list = computed(() => departments.value);
 
     // 构建部门树结构
-    const getTree = computed(() => {
+    const tree = computed(() => {
         const tree: ListNode[] = [];
         const childMap = getChildMap.value;
-
         // 递归构建树节点
         const buildTree = (node: DepartmenItem, parentArray: ListNode[]) => {
             const treeNode = { ...node, children: [] };
@@ -47,52 +46,48 @@ export const useDepartmentStore = defineStore('department', () => {
     });
 
     // 获取目标名称的所有子部门ID
-    const getSubIds = computed(() => {
-        return (targetName: string): (string | number)[] => {
-            // const deptMap = getDeptMap.value;
-            const childMap = getChildMap.value;
-            const result = new Set<string | number>();
-            const queue: (string | number)[] = [];
+    const getSubIds = computed(() => (targetName: string): (string | number)[] => {
+        // const deptMap = getDeptMap.value;
+        const childMap = getChildMap.value;
+        const result = new Set<string | number>();
+        const queue: (string | number)[] = [];
 
-            // 将匹配的目标名称部门ID加入队列
-            departments.value
-                .filter(dept => dept.name === targetName)
-                .forEach(dept => queue.push(dept.id));
+        // 将匹配的目标名称部门ID加入队列
+        departments.value
+            .filter(dept => dept.name === targetName)
+            .forEach(dept => queue.push(dept.id));
 
-            // 广度优先搜索获取所有子部门ID
-            while (queue.length > 0) {
-                const currentId = queue.shift()!;
-                result.add(currentId);
-                (childMap.get(currentId) || []).forEach(child => {
-                    if (!result.has(child.id)) queue.push(child.id);
-                });
-            }
+        // 广度优先搜索获取所有子部门ID
+        while (queue.length > 0) {
+            const currentId = queue.shift()!;
+            result.add(currentId);
+            (childMap.get(currentId) || []).forEach(child => {
+                if (!result.has(child.id)) queue.push(child.id);
+            });
+        }
 
-            return Array.from(result);
-        };
+        return Array.from(result);
     });
 
     // 获取目标ID的路径
-    const getPath = computed(() => {
-        return (targetId: string | number, str: string = '/'): string => {
-            if (!targetId) return '';
-            const deptMap = getDeptMap.value;
-            const path: string[] = [];
-            let currentId: string | number | undefined = targetId;
-            const visited = new Set<string | number>();
+    const getPath = computed(() => (targetId: string | number, str: string = '/'): string => {
+        if (!targetId) return '';
+        const deptMap = getDeptMap.value;
+        const path: string[] = [];
+        let currentId: string | number | undefined = targetId;
+        const visited = new Set<string | number>();
 
-            // 追溯部门路径
-            while (currentId && deptMap.has(currentId as number)) {
-                if (visited.has(currentId)) break; // 防止循环引用
-                visited.add(currentId);
+        // 追溯部门路径
+        while (currentId && deptMap.has(currentId as number)) {
+            if (visited.has(currentId)) break; // 防止循环引用
+            visited.add(currentId);
 
-                const currentDept = deptMap.get(currentId as number)!;
-                path.unshift(currentDept.name); // 将当前部门名添加到路径开头
-                currentId = currentDept.parentId; // 移动到父部门
-            }
+            const currentDept = deptMap.get(currentId as number)!;
+            path.unshift(currentDept.name); // 将当前部门名添加到路径开头
+            currentId = currentDept.parentId; // 移动到父部门
+        }
 
-            return path.slice(1).join(str); // 返回路径字符串
-        };
+        return path.slice(1).join(str); // 返回路径字符串
     });
 
     // 异步获取部门数据
@@ -110,8 +105,8 @@ export const useDepartmentStore = defineStore('department', () => {
 
     // 返回公共方法和属性
     return {
-        getList,
-        getTree,
+        list,
+        tree,
         getSubIds,
         getPath,
         fetchDepartments,

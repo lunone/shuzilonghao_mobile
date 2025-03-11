@@ -11,27 +11,22 @@ export const useUserStore = defineStore('user', () => {
     const self = ref({}) as Ref<UserItem>;
     const token = ref('');
 
-    const getToken = computed(() => token.value);
-
-    const getStaffObj = computed(() => staff.value);
-    const getStaffByName = computed(() => {
-        const userObj = staff.value;
-        const staffByName: Record<string, UserItem> = {};
-        for (let userId in userObj) {
-            const name = userObj[userId].name;
-            staffByName[name] = userObj[userId];
-        }
-        return staffByName;
-    });
-
-    const getPilots = computed(() => pilots.value);
+    const staffObj = computed(() => staff.value);
     const setToken = (newToken?: string) => {
         if (newToken) {
             token.value = newToken;
         }
     };
 
-    const getMyself = async (refresh = false) => {
+    const getStaff = computed(() => (userId: string, idType = 'userId'): UserItem => {
+        if (idType === 'userId') {
+            return staff.value[userId] || {} as UserItem;
+        } else if (idType === 'name') {
+            return Object.values(staff.value).find(user => user.name === userId) || {} as UserItem;
+        }
+    });
+    
+    const myself = async (refresh = false) => {
         const mySelf = await api(CONFIG.url.init) as UserItem;
         if (mySelf?.id) {
             self.value = mySelf;
@@ -67,12 +62,12 @@ export const useUserStore = defineStore('user', () => {
 
     return {
         self,
+        staffObj,
+        pilots,
+        myself,
+        token,
+        getStaff,
         setToken,
-        getStaffObj,
-        getToken,
-        getStaffByName,
-        getMyself,
-        getPilots,
         fetchPilots,
         fetchStaff,
     };

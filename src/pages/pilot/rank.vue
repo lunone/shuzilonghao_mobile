@@ -75,7 +75,7 @@ import api from '@/utils/api';
 import CONFIG from '@/config';
 import Profile from '@/pages/hr/profile.vue';
 import { useUserStore } from '@/store/user.store';
-const { fetchPilots, getPilots } = useUserStore();
+const { fetchPilots, pilots } = useUserStore();
 type PilotStat = { rank: number, pcode: string, userId: string, name: string, totalFlightHours: number, avgFlightHours: number }
 
 // const props = defineProps({
@@ -143,7 +143,7 @@ function clac(num: number) {
     dateRange.value = newDate.split('-') as [string, string];
 }
 function techName(userId: string) {
-    const pilots = getPilots;
+    // const pilots = getPilots;
     const pilot = pilots[userId];
     const techs = pilot?.techs;
 

@@ -46,7 +46,7 @@ import AcSummaryVue from './summary.vue';
 import MelCardVue from '../maintenance/mel/card.vue';
 import detail from './detail.vue';
 
-const { fetchAircrafts, getAircraftArr } = useAircraftStore();
+const aircarftStore = useAircraftStore();
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');
@@ -79,7 +79,7 @@ const aircraftSorted = computed(() => {
         retired: { name: '退役', aircrafts: [] },
         introduced: { name: '引进中', aircrafts: [] },
     };
-    for (let aircraft of getAircraftArr) {
+    for (let aircraft of aircarftStore.aircraftArr) {
         const startDate = dayjs(aircraft.startDate || -1).startOf('day');
         const endDate = dayjs(aircraft.endDate).startOf('day');
         if (!aircraft.endDate || (startDate.isBefore(today) && endDate.isAfter(today))) {
@@ -98,13 +98,13 @@ const aircraftSorted = computed(() => {
 
 
 const acRegMelUpdate = (acRegMel: any[]) => {
-    console.log('acRegMelUpdate', acRegMel);
+    // console.log('acRegMelUpdate', acRegMel);
     mels.value = acRegMel;
     console.warn('++++++++++++++++++mels', mels.value, acRegMel, mels.value?.length)
 }
 // 初始化时获取数据
 onMounted(async () => {// 加载完成默认第一个按钮显示
-    fetchAircrafts().then(() => showInfo(aircraftSorted.value[activeTab.value].aircrafts[0]));
+    aircarftStore.fetchAircrafts().then(() => showInfo(aircraftSorted.value[activeTab.value].aircrafts[0]));
 });
 
 

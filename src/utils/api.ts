@@ -42,7 +42,7 @@ const instance = axios.create(option)
 
 const beforeRequest = async (config) => {
     // todo:判断白名单
-    config.headers[CONFIG.key.token] = store.getToken;
+    config.headers[CONFIG.key.token] = store.token;
     return config
 }
 // 请求拦截器

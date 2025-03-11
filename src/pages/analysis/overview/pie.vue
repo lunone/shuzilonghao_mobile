@@ -44,7 +44,7 @@ const fetchAirports = async () => {
     loading.value = true;
     error.value = '';
     try {
-        const res = airportStore.getCode4;
+        const res = airportStore.code4;
         airports.value = res;
         pieOption.value = getOption();
     } catch (err) {

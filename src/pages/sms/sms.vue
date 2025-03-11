@@ -37,8 +37,8 @@ import eventsVue from '@/pages/sms/events.vue';
 import voluntarysVue from '@/pages/sms/voluntarys.vue';
 import Profile from '@/pages/hr/profile.vue';
 import color from '@/css/color';
-import {useUserStore} from '@/store/user.store';
-const store = useUserStore();
+import { useUserStore } from '@/store/user.store';
+const userStore = useUserStore();
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const showProfile = ref(false);
@@ -81,7 +81,7 @@ const loading2 = status => {
 
 provide("showProfile", (userName: string, type = 'name') => {
     console.log('显示人员信息', userName)
-    let userId = type == 'userId' ? userName : store.getStaffByName[userName]?.userId;
+    let userId = type == 'userId' ? userName : userStore.getStaff(userName, 'name')?.userId;
     if (userId) {
         showProfile.value = true;
         selectUserId.value = userId;

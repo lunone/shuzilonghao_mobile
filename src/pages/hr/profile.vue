@@ -9,7 +9,7 @@
                     {{ name }}({{ userId }})
                     <span class="status">{{ employee?.status == 2 ? '已离职' : '' }}</span>
                 </div>
-                <div class="ietm department">{{ getPath(+employee?.department) }}</div>
+                <div class="ietm department">{{ departmentStore.getPath(+employee?.department) }}</div>
                 <div class="kv position">
                     <div class="key">岗位</div>
                     <div class="value">{{ employee?.position }}</div>
@@ -63,7 +63,7 @@ import { call } from '@/utils/tools';
 import Performance from './profile/performance.vue';
 import Contract from './profile/contract.vue';
 const userStore = useUserStore();
-const { getPath, fetchDepartments } = useDepartmentStore();
+const departmentStore = useDepartmentStore();
 const props = defineProps({
     userId: { type: String, default: '' }
 });
@@ -75,7 +75,7 @@ const fetchEmployee = async () => {
 };
 
 
-const name = computed(() => employee.value?.name || userStore.getStaffObj[props.userId]?.name || '');
+const name = computed(() => employee.value?.name || userStore.staffObj[props.userId]?.name || '');
 const current = ref(0);
 const onClickkv = (e) => {
     if (current != e.currentIndex) {
@@ -83,7 +83,7 @@ const onClickkv = (e) => {
     }
 }
 onMounted(() => {
-    fetchDepartments();
+    departmentStore.fetchDepartments();
     fetchEmployee();
 });
 

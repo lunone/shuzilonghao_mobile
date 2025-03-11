@@ -11,11 +11,11 @@ export const useAircraftStore = defineStore('aircraft', () => {
 
 
 
-    const getAircraftsObj = computed(() => {
+    const aircraftsObj = computed(() => {
         return aircraftsArr.value.reduce((acc, cur) => ({ ...acc, [cur.acReg]: cur }), {});
     });
 
-    const getAircraftArr = computed(() => aircraftsArr.value);
+    const aircraftArr = computed(() => aircraftsArr.value);
 
     const fetchAircrafts = async () => {
         if (isLoding.aircraft) return;
@@ -36,8 +36,8 @@ export const useAircraftStore = defineStore('aircraft', () => {
     };
 
     return {
-        getAircraftArr,
-        getAircraftsObj,
+        aircraftArr,
+        aircraftsObj,
         fetchAircrafts,
     };
 });

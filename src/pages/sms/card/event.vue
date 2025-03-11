@@ -47,13 +47,13 @@
 </template>
 <script lang="ts" setup>
 import { inject, onMounted, watch } from 'vue';
-import { useAirportStore } from '@/store/airport.store';
-const { fetchAirports, getCity } = useAirportStore();
+import {useAirportStore} from '@/store/airport.store';
+const airportStore = useAirportStore();
 const props = defineProps<{ data: Record<string, any> }>();
 const showProfile = inject('showProfile') as Function;
-
+const getCity = airportStore.getCity;
 onMounted(() => {
-    fetchAirports();
+    airportStore.fetchAirports();
 });
 </script>
 <style lang="less" scoped>

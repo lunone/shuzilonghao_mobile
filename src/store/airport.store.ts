@@ -6,10 +6,10 @@ import CONFIG from '@/config';
 import { AircraftItem, AirportItem } from '@/interface';
 
 export const useAirportStore = defineStore('airport', () => {
-    const isLoding = { airport: false  };
+    const isLoding = { airport: false };
     const airportsCode4 = ref<Record<string, AirportItem>>({});
 
-    const getCode3 = computed(() => {
+    const code3 = computed(() => {
         const airportsCode4Value = airportsCode4.value;
         const airportsCode3: Record<string, AirportItem> = {};
         for (const code4 in airportsCode4Value) {
@@ -19,11 +19,11 @@ export const useAirportStore = defineStore('airport', () => {
         }
         return airportsCode3;
     });
-    const getCode4 = computed(() => airportsCode4.value);
+    const code4 = computed(() => airportsCode4.value);
 
     const getCity = computed(() => {
         return (code: string, type: string = 'city'): string => {
-            const airportsCode3Value = getCode3.value;
+            const airportsCode3Value = code3.value;
             const airportsCode4Value = airportsCode4.value;
             const src = code.length === 4 ? airportsCode4Value : airportsCode3Value;
             return src[code]?.[type] || code;
@@ -42,8 +42,8 @@ export const useAirportStore = defineStore('airport', () => {
 
     return {
         getCity,
-        getCode3,
-        getCode4,
+        code3,
+        code4,
         fetchAirports,
     };
 });

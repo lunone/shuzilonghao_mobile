@@ -33,7 +33,7 @@ import { statItem } from '@/interface';
 import dayjs from 'dayjs';
 import airline from './airline/airline.vue';
 import zlDateRangePicker from '@/components/zl/dateRangePicker.vue';
-const { getCity, fetchAirports } = useAirportStore();
+const airportStore = useAirportStore();
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');
@@ -49,7 +49,7 @@ const dateRange = ref([
     dayjs().add(-11, 'day').toDate(),
     dayjs().add(-1, 'day').endOf('day').toDate()
 ]) as Ref<[Date, Date]>;
-
+const getCity = code => airportStore.getCity(code, 'city');
 const stationClick = (name: string) => currentStation.value = name;
 const stations = computed(() => {
     if (!airlineStats.value) return [];
@@ -86,7 +86,7 @@ const fetchData = async (startDate: Date, endDate: Date) => {
 watch(() => dateRange.value, () => {
     const [startDate, endDate] = dateRange.value
     fetchData(startDate, endDate);
-    fetchAirports();
+    airportStore.fetchAirports();
 }, { immediate: true, deep: true })
 
 </script>

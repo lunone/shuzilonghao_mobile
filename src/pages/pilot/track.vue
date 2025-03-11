@@ -21,7 +21,7 @@ const trainings = ref([]) as Ref<{ name: string, startDate: Date, endDate: Date,
 const duties = ref([]) as Ref<{ arr: string, dep: string, flightDate: Date, flightNo: string, flyMinute: number }[]>;
 const absences = ref([]) as Ref<{ code: string, ddoCode: string, ddoType: string, startDate: Date, endDate: Date, title: string, detail: string, userId: string }[]>;
 
-const { getCity, fetchAirports } = useAirportStore();
+const airportStore = useAirportStore();
 
 // 日历
 const days = computed(() => {
@@ -67,8 +67,8 @@ function showDetail(day: { name: string, className: string, data: any }) {
             icon: 'none', duration: 2e3,
             title: day.data.map((d: any) => {
                 const time = `${dayjs(d.atd || d.std).format('HH:mm')}-${dayjs(d.ata || d.sta).format('HH:mm')}`;
-                const dep = getCity(d.dep);
-                const arr = getCity(d.arr);
+                const dep = airportStore.getCity(d.dep);
+                const arr = airportStore.getCity(d.arr);
                 return `${d.flightNo}(${time})${dep} - ${arr}`
             }).join('|')
         })
@@ -79,7 +79,7 @@ watch(() => props.pcode, () => {
     const userData = { userId: props.pcode, idType: 'pcode' }
     const dateData = { startDate: props.startDate, endDate: props.endDate }
     Promise.allSettled([
-        fetchAirports(),
+        airportStore.fetchAirports(),
         api(CONFIG.url.pilotTraining, { ...userData, ...dateData }).then(res => trainings.value = res || []),
         api(CONFIG.url.pilotDuty, { ...userData, ...dateData }).then(res => duties.value = res || []),
         api(CONFIG.url.pilotAbsence, { ...userData, ...dateData }).then(res => absences.value = res || []),
@@ -88,6 +88,26 @@ watch(() => props.pcode, () => {
     }).catch(err => console.log('获取信息', err));
 })
 
+// // 获取飞行员轨迹
+
+// watch(() => [props.userId, props.dateRange], (userId) => {
+//     const startDate = dayjs(props.dateRange[0]).toDate();
+//     const endDate = dayjs(props.dateRange[1]).toDate();
+//     fetchFlightTracks(startDate, endDate, props.userId);
+// }, { deep: true, immediate: true });
+// // 获取机场信息
+// const fetchAirports = async () => {
+//     loading.value = true;
+//     error.value = '';
+//     try {
+//         const res = await airportStore.fetchAirports ;
+//         // airports.value = res;
+//     } catch (err) {
+//         error.value = '获取机场信息失败';
+//     } finally {
+//         loading.value = false;
+//     }
+// };
 
 </script>
 <style lang="less" scoped>
