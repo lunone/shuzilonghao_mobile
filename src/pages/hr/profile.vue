@@ -9,7 +9,7 @@
                     {{ name }}({{ userId }})
                     <span class="status">{{ employee?.status == 2 ? '已离职' : '' }}</span>
                 </div>
-                <div class="ietm department">{{ depName }}</div>
+                <div class="ietm department">{{ getPath(+employee?.department) }}</div>
                 <div class="kv position">
                     <div class="key">岗位</div>
                     <div class="value">{{ employee?.position }}</div>
@@ -52,8 +52,8 @@ import { computed, onMounted, Ref, ref, watch } from 'vue';
 import CONFIG from '@/config';
 import api from '@/utils/api';
 import { UserItem } from '@/interface';
-import {useUserStore} from '@/store/user.store';
-import {useDepartmentStore} from '@/store/department.store';
+import { useUserStore } from '@/store/user.store';
+import { useDepartmentStore } from '@/store/department.store';
 import Salary from './profile/salary.vue';
 import experienceVue from './profile/experience.vue';
 import dutyVue from './profile/duty.vue';
@@ -63,13 +63,13 @@ import { call } from '@/utils/tools';
 import Performance from './profile/performance.vue';
 import Contract from './profile/contract.vue';
 const userStore = useUserStore();
-const departmentStore = useDepartmentStore();
+const { getPath, fetchDepartments } = useDepartmentStore();
 const props = defineProps({
     userId: { type: String, default: '' }
 });
 
 const employee: Ref<UserItem> = ref();
-const depName = computed(() => departmentStore.getPath(+employee.value?.department));
+
 const fetchEmployee = async () => {
     employee.value = await api(CONFIG.url.userProfile, { userId: props.userId });
 };
@@ -82,8 +82,8 @@ const onClickkv = (e) => {
         current.value = e.currentIndex;
     }
 }
-onMounted(async () => {
-    departmentStore.fetchDepartments();
+onMounted(() => {
+    fetchDepartments();
     fetchEmployee();
 });
 

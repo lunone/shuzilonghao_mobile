@@ -33,7 +33,7 @@
                             <div class="avg">
                                 日<span class="value">{{ `${pilot.avgFlightHours}小时` }}</span>
                             </div>
-                            <i class="zl-icon-magnifier" @click="jump(pilot.userId, pilot.code)" />
+                            <i class="zl-icon-magnifier" @click="jump(pilot.userId, pilot.pcode)" />
                         </div>
                     </div>
                 </template>
@@ -59,7 +59,7 @@
                     <div class="avg">
                         日<span class="value">{{ `${pilot.avgFlightHours}小时` }}</span>
                     </div>
-                    <i class="zl-icon-magnifier" @click="jump(pilot.userId, pilot.code)" />
+                    <i class="zl-icon-magnifier" @click="jump(pilot.userId, pilot.pcode)" />
                 </div>
             </div>
         </div>
@@ -74,9 +74,9 @@ import dayjs from 'dayjs';
 import api from '@/utils/api';
 import CONFIG from '@/config';
 import Profile from '@/pages/hr/profile.vue';
-import {useUserStore} from '@/store/user.store';
-const store = useUserStore();
-type PilotStat = { rank: number, code: string, userId: string, name: string, totalFlightHours: number, avgFlightHours: number }
+import { useUserStore } from '@/store/user.store';
+const { fetchPilots, getPilots } = useUserStore();
+type PilotStat = { rank: number, pcode: string, userId: string, name: string, totalFlightHours: number, avgFlightHours: number }
 
 // const props = defineProps({
 //     showMore: { type: Boolean, default: false }
@@ -99,7 +99,7 @@ function showPilotProfile(userId: string) {
 function jump(userId: string, code: string) {
     // console.log('showDetail', showNormal.value)
     if (userId) {
-        uni.navigateTo({ url: `/pages/pilot/portrait?id=${userId}&code=${code}` });
+        uni.navigateTo({ url: `/pages/pilot/portrait?userid=${userId}&pcode=${code}` });
     }
     // showNormal.value = !showNormal.value;
     // emits('showMore')
@@ -130,7 +130,7 @@ function clac(num: number) {
         return
     }
     const old = dayjs(dateRange.value.join('-') + '-01');
-    console.log('----', old.format('YYYY-MM-DD'), dayjs().diff(old, 'month'), dayjs().add(-1, 'year').diff(old, 'month'))
+    // console.log('----', old.format('YYYY-MM-DD'), dayjs().diff(old, 'month'), dayjs().add(-1, 'year').diff(old, 'month'))
     // old 和当前月份的月差值不能小于0,也和一年前不能大于0
     if (num > 0 && dayjs().diff(old, 'month') < 1) {
         return
@@ -143,7 +143,7 @@ function clac(num: number) {
     dateRange.value = newDate.split('-') as [string, string];
 }
 function techName(userId: string) {
-    const pilots = store.getPilots;
+    const pilots = getPilots;
     const pilot = pilots[userId];
     const techs = pilot?.techs;
 
@@ -179,7 +179,7 @@ watch(() => dateRange, async () => {
             rank: -1,
             userId: pilot.userId,
             name: pilot.name,
-            code: pilot.code,
+            pcode: pilot.pcode,
             totalFlightHours: +(pilot.totalMinutes / 60).toFixed(2),
             avgFlightHours: +(pilot.avgMinutes / 60).toFixed(2),
         }));
@@ -206,7 +206,7 @@ watch(() => dateRange, async () => {
 }, { immediate: true, deep: true })
 
 onMounted(() => {
-    store.fetchPilots();
+    fetchPilots();
 })
 </script>
 <style lang="less" scoped>

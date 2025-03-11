@@ -6,21 +6,21 @@ import CONFIG from '@/config';
 import { AircraftItem, AirportItem } from '@/interface';
 
 export const useAircraftStore = defineStore('aircraft', () => {
-    const isLoding = {   aircraft: false };
-    const getAircraftsArr = ref<AircraftItem[]>([]);
+    const isLoding = { aircraft: false };
+    const aircraftsArr = ref<AircraftItem[]>([]);
 
- 
+
 
     const getAircraftsObj = computed(() => {
-        return getAircraftsArr.value.reduce((acc, cur) => ({ ...acc, [cur.acReg]: cur }), {});
+        return aircraftsArr.value.reduce((acc, cur) => ({ ...acc, [cur.acReg]: cur }), {});
     });
 
-    const getArr = computed(() => getAircraftsArr.value);
+    const getAircraftArr = computed(() => aircraftsArr.value);
 
     const fetchAircrafts = async () => {
         if (isLoding.aircraft) return;
         isLoding.aircraft = true;
-        if (!getAircraftsArr.value.length) {
+        if (!aircraftsArr.value.length) {
             const res = await api(CONFIG.url.aircrafts) as AircraftItem[];
             const acTypeShortTranslate: Record<string, string> = {
                 B73: 'B737', B74: 'B747', A32: 'A320', A31: 'A319'
@@ -30,13 +30,13 @@ export const useAircraftStore = defineStore('aircraft', () => {
                 aircraft.endDate = aircraft.endDate ? dayjs(aircraft.endDate).toDate() : undefined;
                 aircraft.acTypeLong = acTypeShortTranslate[aircraft.acTypeLong] || aircraft.acType;
             });
-            getAircraftsArr.value = res;
+            aircraftsArr.value = res;
         }
         isLoding.aircraft = false;
     };
 
     return {
-        getArr,
+        getAircraftArr,
         getAircraftsObj,
         fetchAircrafts,
     };

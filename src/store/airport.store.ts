@@ -22,7 +22,7 @@ export const useAirportStore = defineStore('airport', () => {
     const getCode4 = computed(() => airportsCode4.value);
 
     const getCity = computed(() => {
-        return (code: string, type: string = 'abbr'): string => {
+        return (code: string, type: string = 'city'): string => {
             const airportsCode3Value = getCode3.value;
             const airportsCode4Value = airportsCode4.value;
             const src = code.length === 4 ? airportsCode4Value : airportsCode3Value;

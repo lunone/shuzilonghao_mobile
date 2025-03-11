@@ -28,17 +28,17 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
-import {useUserStore} from '@/store/user.store';
-import {useDepartmentStore} from '@/store/department.store';
-const userStore = useUserStore();
-const departmentStore = useDepartmentStore();
+import { useUserStore } from '@/store/user.store';
+import { useDepartmentStore } from '@/store/department.store';
+const { fetchStaff, getStaffObj } = useUserStore();
+const { fetchDepartments, getSubIds } = useDepartmentStore();
 const stat = computed(() => {
-    const staff = userStore.getStaffObj;
+    const staff = getStaffObj;
     const temp = { all: 0, wx: 0, fx: 0, fg: 0, yk: 0 };
     const ids = {}
     const map = { wx: '维修工程部', fx: '飞行部', fg: '飞行技术管理部', yk: '运行控制部' }
     for (let key in map) {
-        ids[key] = departmentStore.getSubIds(map[key]);
+        ids[key] = getSubIds(map[key]);
     }
     for (let userId in staff) {
         const user = staff[userId];
@@ -63,8 +63,8 @@ function showDetail(type: string) {
     }
 }
 onMounted(() => {
-    departmentStore.fetchDepartments()
-    userStore.fetchStaff()
+    fetchDepartments()
+    fetchStaff()
 })
 </script>
 

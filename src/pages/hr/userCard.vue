@@ -24,7 +24,7 @@ import Profile from '@/pages/hr/profile.vue';
 import { UserItem } from '@/interface';
 import {useUserStore} from '@/store/user.store';
 
-const store = useUserStore();
+const {fetchStaff,getStaffObj} = useUserStore();
 const props = defineProps({
     userId: { type: String, require: true, default: '' },
     // error是如果系统内没有该用户的话的占位名
@@ -59,17 +59,18 @@ const toggleProfile = () => {
 };
 
 
-watch([() => props.userId, () => props.error, () => store.getStaffObj], async () => {
+watch([() => props.userId, () => props.error, () => getStaffObj], async () => {
     // 订阅store.staff变化
-    const users = store.getStaffObj;
+    const users = getStaffObj;
     // 优先id的name,如果没有就是props.name,最后实在不行就是工号
     userName.value = users[props.userId]?.name || props.error || props.userId || '未知';
     if (users[props.userId]) {
         user.value = users[props.userId];
     }
 }, { immediate: true, deep: true });
+
 onMounted(() => {
-    store.fetchStaff();
+    fetchStaff();
 });
 </script>
 

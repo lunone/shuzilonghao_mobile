@@ -46,16 +46,14 @@
     </div>
 </template>
 <script lang="ts" setup>
-import dayjs from 'dayjs';
 import { inject, onMounted, watch } from 'vue';
-import {useAirportStore} from '@/store/airport.store';
-const airportStore = useAirportStore();
+import { useAirportStore } from '@/store/airport.store';
+const { fetchAirports, getCity } = useAirportStore();
 const props = defineProps<{ data: Record<string, any> }>();
-// 拨打电话的方法
 const showProfile = inject('showProfile') as Function;
-const getCity = airportStore.getCity;
+
 onMounted(() => {
-    airportStore.fetchAirports();
+    fetchAirports();
 });
 </script>
 <style lang="less" scoped>

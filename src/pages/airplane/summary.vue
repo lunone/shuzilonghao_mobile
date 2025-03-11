@@ -14,13 +14,13 @@ import { computed, onMounted, ref } from 'vue';
 import { useAircraftStore } from '@/store/aircarft.store';
 import dayjs from 'dayjs';
 
-const aircraftStore = useAircraftStore();
+const { fetchAircrafts, getAircraftArr } = useAircraftStore();
 
 const pieOption = computed(() => {
     const today = dayjs().startOf('day');
     const stat: Record<string, number> = {}
     let all = 0;
-    for (let aircraft of aircraftStore.getArr) {
+    for (let aircraft of getAircraftArr) {
         const startDate = dayjs(aircraft.startDate || -1).startOf('day');
         const endDate = dayjs(aircraft.endDate).startOf('day');
         if (!aircraft.endDate || (startDate.isBefore(today) && endDate.isAfter(today))) {
@@ -76,7 +76,7 @@ const pieOption = computed(() => {
 
 // 初始化时获取数据
 onMounted(() => {
-    aircraftStore.fetchAircrafts();
+    fetchAircrafts();
 });
 
 </script>
