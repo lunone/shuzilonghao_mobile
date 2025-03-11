@@ -41,7 +41,7 @@ import { computed, Ref, ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { useUserStore } from '@/store/user.store';
 import trackVue from './track.vue';
-const { fetchPilots, pilots } = useUserStore();
+const userStore = useUserStore();
 
 const userId = ref('');
 const pilot = ref({}) as Ref<Record<string, any>>;
@@ -49,7 +49,7 @@ const pcode = ref('');
 // 技术等级
 const techs = computed(() => {
     if (!userId.value) return;
-    const techs = pilots[userId.value]?.techs;
+    const techs = userStore.pilots[userId.value]?.techs;
     console.log(techs);
     return techs || []
 })
@@ -60,7 +60,7 @@ onLoad(e => {
     pcode.value = e.pcode;
     const userData = { userId: e.pcode, idType: 'pcode' }
     Promise.allSettled([
-        fetchPilots(),
+        userStore.fetchPilots(),
         api(CONFIG.url.pilotProfile, userData).then(res => pilot.value = res || {}),
     ]).catch(err => console.log('获取信息', err));
 });

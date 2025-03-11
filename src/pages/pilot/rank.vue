@@ -75,7 +75,7 @@ import api from '@/utils/api';
 import CONFIG from '@/config';
 import Profile from '@/pages/hr/profile.vue';
 import { useUserStore } from '@/store/user.store';
-const { fetchPilots, pilots } = useUserStore();
+const userStore = useUserStore();
 type PilotStat = { rank: number, pcode: string, userId: string, name: string, totalFlightHours: number, avgFlightHours: number }
 
 // const props = defineProps({
@@ -144,7 +144,7 @@ function clac(num: number) {
 }
 function techName(userId: string) {
     // const pilots = getPilots;
-    const pilot = pilots[userId];
+    const pilot = userStore.pilots[userId];
     const techs = pilot?.techs;
 
     if (!techs) return [];
@@ -206,7 +206,7 @@ watch(() => dateRange, async () => {
 }, { immediate: true, deep: true })
 
 onMounted(() => {
-    fetchPilots();
+    userStore.fetchPilots();
 })
 </script>
 <style lang="less" scoped>
