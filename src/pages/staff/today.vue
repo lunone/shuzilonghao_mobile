@@ -14,7 +14,7 @@
         <div class="section detail">
             <div class="item" :class="key" v-for="(value, key) in flightStats.unnormal" @click="showDetail(key)"
                 :key="key">
-                <text class="title">{{ names[key] }}</text>
+                <text class="title">{{ unnormals[key] }}</text>
                 <text class="value" :class="value ? 'hover' : ''">{{ value }}</text>
             </div>
         </div>
@@ -28,18 +28,8 @@ import dayjs from 'dayjs';
 import { FlightItem } from '@/interface';
 
 const flights = ref<FlightItem[]>([]);
-const fetchFlights = async () => {
-    const startDate = dayjs().startOf('day').toDate();
-    const endDate = dayjs().endOf('day').toDate();
-    try {
-        const res = await api(CONFIG.url.flightsDate, { startDate, endDate }) as FlightItem[];
-        console.log(res, startDate, endDate);
-        flights.value = res;
-    } catch (err) {
-        console.error('获取航班信息失败', err);
-    }
-};
-const names = { isCancle: '取消', isAltn: '备降', isDelay: '延误', isReturn: '返航', }
+
+const unnormals = { isCancle: '取消', isAltn: '备降', isDelay: '延误', isReturn: '返航', }
 // 当前循环方式可改为更高效的reduce
 const flightStats = computed(() => {
     return flights.value.reduce((acc, flight) => {
@@ -48,10 +38,10 @@ const flightStats = computed(() => {
         acc.total++
         if (flight.atd) acc.executed++
 
-        Object.keys(names).forEach(key => acc.unnormal[key] += flight[key] ? 1 : 0)
+        Object.keys(unnormals).forEach(key => acc.unnormal[key] += flight[key] ? 1 : 0)
 
         return acc
-    }, { total: 0, executed: 0, unnormal: Object.fromEntries(Object.keys(names).map(k => [k, 0])) })
+    }, { total: 0, executed: 0, unnormal: Object.fromEntries(Object.keys(unnormals).map(k => [k, 0])) })
 })
 
 
@@ -59,7 +49,8 @@ function showDetail(key) {
     // 这里弹出框
 }
 onMounted(() => {
-    fetchFlights();
+    api(CONFIG.url.flightsDate, { startDate: dayjs().startOf('day').toDate(), endDate: dayjs().endOf('day').toDate() })
+        .then(res => flights.value = res as FlightItem[]);
 });
 </script>
 <style lang="less" scoped>
