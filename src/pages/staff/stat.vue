@@ -1,71 +1,34 @@
 <template>
     <div class="wrapper">
-        <div class="lastyear">
-            <div class="title"> {{ props.range == 'year' ? '去年' : '前日' }} </div>
-            <div class="counter">
-                <span class="value">{{ numberByWan(lastYear.counter) }}</span>
-                <span class="unit">班</span>
-            </div>
-            <div class="weight">
-                <span class="value">{{ numberByWan(lastYear.netWeightCargo) }}</span>
-                <span class="unit">吨</span>
-            </div>
-            <div class="hour">
-                <span class="value">{{ numberByWan(lastYear.hours) }}</span>
-                <span class="unit">小时</span>
-            </div>
-        </div>
-        <div class="thisyear">
-            <span class="title"> {{ props.range == 'year' ? '今年' : '昨日' }} </span>
-            <div class="counter">
-                <span class="value">{{ numberByWan(thisYear.counter) }}</span>
-                <span class="unit">班</span>
-            </div>
-            <div class="weight">
-                <span class="value">{{ numberByWan(thisYear.netWeightCargo) }}</span>
-                <span class="unit">吨</span>
-            </div>
-            <div class="hour">
-                <div class="value">{{ numberByWan(thisYear.hours) }}</div>
-                <div class="unit">小时</div>
-            </div>
-        </div>
-        <div class="rate">
-            <span class="title">变化 </span>
-            <div class="counter">
-                <span class="value">{{ rate.counter }}</span>
-                <span class="unit">%</span>
-            </div>
-            <div class="weight">
-                <span class="value">{{ rate.netWeightCargo }}</span>
-                <span class="unit">%</span>
-            </div>
-            <div class="hour">
-                <span class="value">{{ rate.hour }}</span>
-                <span class="unit">%</span>
-            </div>
-
+        <div v-for="(item, index) in sections" :key="index" class="section"
+            :class="['lastyear', 'thisyear', 'rate'][index]">
+            <div class="title">{{ titles[props.range][index] }}</div>
+            <template v-for="(unit, key) in fields" :key="key">
+                <div class="item">
+                    <span class="value">{{ index == 2 ? numberByWan(item[key]) : item[key] }}</span>
+                    <span class="unit">{{ index == 2 ? unit : '%' }}</span>
+                </div>
+            </template>
         </div>
         <div class="remark" v-if="props.range == 'year'">
-            <!-- <van-icon name="info" /> -->
             <i class="icon zl-icon-info" />
-            今年:{{ dayjs(dates.firstDayOfYear).format('YYYY/M/D') }}-{{ dayjs(dates.now).format('YYYY/M/D') }},
-            去年:{{ dayjs(dates.firstDayOfLastYear).format('YYYY/M/D') }}-{{
-                dayjs(dates.dayBeforeOneYear).format('YYYY/M/D') }}
+            今年:{{ dayjs(dates.firstDayOfYear).format('YYYY/M/D') }}-{{ dayjs(dates.now).format('YYYY/M/D') }},去年:{{
+                dayjs(dates.firstDayOfLastYear).format('YYYY/M/D') }}-{{ dayjs(dates.dayBeforeOneYear).format('YYYY/M/D') }}
         </div>
     </div>
 </template>
-
 <script setup lang="ts">
 import api from '@/utils/api';
 import dayjs from 'dayjs';
 import { computed, onMounted, PropType, reactive, Ref, ref } from 'vue';
 import CONFIG from '@/config';
 import { numberByWan } from '@/utils/tools';
-type Stat = { counter: number, netWeightCargo: number, hours: number };
+// 新增类型定义
+type StatField = 'counter' | 'netWeightCargo' | 'hours';
+type Stat = Record<StatField, number>;
+
 const props = defineProps({
-    text: { type: String, default: '获取' },
-    range: { type: String as PropType<string>, default: 'year' },
+    range: { type: String as PropType<'year' | 'day'>, default: 'year' },
 })
 
 const dates = {
@@ -73,76 +36,55 @@ const dates = {
     today: dayjs().startOf('day').toDate(),
     yesterday: dayjs().subtract(1, 'day').startOf('day').toDate(),
     theDayBeforeYesterday: dayjs().subtract(2, 'day').startOf('day').toDate(),
-
     // year的
     now: dayjs().toDate(),
     dayBeforeOneYear: dayjs().subtract(1, 'year').toDate(),
     firstDayOfYear: dayjs().startOf('year').toDate(),
     firstDayOfLastYear: dayjs().subtract(1, 'year').startOf('year').toDate(),
-
 }
 
-const thisYearRes: Ref<Stat> = ref({ netWeightCargo: 0, counter: 0, hours: 0 });
-const lastYearRes: Ref<Stat> = ref({ netWeightCargo: 0, counter: 0, hours: 0 });
+const lastRes: Ref<Stat> = ref({ netWeightCargo: 0, counter: 0, hours: 0 });
+const currentRes: Ref<Stat> = ref({ netWeightCargo: 0, counter: 0, hours: 0 });
 
-const thisYear = computed(() => {
-    const value = thisYearRes.value;
-    return {
-        counter: value?.counter ?? 0,
-        netWeightCargo: +((value?.netWeightCargo ?? 0) / 1e3).toFixed(2) | 0,
-        hours: +(value?.hours ?? 0).toFixed(2) | 0,
-    }
-});
-const lastYear = computed(() => {
-    const value = lastYearRes.value;
-    return {
-        counter: value?.counter ?? 0,
-        netWeightCargo: +((value?.netWeightCargo ?? 0) / 1e3).toFixed(2) | 0,
-        hours: +(value?.hours ?? 0).toFixed(2) | 0,
-    }
-});
+const titles = { day: ['前日', '昨日', '变化'], year: ['去年', '今年', '变化'] }
+// 在 computed 属性后添加：
+const fields = { counter: '班', netWeightCargo: '吨', hours: '小时' }
 
-
-const rate = computed(() => {
-    const newVal = thisYearRes.value, oldVal = lastYearRes.value;
-    return {
-        counter: oldVal.counter > 0
-            ? ((newVal.counter - oldVal.counter) / oldVal.counter * 100).toFixed(1)
-            : '--',
-        netWeightCargo: oldVal.netWeightCargo
-            ? ((newVal.netWeightCargo - oldVal.netWeightCargo) / oldVal.netWeightCargo * 100).toFixed(1)
-            : '--',
-        hour: oldVal.hours
-            ? ((newVal.hours - oldVal.hours) / oldVal.hours * 100).toFixed(1)
-            : '--',
-    }
+const rate = (last: number, current: number) => last > 0 ? ((current - last) / last * 100).toFixed(1) : '--';
+const formater = (src) => ({
+    counter: src?.counter ?? 0,
+    netWeightCargo: +((src?.netWeightCargo ?? 0) / 1e3).toFixed(2) | 0,
+    hours: +(src?.hours ?? 0).toFixed(2) | 0,
 })
+const sections = computed<Record<StatField, string | number>[]>(() => [
+    formater(lastRes.value),
+    formater(currentRes.value),
+    Object.keys(fields).reduce((acc, key) => ({
+        ...acc,
+        [key]: rate(lastRes.value[key] ?? 0, currentRes.value[key] ?? 0)
+    }), {} as Record<StatField, string>),
+]);
 
-// 先渲染一遍数据，挂载完成再获取资源，避免页面跳变。
-onMounted(async () => {
-    const rangeThisYear = props.range == 'year' ? { startDate: dates.firstDayOfYear, endDate: dates.now } : { startDate: dates.yesterday, endDate: dates.today };
-    const rangeLastYear = props.range == 'year' ? { startDate: dates.firstDayOfLastYear, endDate: dates.dayBeforeOneYear } : { startDate: dates.theDayBeforeYesterday, endDate: dates.yesterday };
+onMounted(() => {
+    const lastRange = props.range == 'year' ? { startDate: dates.firstDayOfLastYear, endDate: dates.dayBeforeOneYear } : { startDate: dates.theDayBeforeYesterday, endDate: dates.yesterday };
+    const currentRange = props.range == 'year' ? { startDate: dates.firstDayOfYear, endDate: dates.now } : { startDate: dates.yesterday, endDate: dates.today };
     Promise.allSettled([
-        api(CONFIG.url.statPeriod, rangeThisYear).then(res => thisYearRes.value = res as Stat),
-        api(CONFIG.url.statPeriod, rangeLastYear).then(res => lastYearRes.value = res as Stat),
+        api(CONFIG.url.statPeriod, currentRange).then(res => currentRes.value = res as Stat),
+        api(CONFIG.url.statPeriod, lastRange).then(res => lastRes.value = res as Stat),
     ])
         // .then((arr) => console.log('获取信息', arr, thisYearRes.value, lastYearRes.value))
         .catch(err => console.warn('错误', err));
 });
 
 </script>
-
 <style lang="less" scoped>
-/* 这里是样式部分，用于定义组件的样式 */
 @import "@/css/base.less";
 
 .wrapper {
     display: flex;
     flex-direction: column;
 
-    .lastyear,
-    .thisyear,
-    .rate {
+    .section {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
@@ -162,9 +104,7 @@ onMounted(async () => {
             font-size: .9rem;
         }
 
-        .counter,
-        .weight,
-        .hour {
+        .item {
             display: flex;
             justify-content: space-around;
             flex-direction: row;
