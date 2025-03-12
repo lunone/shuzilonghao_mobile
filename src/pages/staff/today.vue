@@ -20,7 +20,6 @@
         </div>
     </div>
 </template>
-
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, Ref } from 'vue';
 import api from '@/utils/api';
@@ -40,57 +39,22 @@ const fetchFlights = async () => {
         console.error('获取航班信息失败', err);
     }
 };
-const names = {
-    cancle: '取消',
-    altn: '备降',
-    delay: '延误',
-    return: '返航',
-}
+const names = { isCancle: '取消', isAltn: '备降', isDelay: '延误', isReturn: '返航', }
+// 当前循环方式可改为更高效的reduce
 const flightStats = computed(() => {
-    let total = 0;
-    let executed = 0;
-    // let normal = 0;
-    const unnormal = {
-        cancle: 0,
-        altn: 0,
-        delay: 0,
-        return: 0,
-    };
+    return flights.value.reduce((acc, flight) => {
+        if (flight.isPatch) return acc
 
-    for (let flight of flights.value) {
-        // FLG_PATCH 是否返航/备降新增段// 新增字段不处理，只处理旧有的航段
-        if (flight.isPatch) {
-            continue;
-        }
+        acc.total++
+        if (flight.atd) acc.executed++
 
-        if (flight.atd) {// 已执行
-            executed++;
-        }
+        Object.keys(names).forEach(key => acc.unnormal[key] += flight[key] ? 1 : 0)
 
-        if (flight.isDelay) {// 延误
-            unnormal.delay++
-        }
+        return acc
+    }, { total: 0, executed: 0, unnormal: Object.fromEntries(Object.keys(names).map(k => [k, 0])) })
+})
 
-        if (flight.isReturn) {// 返回
-            unnormal.return++;
-        }
 
-        if (flight.isAltn) {// 备降
-            unnormal.altn++;
-        }
-        if (flight.isCancle) {
-            unnormal.cancle++;
-        }
-        total++;
-    };
-
-    return { total, executed, unnormal };
-});
-
-const executionRate: Ref<number> = ref(0);
-// watch(flights, () => {
-//     executionRate.value = flightStats.value.executed / flightStats.value.total * 100;
-// });
 function showDetail(key) {
     // 这里弹出框
 }
@@ -98,7 +62,6 @@ onMounted(() => {
     fetchFlights();
 });
 </script>
-
 <style lang="less" scoped>
 @import '@/css/base.less';
 
