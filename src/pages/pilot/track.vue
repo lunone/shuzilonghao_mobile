@@ -72,20 +72,21 @@ const days = computed(() => {
         // if (day.isSame(dayjs(), 'day')) {
         //     className = 'today';
         // }
-        arr.push({ index, name, className, data });
+        arr.push({ index, name, className, data, day });
     }
     return arr;
 })
 
-function showDetail(day: { name: string, className: string, data: any }) {
-    if (day.className == 'training') {
-        uni.showToast({ title: `${day.data.baseName} : ${day.data.name}`, icon: 'none', duration: 2e3 })
-    } else if (day.className == 'absence') {
-        uni.showToast({ icon: 'none', duration: 2e3, title: day.data.detail || day.data.title })
-    } else if (day.className == 'duty') {
+function showDetail(date: { day: Date, index: string, name: string, className: string, data: any }) {
+    const { day, index, name, className, data } = date;
+    if (className == 'training') {
+        uni.showToast({ title: `${dayjs(day).format('M月DD日')}${data.baseName} : ${data.name}`, icon: 'none', duration: 2e3 })
+    } else if (className == 'absence') {
+        uni.showToast({ icon: 'none', duration: 2e3, title: `${dayjs(day).format('M月DD日')}` + (data.detail || data.title) })
+    } else if (className == 'duty') {
         uni.showToast({
             icon: 'none', duration: 2e3,
-            title: day.data.map((d: any) => {
+            title: `${dayjs(day).format('M月DD日')}` + data.map((d: any) => {
                 const time = `${dayjs(d.atd || d.std).format('HH:mm')}-${dayjs(d.ata || d.sta).format('HH:mm')}`;
                 const dep = airportStore.getCity(d.dep);
                 const arr = airportStore.getCity(d.arr);

@@ -50,7 +50,6 @@ const pcode = ref('');
 const techs = computed(() => {
     if (!pcode.value) return;
     const techs = getTech(pcode.value, 'pcode');
-    console.log(techs, pcode.value);
     return techs || []
 })
 
