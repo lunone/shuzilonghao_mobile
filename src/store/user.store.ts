@@ -5,9 +5,8 @@ import CONFIG from '@/config';
 import { PilotItem, UserItem } from '@/interface';
 
 export const useUserStore = defineStore('user', () => {
-    const isLoading = { staff: false, pilot: false };
+    const isLoading = { staff: false };
     const staff = ref<Record<string, UserItem>>({});
-    const pilots = ref<Record<string, PilotItem>>({});
     const self = ref({}) as Ref<UserItem>;
     const token = ref('');
 
@@ -34,6 +33,7 @@ export const useUserStore = defineStore('user', () => {
         return self.value;
     };
 
+
     const fetchStaff = async () => {
         if (isLoading.staff) return;
         isLoading.staff = true;
@@ -50,24 +50,14 @@ export const useUserStore = defineStore('user', () => {
         isLoading.staff = false;
     };
 
-    const fetchPilots = async () => {
-        if (isLoading.pilot) return;
-        isLoading.pilot = true;
-        if (!Object.keys(pilots.value).length) {
-            const res = await api(CONFIG.url.pilots) as Record<string, PilotItem>;
-            pilots.value = Object.keys(res).length ? res : {};
-        }
-        isLoading.pilot = false;
-    };
+
 
     return {
         staffObj,
-        pilots: computed(() => pilots.value),
         token: computed(() => token.value),
         myself,
         getStaff,
         setToken,
-        fetchPilots,
         fetchStaff,
     };
 });

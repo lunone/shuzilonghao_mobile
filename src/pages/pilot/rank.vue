@@ -6,11 +6,11 @@
             </div> -->
             <div class="title">月度排行</div>
             <div class="date">
-                <div class="left" :class="isEnable.left ? '' : 'disable'" @click="clac(-1)">
+                <div class="left" :class="isEnable.left ? '' : 'disable'" @click="clacMonth(-1)">
                     <i class="zl-icon-left" />
                 </div>
                 <div class="str">{{ dateRange[0] }}年{{ dateRange[1] }}月</div>
-                <div class="right" :class="isEnable.right ? '' : 'disable'" @click="clac(1)">
+                <div class="right" :class="isEnable.right ? '' : 'disable'" @click="clacMonth(1)">
                     <i class="zl-icon-right" />
                 </div>
             </div>
@@ -21,7 +21,7 @@
                         <div class="ser">TOP.{{ pilot.rank }}</div>
                         <div class="name-wrapper" @click="showPilotProfile(pilot.userId)">
                             <span class="name">{{ pilot.name }}</span>
-                            <span v-for="tech of techName(pilot.userId)"
+                            <span v-for="tech of getTech(pilot.userId)"
                                 :key="pilot.userId + tech.acType + tech.techName" class="tech" :class="tech.techName">
                                 {{ tech.techName }}
                             </span>
@@ -41,13 +41,13 @@
 
         </div>
         <div class="normal" v-if="showNormal">
-            <div v-for="pilot in data" class="pilot" :key="pilot.userId">
+            <div v-for="pilot in pilots" class="pilot" :key="pilot.userId">
                 <span class="icon" :class="`no${pilot.rank}`">
                     <template> {{ pilot.rank }}</template>
                 </span>
                 <div class="name" @click="showPilotProfile(pilot.userId)">
                     {{ pilot.name }}
-                    <span v-for="tech of techName(pilot.userId)" :key="pilot.userId + tech.acType + tech.techName"
+                    <span v-for="tech of getTech(pilot.userId)" :key="pilot.userId + tech.acType + tech.techName"
                         class="tech" :class="tech.techName">
                         {{ tech.techName }}
                     </span>
@@ -74,18 +74,24 @@ import dayjs from 'dayjs';
 import api from '@/utils/api';
 import CONFIG from '@/config';
 import Profile from '@/pages/hr/profile.vue';
-import { useUserStore } from '@/store/user.store';
-const userStore = useUserStore();
+import { usePilotStore } from '@/store/pilot.store';
+const { getTech, fetchPilots } = usePilotStore();
 type PilotStat = { rank: number, pcode: string, userId: string, name: string, totalFlightHours: number, avgFlightHours: number }
 
 const emits = defineEmits(['showMore', 'select']);
 
+const dateRange = ref<[string, string]>([dayjs().format('YYYY'), dayjs().format('MM')]);
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');
 const showProfile = ref(false);
 const showNormal = ref(true);
 const selectUserId = ref('');
+
+const pilots = ref([]) as Ref<PilotStat[]>;
+const first = ref({}) as Ref<PilotStat>;
+const second = ref({}) as Ref<PilotStat>;
+const third = ref({}) as Ref<PilotStat>;
 function showPilotProfile(userId: string) {
     console.log('showPilotProfile', userId)
     if (userId) {
@@ -98,11 +104,7 @@ function jump(userId: string, code: string) {
         uni.navigateTo({ url: `/pages/pilot/portrait?userid=${userId}&pcode=${code}` });
     }
 }
-const data = ref([]) as Ref<PilotStat[]>;
-const dateRange = ref<[string, string]>([dayjs().format('YYYY'), dayjs().format('MM')]);
-const first = ref({}) as Ref<PilotStat>;
-const second = ref({}) as Ref<PilotStat>;
-const third = ref({}) as Ref<PilotStat>;
+
 
 // 定义统计数据
 const summary = ref({
@@ -118,7 +120,7 @@ const isEnable = computed(() => {
         right: dayjs().diff(old, 'month') > 0,
     }
 })
-function clac(num: number) {
+function clacMonth(num: number) {
     if (loading.value) {
         return
     }
@@ -134,30 +136,7 @@ function clac(num: number) {
     console.log('new', newDate, newDate.split('-'));
     dateRange.value = newDate.split('-') as [string, string];
 }
-function techName(userId: string) {
-    // const pilots = getPilots;
-    const pilot = userStore.pilots[userId];
-    const techs = pilot?.techs;
 
-    if (!techs) return [];
-    const oreder = ["F0", "FR", "F1", "F2", "F3", "F4", "F5", "F6", "C0", "C1", "C2", "C3", "TA", "TB", "TC"];
-    const sorted = [...techs].sort((a, b) => oreder.indexOf(b.techName) - oreder.indexOf(a.techName));
-
-    // 去重并保留最高优先级
-    const res = [];
-    const seen = new Set();
-    for (const tech of sorted) {
-        const key = tech.acType.slice(0, 2);
-        if (!seen.has(key)) {
-            seen.add(key);
-            res.push({
-                acType: tech.acType,
-                techName: tech.techName,
-            });
-        }
-    }
-    return res;
-}
 
 // 获取统计数据和飞行员排名
 watch(() => dateRange, async () => {
@@ -187,7 +166,7 @@ watch(() => dateRange, async () => {
         first.value = sortStat.shift();
         second.value = sortStat.shift();
         third.value = sortStat.shift();
-        data.value = sortStat;
+        pilots.value = sortStat;
         // 排序飞行员
     } catch (err) {
         error.value = '获取统计数据和飞行员排名失败';
@@ -198,7 +177,7 @@ watch(() => dateRange, async () => {
 }, { immediate: true, deep: true })
 
 onMounted(() => {
-    userStore.fetchPilots();
+    fetchPilots();
 })
 </script>
 <style lang="less" scoped>

@@ -21,6 +21,7 @@ export default {
         statMonth: '/stat/month',
         statByAirline: '/stat/by/airline',
         statByAircraft: '/stat/by/aircraft',
+        statByStation: '/stat/by/station',
         //
         crewFlights: '/crew/list',
         //
