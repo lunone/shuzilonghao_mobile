@@ -5,8 +5,8 @@
             <div class="title">{{ titles[props.range][index] }}</div>
             <template v-for="(unit, key) in fields" :key="key">
                 <div class="item">
-                    <span class="value">{{ index == 2 ? numberByWan(item[key]) : item[key] }}</span>
-                    <span class="unit">{{ index == 2 ? unit : '%' }}</span>
+                    <span class="value">{{ item[key] }}</span>
+                    <span class="unit">{{ index == 2 ? '%' : unit }}</span>
                 </div>
             </template>
         </div>
@@ -52,9 +52,9 @@ const fields = { counter: '班', netWeightCargo: '吨', hours: '小时' }
 
 const rate = (last: number, current: number) => last > 0 ? ((current - last) / last * 100).toFixed(1) : '--';
 const formater = (src) => ({
-    counter: src?.counter ?? 0,
-    netWeightCargo: +((src?.netWeightCargo ?? 0) / 1e3).toFixed(2) | 0,
-    hours: +(src?.hours ?? 0).toFixed(2) | 0,
+    counter: numberByWan(src?.counter ?? 0),
+    netWeightCargo: numberByWan(((src?.netWeightCargo ?? 0) / 1e3) | 0),
+    hours: numberByWan((src?.hours ?? 0) | 0),
 })
 const sections = computed<Record<StatField, string | number>[]>(() => [
     formater(lastRes.value),
