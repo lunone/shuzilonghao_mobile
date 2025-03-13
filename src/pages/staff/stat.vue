@@ -23,7 +23,7 @@ import dayjs from 'dayjs';
 import { computed, onMounted, PropType, reactive, Ref, ref } from 'vue';
 import CONFIG from '@/config';
 import { numberByWan } from '@/utils/tools';
-import { Stat, StatField } from '@/interface/flight.interface';
+import { StatSingle } from '@/interface/flight.interface';
 
 
 const props = defineProps({
@@ -42,34 +42,34 @@ const dates = {
     firstDayOfLastYear: dayjs().subtract(1, 'year').startOf('year').toDate(),
 }
 
-const lastRes: Ref<Stat> = ref({ netWeightCargo: 0, counter: 0, hours: 0 });
-const currentRes: Ref<Stat> = ref({ netWeightCargo: 0, counter: 0, hours: 0 });
+const lastRes: Ref<StatSingle> = ref({ netWeightCargo: 0, counter: 0, hour: 0 });
+const currentRes: Ref<StatSingle> = ref({ netWeightCargo: 0, counter: 0, hour: 0 });
 
 const titles = { day: ['前日', '昨日', '变化'], year: ['去年', '今年', '变化'] }
 // 在 computed 属性后添加：
-const fields = { counter: '班', netWeightCargo: '吨', hours: '小时' }
+const fields = { counter: '班', netWeightCargo: '吨', hour: '小时' }
 
 const rate = (last: number, current: number) => last > 0 ? ((current - last) / last * 100).toFixed(1) : '--';
 const formater = (src) => ({
     counter: numberByWan(src?.counter ?? 0),
     netWeightCargo: numberByWan(((src?.netWeightCargo ?? 0) / 1e3) | 0),
-    hours: numberByWan((src?.hours ?? 0) | 0),
+    hour: numberByWan((src?.hour ?? 0) | 0),
 })
-const sections = computed<Record<StatField, string | number>[]>(() => [
+//  Record<keyof Stat, string | number>[]
+const sections = computed(() => [
     formater(lastRes.value),
     formater(currentRes.value),
     Object.keys(fields).reduce((acc, key) => ({
-        ...acc,
-        [key]: rate(lastRes.value[key] ?? 0, currentRes.value[key] ?? 0)
-    }), {} as Record<StatField, string>),
+        ...acc, [key]: rate(lastRes.value[key] ?? 0, currentRes.value[key] ?? 0)
+    }), {} as Record<keyof StatSingle, string>),
 ]);
 
 onMounted(() => {
     const lastRange = props.range == 'year' ? { startDate: dates.firstDayOfLastYear, endDate: dates.dayBeforeOneYear } : { startDate: dates.theDayBeforeYesterday, endDate: dates.yesterday };
     const currentRange = props.range == 'year' ? { startDate: dates.firstDayOfYear, endDate: dates.now } : { startDate: dates.yesterday, endDate: dates.today };
     Promise.allSettled([
-        api(CONFIG.url.statPeriod, currentRange).then(res => currentRes.value = res as Stat),
-        api(CONFIG.url.statPeriod, lastRange).then(res => lastRes.value = res as Stat),
+        api(CONFIG.url.statPeriod, currentRange).then(res => currentRes.value = res as StatSingle),
+        api(CONFIG.url.statPeriod, lastRange).then(res => lastRes.value = res as StatSingle),
     ])
         // .then((arr) => console.log('获取信息', arr, thisYearRes.value, lastYearRes.value))
         .catch(err => console.warn('错误', err));

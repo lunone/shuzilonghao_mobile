@@ -35,7 +35,7 @@ watch(() => props.data, () => {
         let weight = 0, hour = 0, counter = 0;
         groupFlights[date].forEach(f => {
             weight += f.netWeightCargo || 0;
-            hour += dayjs(f.ata).diff(dayjs(f.atd), 'minute') || 0;
+            hour += dayjs(f.ata).diff(dayjs(f.atd), 'hour') || 0;
             counter++;
             //     if (!data[date]) {
             //         data[date] = { weight: 0, count: 0, hour: 0 };

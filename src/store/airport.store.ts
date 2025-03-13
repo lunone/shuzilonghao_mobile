@@ -2,7 +2,8 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import api from '@/utils/api';
 import CONFIG from '@/config';
-import { AirportItem } from '@/interface/flight.interface';
+import { AirportItem } from '@/interface/airport.interface';
+ 
 
 export const useAirportStore = defineStore('airport', () => {
     const isLoading = { airport: false };
@@ -17,7 +18,7 @@ export const useAirportStore = defineStore('airport', () => {
 
     const getCity = computed(() => {
         return (code: string, type: string = 'city'): string => {
-            const src = code.length === 4 ? airportsCode4.value : code3.value;
+            const src = code?.length === 4 ? airportsCode4.value : code3.value;
             return src[code]?.[type] || code;
         };
     });

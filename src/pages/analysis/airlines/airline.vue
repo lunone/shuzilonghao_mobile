@@ -18,13 +18,13 @@
         <div class="summary">
             <span class="title">总计:</span>
             <span class="count">
-                {{ toFixed(stats[selectAcReg].counter) }}班
+                {{ toFixed(stats[selectAcReg].counter as unknown as number) }}班
             </span>
             <span class="weight">
                 {{ toFixed(stats[selectAcReg].netWeightCargo.total) }}吨
             </span>
             <span class="hour">
-                平均空时: {{ toFixed(stats[selectAcReg].minutes.avg) }}分钟
+                平均空时: {{ toFixed(stats[selectAcReg].hour.avg * 60) }}分钟
             </span>
         </div>
         <div class="weight">
@@ -43,12 +43,12 @@
 
 </template>
 <script setup lang="ts">
-import { statItem } from '@/interface/flight.interface';
+import { StatMulti } from '@/interface/flight.interface';
 import { onMounted, PropType, ref, watch } from 'vue';
 const props = defineProps({
     dep: { type: String, default: '', },
     arr: { type: String, default: '', },
-    stats: { type: Object as PropType<Record<string, statItem>>, default: () => { }, },
+    stats: { type: Object as PropType<Record<string, StatMulti>>, default: () => { }, },
 })
 const selectAcReg = ref('total');
 watch(() => props, () => {

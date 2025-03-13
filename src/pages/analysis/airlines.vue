@@ -29,7 +29,7 @@ import { ref, computed, watch, Ref, onMounted } from 'vue';
 import CONFIG from '@/config';
 import api from '@/utils/api';
 import { useAirportStore } from '@/store/airport.store';
-import { statItem } from '@/interface/flight.interface';
+import { StatMulti } from '@/interface/flight.interface';
 import dayjs from 'dayjs';
 import airline from './airlines/airline.vue';
 import zlDateRangePicker from '@/components/zl/dateRangePicker.vue';
@@ -41,7 +41,7 @@ const error = ref('');
 
 const currentStation = ref('');
 // ZHCC-ZHYC:{'B220M':{avgNEtcargo:number……}}
-type Res = Record<string, Record<string, statItem>>
+type Res = Record<string, Record<string, StatMulti>>
 const isDep: Ref<boolean> = ref(false);
 const airlineStats = ref({}) as Ref<Res>;
 
@@ -56,7 +56,7 @@ const stations = computed(() => {
     return [...new Set(Object.keys(airlineStats.value).reduce((acc, cur) => [...acc, ...cur.split('-')], []))];
 })
 const filterStation = computed(() => {
-    const temp = {} as Record<string, Record<string, statItem>>;
+    const temp = {} as Record<string, Record<string, StatMulti>>;
     for (let key in airlineStats.value) {
         const [dep, arr] = key.split('-');
         let selectStation = isDep.value ? dep : arr;

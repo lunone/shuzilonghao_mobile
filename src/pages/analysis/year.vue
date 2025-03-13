@@ -16,19 +16,19 @@ import CONFIG from '@/config';
 import dayjs from 'dayjs';
 import api from '@/utils/api';
 import { numberByWan } from '@/utils/tools';
-import { Stat } from '@/interface/flight.interface';
+import { StatSingle } from '@/interface/flight.interface';
 
-type StatItem = Stat & {
+type StatMulti = StatSingle & {
     month?: string;
-    values?: StatItem[];
+    values?: StatSingle[];
 };
 
 const loading = ref(false);
 const error = ref('');
 const dateRange = ref<[Date, Date]>([dayjs().add(-2, 'year').startOf('year').toDate(), new Date()]);
 const selectYear = ref('');
-const stats = ref<Record<string, StatItem>>({});
-let statsYear = {} as Record<string, StatItem>;
+const stats = ref<Record<string, StatMulti>>({});
+let statsYear = {} as Record<string, StatMulti>;
 
 const option = ref<any>();
 
@@ -39,7 +39,7 @@ const tips = computed(() => selectYear.value ? '返回多年统计' : '点击下
 async function fetchData(startDate: Date, endDate: Date) {
     loading.value = true;
     try {
-        const res = await api(CONFIG.url.statMonth, { startDate, endDate }) as StatItem[];
+        const res = await api(CONFIG.url.statMonth, { startDate, endDate }) as StatSingle[];
         stats.value = stat(res);
     } catch (err) {
         error.value = '数据加载失败';
@@ -60,7 +60,7 @@ function stat(res, year = 'year') {
             month: monthGroup[0].month,
             values: monthGroup,
             counter: _.sumBy(monthGroup, 'counter'),
-            hours: +_.sumBy(monthGroup, 'hours').toFixed(2),
+            hour: _.sumBy(monthGroup, 'hour'),
             netWeightCargo: +(_.sumBy(monthGroup, 'netWeightCargo') / 1e3).toFixed(2)
         }))
         .value();
@@ -83,7 +83,7 @@ const showTip = (chart: any, event: any) => {
                 { text: `${month}月`, color: null },
                 { text: `航班: ${numberByWan(stats.value[year].counter)} 班`, color: '#91CB74' },
                 { text: `货运: ${numberByWan(stats.value[year].netWeightCargo)} 吨`, color: '#1890FF' },
-                { text: `飞行: ${numberByWan(stats.value[year].hours)} 小时`, color: '#FAC858' }
+                { text: `飞行: ${numberByWan(stats.value[year].hour)} 小时`, color: '#FAC858' }
             ]
         });
     }
@@ -105,7 +105,7 @@ watch(stats, (newStats, oldStats) => {
     // 原始数据提取
     const rawFlights = years.map(year => newStats[year].counter);
     const rawCargo = years.map(year => newStats[year].netWeightCargo);
-    const rawHours = years.map(year => newStats[year].hours);
+    const rawHours = years.map(year => newStats[year].hour);
 
     yearsRef.value = years;
     // console.log('years', years, rawFlights, rawCargo, rawHours);
@@ -118,7 +118,7 @@ watch(stats, (newStats, oldStats) => {
     const adjustedData = {
         flights: rawFlights.map(v => v * FLIGHT_SCALE + BASE_HEIGHT),
         cargo: rawCargo.map(v => v * CARGO_SCALE + BASE_HEIGHT),
-        hours: rawHours.map(v => v + BASE_HEIGHT)
+        hour: rawHours.map(v => v + BASE_HEIGHT)
     };
 
     option.value = {
@@ -130,9 +130,9 @@ watch(stats, (newStats, oldStats) => {
                 name: '飞行小时',
                 type: 'column',
                 color: '#FAC858',
-                data: adjustedData.hours,
+                data: adjustedData.hour,
                 textColor: '#37383a',
-                formatter: (val) => numberByWan(val - BASE_HEIGHT) // 还原小时数
+                formatter: (val) => numberByWan((val - BASE_HEIGHT).toFixed(1)) // 还原小时数
             }, {
                 name: '货运总量(吨)',
                 type: 'column',
@@ -169,7 +169,6 @@ watch(stats, (newStats, oldStats) => {
         },
         extra: {
             column: {
-                // width: 30,
                 categoryGap: 2
             }
         }

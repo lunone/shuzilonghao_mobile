@@ -38,14 +38,20 @@ export type FlightItem = {
 }
 
 
+type multi = { total: number, avg?: number, max?: number, min?: number };
 
-export type StatField = 'counter' | 'netWeightCargo' | 'hours';
-type single = { total: number, avg: number, max: number, min: number };
-export type statItem = {
+
+export type StatSingle = {
+    name?: string,
     acRegs?: string[],
+    hour?: number
     counter: number
-    minutes: single
-    netWeightCargo?: single,
-}
-
-export type Stat = { name?: string } & Record<StatField, number>;
+    netWeightCargo: number
+};
+export type StatMulti = {
+    name?: string,
+    acRegs?: string[],
+    hour: multi
+    counter: multi,
+    netWeightCargo: multi,
+};
