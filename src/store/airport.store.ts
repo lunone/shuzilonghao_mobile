@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import api from '@/utils/api';
 import CONFIG from '@/config';
-import { AirportItem } from '@/interface';
+import { AirportItem } from '@/interface/flight.interface';
 
 export const useAirportStore = defineStore('airport', () => {
     const isLoading = { airport: false };

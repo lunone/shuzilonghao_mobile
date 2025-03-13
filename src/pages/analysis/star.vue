@@ -1,11 +1,11 @@
 <template>
     <div class="star-wrapper">
         <div class="title">{{ text }}</div>
-        <div class="star" v-for="(item, index) in starList" :key="index">
-            <div class="name">{{ getCity(item.name) }}</div>
-            <div class="counter">{{ numberByWan(item.counter) }}班</div>
-            <div class="weight">{{ numberByWan(item.netWeightCargo) }}吨</div>
-            <div class="hour">{{ numberByWan(item.hours) }}小时</div>
+        <div class="star">
+            <div class="name">{{ getCity(starList.name) }}</div>
+            <div class="counter">{{ numberByWan(starList.counter) }}班</div>
+            <div class="weight">{{ numberByWan(starList.netWeightCargo) }}吨</div>
+            <div class="hour">{{ numberByWan(starList.hours) }}小时</div>
         </div>
     </div>
 </template>
@@ -16,8 +16,10 @@ import { numberByWan } from '@/utils/tools';
 import CONFIG from '@/config';
 import api from '@/utils/api';
 import dayjs from 'dayjs';
-const airportStore = useAirportStore();
-const { getCity } = airportStore;
+import { Stat, statItem } from '@/interface/flight.interface';
+
+
+const { getCity, fetchAirports } = useAirportStore();
 
 const props = defineProps({
     startDate: { type: Date, default: () => dayjs().startOf('year').toDate() },
@@ -29,24 +31,22 @@ const text = computed(() => {
 })
 const starSrc = ref({}) as Ref<Record<string, any>>;
 const starList = computed(() => {
-    if (!Object.values(starSrc.value).length) return [];
-    const src = [
-        { name: 'ZHCC', ...starSrc.value }
-    ] as { name: string, counter: number, netWeightCargo: number, hours: number }[];
-
-    src.map(item => {
-        item.hours = +item.hours.toFixed(2);
-        item.netWeightCargo = +(item.netWeightCargo / 1e3).toFixed(2)
-    })
+    if (!Object.values(starSrc.value).length) return {} as Stat  ;
+    const item = starSrc.value;
+    const src = {
+        name: 'ZHCC',
+        counter: +item.counter.toFixed(2),
+        hours: +item.hours.toFixed(2),
+        netWeightCargo: +(item.netWeightCargo / 1e3).toFixed(2)
+    };
     return src;
-})
+}) as Ref<Stat  >;
 onMounted(() => {
     const data = { station: 'ZHCC', startDate: props.startDate, endDate: props.endDate }
     Promise.all([
-        airportStore.fetchAirports(),
-        api(CONFIG.url.statByStation, data).then(res => starSrc.value = res || [])
+        fetchAirports(),
+        api(CONFIG.url.statByStation, data).then(res => starSrc.value = res || {})
     ])
-    airportStore.fetchAirports();
 })
 </script>
 <style lang="less" scoped>
@@ -65,7 +65,9 @@ onMounted(() => {
         .name,
         .counter,
         .weight,
-        .hour {}
+        .hour {
+            border: 0;
+        }
     }
 
 

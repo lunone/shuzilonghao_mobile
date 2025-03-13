@@ -16,11 +16,9 @@ import CONFIG from '@/config';
 import dayjs from 'dayjs';
 import api from '@/utils/api';
 import { numberByWan } from '@/utils/tools';
+import { Stat } from '@/interface/flight.interface';
 
-type StatItem = {
-    counter: number;
-    hours: number;
-    netWeightCargo: number;
+type StatItem = Stat & {
     month?: string;
     values?: StatItem[];
 };

@@ -29,9 +29,9 @@ import { ref, computed, watch, Ref, onMounted } from 'vue';
 import CONFIG from '@/config';
 import api from '@/utils/api';
 import { useAirportStore } from '@/store/airport.store';
-import { statItem } from '@/interface';
+import { statItem } from '@/interface/flight.interface';
 import dayjs from 'dayjs';
-import airline from './airline/airline.vue';
+import airline from './airlines/airline.vue';
 import zlDateRangePicker from '@/components/zl/dateRangePicker.vue';
 const airportStore = useAirportStore();
 // 定义 loading 和 error 状态

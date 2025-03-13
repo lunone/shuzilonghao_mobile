@@ -28,7 +28,7 @@
 import { Ref, ref, computed } from 'vue';
 
 import dayjs from 'dayjs';
-import { FlightItem } from '@/interface';
+import { FlightItem } from '@/interface/flight.interface';
 import bar from './overview/bar.vue';
 import pie from './overview/pie.vue';
 // 定义props来接收外部传入的startDate和endDate属性

@@ -8,7 +8,7 @@
 import { ref, onMounted, Ref, computed } from 'vue';
 import dayjs from 'dayjs';
 import api from '@/utils/api';
-import { FlightItem } from '@/interface';
+import { FlightItem } from '@/interface/flight.interface';
 import ucharts from '@/components/ucharts/ucharts.vue';
 import CONFIG from '@/config';
 import _ from 'lodash-es';
@@ -42,12 +42,11 @@ function setOption(flights: Record<string, Record<string, number>>) {
             {
                 name: "排班量",
                 data: dates.map(date => {
-                    const flightCounter = groupedFlights[date];
+                    const counter = groupedFlights[date];
                     // 超过平均值20%的颜色红色，低于平均值20%的颜色暗绿色，其他的颜色为蓝色
-                    const diff = (flightCounter - avgDay) / avgDay;
-                    // console.log('---------',diff, flightCounter, avgDay)
+                    const diff = (counter - avgDay) / avgDay;
                     const color = diff > 0.4 ? '#C52305' : (diff < -0.4) ? '#C52305' : "#E27C69";
-                    return { color, value: flightCounter - Math.round(avgDay / 3) }
+                    return { color, value: counter - Math.round(avgDay / 3) }
                 }),
                 formatter: val => val + Math.round(avgDay / 3),
                 textOffset: 18,

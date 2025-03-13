@@ -18,32 +18,32 @@
         <div class="summary">
             <span class="title">总计:</span>
             <span class="count">
-                {{ stats[selectAcReg].flightCount }}班
+                {{ toFixed(stats[selectAcReg].counter) }}班
             </span>
             <span class="weight">
-                {{ stats[selectAcReg].netWeightCargo }}吨
+                {{ toFixed(stats[selectAcReg].netWeightCargo.total) }}吨
             </span>
             <span class="hour">
-                平均空时: {{ stats[selectAcReg].avgFlightTime }}分钟
+                平均空时: {{ toFixed(stats[selectAcReg].minutes.avg) }}分钟
             </span>
         </div>
         <div class="weight">
             <span class="title">运量:</span>
             <span class="avg">
-                平均{{ stats[selectAcReg].avgFlightWeight }}吨
+                平均{{ toFixed(stats[selectAcReg].netWeightCargo.avg) }}吨
             </span>
             <span class="min">
-                最少{{ stats[selectAcReg].minFlightWeight }}吨
+                最少{{ toFixed(stats[selectAcReg].netWeightCargo.min) }}吨
             </span>
             <span class="max">
-                最多{{ stats[selectAcReg].maxFlightWeight }}吨
+                最多{{ toFixed(stats[selectAcReg].netWeightCargo.max) }}吨
             </span>
         </div>
     </div>
 
 </template>
 <script setup lang="ts">
-import { statItem } from '@/interface';
+import { statItem } from '@/interface/flight.interface';
 import { onMounted, PropType, ref, watch } from 'vue';
 const props = defineProps({
     dep: { type: String, default: '', },
@@ -55,7 +55,9 @@ watch(() => props, () => {
     selectAcReg.value = 'total';
 }, { deep: true, immediate: true })
 const acRegChange = (acReg: string) => selectAcReg.value = acReg
-
+function toFixed(num: number) {
+    return +num.toFixed(1);
+}
 </script>
 <style lang="less" scoped>
 .item {

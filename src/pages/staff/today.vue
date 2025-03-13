@@ -25,7 +25,7 @@ import { ref, computed, onMounted, watch, Ref } from 'vue';
 import api from '@/utils/api';
 import CONFIG from '@/config';
 import dayjs from 'dayjs';
-import { FlightItem } from '@/interface';
+import { FlightItem } from '@/interface/flight.interface';
 
 const flights = ref<FlightItem[]>([]);
 

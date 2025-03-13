@@ -1,4 +1,4 @@
-import { ListNode, TreeNode } from "@/interface";
+import { ListNode, TreeNode } from "@/interface/flight.interface";
 
 export const call = (phoneNumber: string) => {
     uni.makePhoneCall({ phoneNumber });

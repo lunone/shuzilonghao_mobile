@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed, Ref } from 'vue';
 import api from '@/utils/api';
 import CONFIG from '@/config';
-import { PilotItem, UserItem } from '@/interface';
+import { UserItem } from '@/interface/user.interface';
 
 export const useUserStore = defineStore('user', () => {
     const isLoading = { staff: false };

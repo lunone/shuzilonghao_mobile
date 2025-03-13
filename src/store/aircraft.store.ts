@@ -3,7 +3,7 @@ import { ref, computed } from 'vue';
 import api from '@/utils/api';
 import dayjs from 'dayjs';
 import CONFIG from '@/config';
-import { AircraftItem } from '@/interface';
+import { AircraftItem } from '@/interface/flight.interface';
 
 export const useAircraftStore = defineStore('aircraft', () => {
     const isLoading = { aircraft: false };

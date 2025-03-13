@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import api from '@/utils/api'; // 导入API工具函数
 import CONFIG from '@/config'; // 导入配置文件
-import { DepartmenItem, ListNode } from '@/interface'; // 导入接口定义
+import { DepartmenItem, ListNode } from '@/interface/flight.interface'; // 导入接口定义
 
 // 定义部门存储模块
 export const useDepartmentStore = defineStore('department', () => {

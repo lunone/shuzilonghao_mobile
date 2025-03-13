@@ -51,7 +51,7 @@
 import { computed, onMounted, Ref, ref, watch } from 'vue';
 import CONFIG from '@/config';
 import api from '@/utils/api';
-import { UserItem } from '@/interface';
+import { UserItem } from '@/interface/flight.interface';
 import { useUserStore } from '@/store/user.store';
 import { useDepartmentStore } from '@/store/department.store';
 import Salary from './profile/salary.vue';

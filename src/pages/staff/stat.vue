@@ -23,9 +23,8 @@ import dayjs from 'dayjs';
 import { computed, onMounted, PropType, reactive, Ref, ref } from 'vue';
 import CONFIG from '@/config';
 import { numberByWan } from '@/utils/tools';
-// 新增类型定义
-type StatField = 'counter' | 'netWeightCargo' | 'hours';
-type Stat = Record<StatField, number>;
+import { Stat, StatField } from '@/interface/flight.interface';
+
 
 const props = defineProps({
     range: { type: String as PropType<'year' | 'day'>, default: 'year' },

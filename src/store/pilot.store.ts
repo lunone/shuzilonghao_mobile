@@ -2,8 +2,8 @@ import { defineStore } from 'pinia';
 import { ref, computed, Ref } from 'vue';
 import api from '@/utils/api';
 import CONFIG from '@/config';
-import { PilotItem, UserItem } from '@/interface';
 import _ from 'lodash';
+import { PilotItem } from '@/interface/user.interface';
 
 export const usePilotStore = defineStore('pilot', () => {
     const isLoading = { pilot: false };
