@@ -1,11 +1,13 @@
 <template>
     <div class="star-wrapper">
-        <div class="title">{{ text }}</div>
+        <div class="title">{{ getCity(starList.name) }}今年</div>
         <div class="star">
-            <div class="name">{{ getCity(starList.name) }}</div>
-            <div class="counter">{{ numberByWan(starList.counter) }}班</div>
-            <div class="weight">{{ numberByWan(starList.netWeightCargo) }}吨</div>
-            <div class="hour">{{ numberByWan(starList.hour) }}小时</div>
+            <template v-for="(unit, key) in fields" :key="key">
+                <div class="item">
+                    <span class="value">{{ numberByWan(starList[key]) }}</span>
+                    <span class="unit">{{ unit }}</span>
+                </div>
+            </template>
         </div>
     </div>
 </template>
@@ -18,16 +20,16 @@ import api from '@/utils/api';
 import dayjs from 'dayjs';
 import { StatSingle } from '@/interface/flight.interface';
 
-
+const fields = { counter: '班', netWeightCargo: '吨', hour: '小时' }
 const { getCity, fetchAirports } = useAirportStore();
 
 const props = defineProps({
     startDate: { type: Date, default: () => dayjs().startOf('year').toDate() },
     endDate: { type: Date, default: () => dayjs().toDate() },
 })
-const text = computed(() => {
-    return `${dayjs(props.startDate).format('YYYY-MM-DD')}-${dayjs(props.endDate).format('YYYY-MM-DD')}`
-})
+// const text = computed(() => {
+//     return `${dayjs(props.startDate).format('YYYY-MM-DD')}-${dayjs(props.endDate).format('YYYY-MM-DD')}`
+// })
 const starSrc = ref({}) as Ref<Record<string, any>>;
 const starList = computed(() => {
     if (!Object.values(starSrc.value).length) return { name: 'ZHCC', } as StatSingle;
@@ -52,23 +54,62 @@ onMounted(() => {
 @import '@/css/base.less';
 
 .star-wrapper {
+    .column;
     width: 100%;
     margin: 0;
-    .column;
+    // gap: 6px; // 增加垂直间距
+    // padding: 10px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .title {
+        font-size: 18px;
+        font-weight: 500;
+        color: #747474;
+        // padding-bottom: 8px;
+        font-weight: bold;
+        border-bottom: 1px solid #eee;
+        align-self: flex-start;
+        margin: 6px 20px 0;
+    }
+
 
     .star {
         .row;
         justify-content: space-between;
         width: 100%;
+        gap: 8px; // 增加子项间距
+        // padding: 12px 0;
 
         .name,
-        .counter,
-        .weight,
-        .hour {
+        .item {
             border: 0;
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            transition: all 0.3s;
+
+            .value {
+                font-size: 16px;
+                color: #182027;
+                font-weight: 600;
+                margin-right: 4px;
+            }
+
+            .unit {
+                font-size: 12px;
+                color: #99a9bf;
+            }
+        }
+
+        .name {
+            font-weight: 500;
+            color: #303133;
+            text-align: left;
+            flex: 1.2;
         }
     }
-
 
 }
 </style>
