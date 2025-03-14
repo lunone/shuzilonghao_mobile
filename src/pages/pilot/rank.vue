@@ -146,6 +146,7 @@ watch(() => dateRange, async () => {
         const startDate = dayjs(dateRange.value.join('-') + '-01').toDate();
         const endDate = dayjs(startDate).endOf('month').toDate();
         const res = await api(CONFIG.url.statCrewFh, { startDate, endDate }) as any[];
+        uni.hideToast();
         const stat = res.map((pilot: any) => ({
             rank: -1,
             userId: pilot.userId,

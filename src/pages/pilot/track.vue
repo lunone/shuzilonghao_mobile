@@ -40,13 +40,13 @@ const days = computed(() => {
     const arr = [];
     const startDate = dayjs(props.startDate);
     const dayLength = dayjs(props.endDate).diff(startDate, 'day');
-    // console.log('00000000000', dayLength);
     for (let i = 0; i < dayLength; i++) {
         const day = startDate.add(i, 'day').add(1, 'hour');// 加1小时是因为防止边界判断
         let className = '', index = day.format('DD'), name = '';
-        const trainingsDay = trainings.value.find(t => day.isAfter(t.startDate) && day.isBefore(t.endDate));
+        const trainingsDay = trainings.value.find(t => day.isSame(t.startDate, 'day') || day.isSame(t.endDate, 'day'));
         const dutyDay = duties.value.filter(t => day.isSame(t.flightDate, 'day'));
-        const absenceDay = absences.value.find(t => day.isAfter(t.startDate) && day.isBefore(t.endDate));
+        const absenceDay = absences.value.find(t => day.isSame(t.startDate, 'day') || day.isSame(t.endDate, 'day'));
+
         let data;
         if (trainingsDay) {
             name = 'learn';
@@ -104,7 +104,7 @@ watch(() => props.pcode, () => {
         api(CONFIG.url.pilotTraining, data).then(res => trainings.value = res || []),
         api(CONFIG.url.pilotDuty, data).then(res => duties.value = res || []),
         api(CONFIG.url.pilotAbsence, data).then(res => absences.value = res || []),
-    ]).then((arr) => console.log('获取信息', arr, trainings.value, duties.value, absences.value))
+    ]).then((arr) => console.log('获取信息train,duty,absence', arr))
         .catch(err => console.warn('错误', err));
 }, { immediate: true, deep: true })
 
