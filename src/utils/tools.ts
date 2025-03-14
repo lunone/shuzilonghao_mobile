@@ -1,7 +1,10 @@
-import { ListNode, TreeNode } from "@/interface/flight.interface";
-
 export const call = (phoneNumber: string) => {
-    uni.makePhoneCall({ phoneNumber });
+    uni.makePhoneCall({
+        phoneNumber,
+        fail(result) {
+            console.log('拨打电话已取消')
+        },
+    });
 };
 /**
  * 将数字格式化为以万为单位的逗号分隔字符串（每4位分隔）
@@ -18,6 +21,6 @@ export const call = (phoneNumber: string) => {
  *    - (?=(\d{4})+(?!\d)) 正向预查，确保当前位置后面存在若干组4位数字，
  *      且这些4位组后面没有更多数字（保证从右往左按4位分组）
  */
-export const numberByWan = (num: number | string) => 
-  // 强制类型转换并执行正则替换
-  (num + '').replace(/\B(?=(\d{4})+(?!\d))/g, ',')
+export const numberByWan = (num: number | string) =>
+    // 强制类型转换并执行正则替换
+    (num + '').replace(/\B(?=(\d{4})+(?!\d))/g, ',')

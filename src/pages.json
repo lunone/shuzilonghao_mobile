@@ -69,7 +69,7 @@
             "path": "pages/pilot/portrait",
             "style": {
                 "navigationBarTitleText": "人员画像",
-                "navigationBarBackgroundColor": "#D13419"
+                "navigationBarBackgroundColor": "#FFFFFF"
             }
         },
         {
