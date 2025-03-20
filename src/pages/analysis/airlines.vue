@@ -26,7 +26,7 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, watch, Ref, onMounted } from 'vue';
-import CONFIG from '@/config';
+import { CONFIG } from '@/config';
 import api from '@/utils/api';
 import { useAirportStore } from '@/store/airport.store';
 import { StatMulti } from '@/interface/flight.interface';

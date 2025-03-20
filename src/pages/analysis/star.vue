@@ -15,7 +15,7 @@
 import { computed, onMounted, Ref, ref } from 'vue';
 import { useAirportStore } from '@/store/airport.store';
 import { numberByWan } from '@/utils/tools';
-import CONFIG from '@/config';
+import { CONFIG } from '@/config';
 import api from '@/utils/api';
 import dayjs from 'dayjs';
 import { StatSingle } from '@/interface/flight.interface';

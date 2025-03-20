@@ -1,4 +1,4 @@
-export default {
+export const CONFIG = {
     url: {
         timeout: 30e3,
         api: 'https://app.airlonghao.com/sz2',

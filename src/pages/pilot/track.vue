@@ -10,7 +10,7 @@
 import { useAirportStore } from '@/store/airport.store';
 import api from '@/utils/api';
 import dayjs from 'dayjs';
-import CONFIG from '@/config';
+import { CONFIG } from '@/config';
 import { computed, onMounted, PropType, Ref, ref, watch } from 'vue';
 
 const props = defineProps({
@@ -64,7 +64,7 @@ const days = computed(() => {
                     break;
                 }
             }
-            console.log('absenceReasons', absenceReasons, absenceDay)
+            // console.log('absenceReasons', absenceReasons, absenceDay)
             // name = '休';
             className = 'absence';
             data = absenceDay;

@@ -15,7 +15,7 @@
 import { ref } from 'vue';
 import api from '@/utils/api';
 import {useUserStore} from '@/store/user.store';
-import CONFIG from '@/config';
+import { CONFIG } from '@/config';
 const store = useUserStore();
 const disable = ref(false);
 const activationCode = ref('');

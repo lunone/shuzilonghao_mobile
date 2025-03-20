@@ -10,7 +10,7 @@ import dayjs from 'dayjs';
 import api from '@/utils/api';
 import { FlightItem } from '@/interface/flight.interface';
 import ucharts from '@/components/ucharts/ucharts.vue';
-import CONFIG from '@/config';
+import { CONFIG } from '@/config';
 import _ from 'lodash-es';
 
 const dayLenth = 22;

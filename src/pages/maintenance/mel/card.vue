@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import api from '@/utils/api'
 import dayjs from 'dayjs'
-import CONFIG from '@/config';
+import { CONFIG } from '@/config';
 import { ref, computed, watch, onMounted, PropType, Ref, watchEffect } from 'vue'
 
 // 定义 loading 和 error 状态

@@ -72,7 +72,7 @@
 import { ref, watch, onMounted, PropType, Ref, computed } from 'vue'
 import dayjs from 'dayjs';
 import api from '@/utils/api';
-import CONFIG from '@/config';
+import { CONFIG } from '@/config';
 import Profile from '@/pages/hr/profile.vue';
 import { usePilotStore } from '@/store/pilot.store';
 const { getTech, fetchPilots } = usePilotStore();

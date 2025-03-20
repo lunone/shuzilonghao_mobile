@@ -4,7 +4,7 @@
 <script lang="ts" setup>
 import api from '@/utils/api';
 import { onMounted, PropType, ref, Ref, watch } from 'vue';
-import CONFIG from '@/config';
+import { CONFIG } from '@/config';
 import EventVue from './card/event.vue';
 import dayjs from 'dayjs';
 

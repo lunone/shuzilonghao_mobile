@@ -31,7 +31,7 @@
 <script setup lang="ts">
 import api from '@/utils/api';
 import { inject, onMounted, PropType, ref, Ref, watch } from 'vue';
-import CONFIG from '@/config';
+import { CONFIG } from '@/config';
 import dayjs from 'dayjs';
 
 const props = defineProps({

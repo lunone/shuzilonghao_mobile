@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed, Ref } from 'vue';
 import api from '@/utils/api';
-import CONFIG from '@/config';
+import { CONFIG } from '@/config';
 import _ from 'lodash';
 import { PilotItem } from '@/interface/user.interface';
 

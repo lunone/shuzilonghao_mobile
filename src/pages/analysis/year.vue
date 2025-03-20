@@ -12,7 +12,7 @@
 import ucharts from '@/components/ucharts/ucharts.vue';
 import { computed, ref, watch } from 'vue';
 import _ from 'lodash';
-import CONFIG from '@/config';
+import { CONFIG } from '@/config';
 import dayjs from 'dayjs';
 import api from '@/utils/api';
 import { numberByWan } from '@/utils/tools';

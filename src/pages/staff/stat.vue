@@ -21,7 +21,7 @@
 import api from '@/utils/api';
 import dayjs from 'dayjs';
 import { computed, onMounted, PropType, reactive, Ref, ref } from 'vue';
-import CONFIG from '@/config';
+import { CONFIG } from '@/config';
 import { numberByWan } from '@/utils/tools';
 import { StatSingle } from '@/interface/flight.interface';
 

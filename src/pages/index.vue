@@ -18,7 +18,7 @@
 <script lang="ts" setup>
 import { onLoad } from '@dcloudio/uni-app';
 import { ref } from 'vue';
-import CONFIG from '@/config';
+import { CONFIG } from '@/config';
 import activateVue from '@/pages/public/activate.vue';
 import errorVue from '@/pages/public/error.vue';
 import splashVue from '@/pages/public/splash.vue';

@@ -31,7 +31,7 @@ import { ref, computed, onMounted, Ref, provide } from 'vue';
 // import NavVue from '@/components/Nav.vue';
 import api from '@/utils/api';
 import dayjs from 'dayjs';
-import CONFIG from '@/config';
+import { CONFIG } from '@/config';
 import ucharts from '@/components/ucharts/ucharts.vue';
 import eventsVue from '@/pages/sms/events.vue';
 import voluntarysVue from '@/pages/sms/voluntarys.vue';
