@@ -8,7 +8,7 @@
 </template>
 <script lang="ts" setup>
 import { useAirportStore } from '@/store/airport.store';
-import api from '@/utils/api';
+import { api } from '@/utils/api';
 import dayjs from 'dayjs';
 import { CONFIG } from '@/config';
 import { computed, onMounted, PropType, Ref, ref, watch } from 'vue';

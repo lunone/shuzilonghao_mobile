@@ -169,7 +169,7 @@
 </template>
 <script setup lang="ts">
 import { CONFIG } from '@/config';
-import api from '@/utils/api';
+import { api } from '@/utils/api';
 import { computed, Ref, ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { usePilotStore } from '@/store/pilot.store';

@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { ref, onMounted, Ref, computed } from 'vue';
 import dayjs from 'dayjs';
-import api from '@/utils/api';
+import { api } from '@/utils/api';
 import { FlightItem } from '@/interface/flight.interface';
 import ucharts from '@/components/ucharts/ucharts.vue';
 import { CONFIG } from '@/config';

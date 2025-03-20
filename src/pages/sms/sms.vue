@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, Ref, provide } from 'vue';
 // import NavVue from '@/components/Nav.vue';
-import api from '@/utils/api';
+import { api } from '@/utils/api';
 import dayjs from 'dayjs';
 import { CONFIG } from '@/config';
 import ucharts from '@/components/ucharts/ucharts.vue';

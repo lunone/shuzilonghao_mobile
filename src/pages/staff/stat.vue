@@ -18,7 +18,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import api from '@/utils/api';
+import { api } from '@/utils/api';
 import dayjs from 'dayjs';
 import { computed, onMounted, PropType, reactive, Ref, ref } from 'vue';
 import { CONFIG } from '@/config';

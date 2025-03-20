@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import api from '@/utils/api';
+import { api } from '@/utils/api';
 import dayjs from 'dayjs';
 import { CONFIG } from '@/config';
 import { AircraftItem } from '@/interface/aircraft.interface';

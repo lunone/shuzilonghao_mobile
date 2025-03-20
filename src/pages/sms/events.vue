@@ -2,7 +2,7 @@
     <EventVue :data="event" v-for="event in events" :key="event.id" />
 </template>
 <script lang="ts" setup>
-import api from '@/utils/api';
+import { api } from '@/utils/api';
 import { onMounted, PropType, ref, Ref, watch } from 'vue';
 import { CONFIG } from '@/config';
 import EventVue from './card/event.vue';

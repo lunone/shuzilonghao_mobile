@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import api from '@/utils/api';
+import { api } from '@/utils/api';
 import { CONFIG } from '@/config';
 import { AirportItem } from '@/interface/airport.interface';
  

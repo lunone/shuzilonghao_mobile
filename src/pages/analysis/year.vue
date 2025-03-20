@@ -14,7 +14,7 @@ import { computed, ref, watch } from 'vue';
 import _ from 'lodash';
 import { CONFIG } from '@/config';
 import dayjs from 'dayjs';
-import api from '@/utils/api';
+import { api } from '@/utils/api';
 import { numberByWan } from '@/utils/tools';
 import { StatSingle } from '@/interface/flight.interface';
 

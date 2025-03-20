@@ -29,7 +29,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import api from '@/utils/api';
+import { api } from '@/utils/api';
 import { inject, onMounted, PropType, ref, Ref, watch } from 'vue';
 import { CONFIG } from '@/config';
 import dayjs from 'dayjs';
