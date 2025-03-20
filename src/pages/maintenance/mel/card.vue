@@ -25,7 +25,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import api from '@/utils/api'
+import { api } from '@/utils/api'
 import dayjs from 'dayjs'
 import { CONFIG } from '@/config';
 import { ref, computed, watch, onMounted, PropType, Ref, watchEffect } from 'vue'
