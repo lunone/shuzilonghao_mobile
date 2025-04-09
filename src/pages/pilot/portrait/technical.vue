@@ -1,58 +1,66 @@
 <template>
     <div class="portrait-wrapper">
-        <Card :pilot="pilot" />
-        <press-tabs :active="tabCurrent" @change="onClickItem">
-            <press-tab title="基本信息">
-                <BasicInfo :pcode="pcode" :pilot="pilot" />
-            </press-tab>
-            <press-tab title="技术能力">
-                <Technical :pilot="pilot" />
-            </press-tab>
-            <press-tab title="疲劳分析">
-                <div class="track card">
-                    <h3 class="title"><i class="zl-icon-dep" />近期日程</h3>
-                    <div class="body">
-                        <trackVue :pcode="pcode" />
-                    </div>
+        <!-- 资质证书 -->
+        <div class="card">
+            <h3 class="title"><i class="zl-icon-dep" /> 资质认证</h3>
+            <div class="body cert">
+
+                <div class="cert-item">
+                    <div class="cert-label">ICAO等级</div>
+                    <div class="cert-value">Level {{ pilot.icaoClass }}</div>
                 </div>
-                <Stat :pcode="pcode" />
-            </press-tab>
-        </press-tabs>
+                <div class="cert-item">
+                    <div class="cert-label">ICAO有效期</div>
+                    <div class="cert-value">{{ formatDate(pilot.icaoValidDate) }}</div>
+                </div>
+                <div class="cert-item">
+                    <div class="cert-label">电台</div>
+                    <div class="cert-value">{{ pilot.vor }}</div>
+                </div>
+
+            </div>
+        </div>
+        <div class="card">
+            <h3 class="title"><i class="zl-icon-dep" />能力标识</h3>
+            <div class="body info">
+                <div class="info-item" v-for="title, key of marks" :key="key">
+                    <label class="cert-label">{{ title }}</label>
+                    <span class="cert-value">{{ pilot[key] }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <h3 class="title"><i class="zl-icon-dep" />计划限制</h3>
+            <div class="body info">
+                <div class="info-item" v-for="title, key of limit" :key="key">
+                    <label class="cert-label">{{ title }}</label>
+                    <span class="cert-value">{{ pilot[key] || '无限制' }}</span>
+                </div>
+            </div>
+        </div>
+
+
+
+
     </div>
 </template>
 <script setup lang="ts">
 import { CONFIG } from '@/config';
 import { api } from '@/utils/api';
 import { computed, Ref, ref } from 'vue';
-import { onLoad } from '@dcloudio/uni-app';
-import { usePilotStore } from '@/store/pilot.store';
-import trackVue from './track.vue';
 import dayjs from 'dayjs';
-import { call } from '@/utils/tools';
-import Stat from './stat.vue';
-import Card from './portrait/card.vue';
-import BasicInfo from './portrait/basicInfo.vue';
-import Technical from './portrait/technical.vue';
-const { getTech, fetchPilots } = usePilotStore();
-
-const pilot = ref({}) as Ref<Record<string, any>>;
-const pcode = ref('');
 const formatDate = (date: string) => date ? dayjs(date).format('YYYY-MM-DD') : '';
 
-const tabCurrent = ref(0);
-const onClickItem = e => tabCurrent.value = tabCurrent != e.currentIndex ? e.currentIndex : tabCurrent.value;
-
-onLoad(e => {
-    console.log('onLoad', e)
-    if (!e.pcode) return;
-    pcode.value = e.pcode;
-    const userData = { userId: e.pcode, idType: 'pcode' }
-    Promise.allSettled([
-        fetchPilots(), api(CONFIG.url.pilotProfile, userData).then(res => pilot.value = res || {}),
-    ])
-        .then(res => { console.log('allSettled:', res) })
-        .catch(err => console.log('error', err));
+const props = defineProps({
+    pilot: { type: Object, required: true }
 });
+
+
+const marks = {
+    isAjc: "空保转乘务", isBack: "isBack", isDuty: "是否可执勤", isLeader: "是否领导", isMate: "isMate", isModule: "isModule",
+    isNewfly: "是否新飞", isNight: "是否可执行夜航", isPower: "实力", isSmoke: "抽烟", isValid: "有效", isWith: "伴飞"
+}
+const limit = { yearMax: '年度最大', month3Max: '3月最大', monthMax: '月最大', monthMin: '月最小', weekMax: '周最大', }
 </script>
 <style lang="less" scoped>
 @import '@/css/base.less';

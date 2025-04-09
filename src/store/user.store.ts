@@ -56,6 +56,7 @@ export const useUserStore = defineStore('user', () => {
         staffObj,
         token: computed(() => token.value),
         myself,
+        staff: computed(() => Object.values(staff.value)),
         getStaff,
         setToken,
         fetchStaff,

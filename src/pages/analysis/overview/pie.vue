@@ -13,8 +13,8 @@
 <script lang="ts" setup>
 import { onMounted, PropType, ref } from 'vue'
 import ucharts from '@/components/ucharts/ucharts.vue';
-import {useAirportStore} from '@/store/airport.store';
-import { AirportItem } from '@/interface/flight.interface';
+import { useAirportStore } from '@/store/airport.store';
+import { AirportItem } from '@/interface/airport.interface';
 
 // 定义组件props
 const props = defineProps({

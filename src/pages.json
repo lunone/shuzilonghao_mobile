@@ -55,7 +55,7 @@
             "path": "pages/pilot/pilot",
             "style": {
                 "navigationBarTitleText": "飞行员",
-                "navigationBarBackgroundColor":"#D13419"
+                "navigationBarBackgroundColor": "#D13419"
             }
         },
         {
@@ -63,6 +63,13 @@
             "style": {
                 "navigationBarTitleText": "飞行排名",
                 "navigationBarBackgroundColor": "#D13419"
+            }
+        },
+        {
+            "path": "pages/pilot/stat",
+            "style": {
+                "navigationBarTitleText": "疲劳分析",
+                "navigationBarBackgroundColor": "#FFFFFF"
             }
         },
         {
