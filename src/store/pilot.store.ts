@@ -27,6 +27,9 @@ export const usePilotStore = defineStore('pilot', () => {
         return res;
     })
 
+    const getPilot = computed(() => (userId: string, key = 'pcode') => {
+        return _.find(pilots.value, item => item[key] == userId);
+    })
 
     const fetchPilots = async () => {
         if (isLoading.pilot) return;
@@ -41,6 +44,7 @@ export const usePilotStore = defineStore('pilot', () => {
     return {
         arr: computed(() => pilots.value),
         getTech,
+        getPilot,
         fetchPilots,
     };
 });

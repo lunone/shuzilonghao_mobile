@@ -3,7 +3,7 @@ import { ref, computed } from 'vue';
 import { api } from '@/utils/api';
 import { CONFIG } from '@/config';
 import { AirportItem } from '@/interface/airport.interface';
- 
+
 
 export const useAirportStore = defineStore('airport', () => {
     const isLoading = { airport: false };
@@ -15,7 +15,16 @@ export const useAirportStore = defineStore('airport', () => {
             .map(airport => [airport.code3, airport])
     ));
 
-
+    /**
+     * 获取机场名称
+     * @param code 机场代码
+     * @param type 类型，默认为 'city'，可选 'name'
+     * @returns 机场名称
+     * @example getCity('ZHE') // '珠海'
+     * @example getCity('ZHE', 'name') // '珠海国际机场'
+     * @example getCity('ZHE', 'code3') // 'ZHE'
+     * @example getCity('ZHE', 'code4') // 'ZHEZ'
+     * */
     const getCity = computed(() => {
         return (code: string, type: string = 'city'): string => {
             const src = code?.length === 4 ? airportsCode4.value : code3.value;
