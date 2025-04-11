@@ -28,6 +28,7 @@ export const usePilotStore = defineStore('pilot', () => {
     })
 
     const getPilot = computed(() => (userId: string, key = 'pcode') => {
+        // console.log('getPilot', userId,  pilots.value);
         return _.find(pilots.value, item => item[key] == userId);
     })
 

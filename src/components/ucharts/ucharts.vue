@@ -37,11 +37,25 @@ function draw(data) {
         // 执行所有的请求。请求结果按请求次序构成数组，在 callback 的第一个参数中返回。
         .exec(res => {
             let { node, width, height, left, right, top, bottom } = res[0] || {};
+            console.log('此时图表的宽高', width, height, left, right, top, bottom)
             margin.left = left, margin.right = right, margin.top = top, margin.bottom = bottom;
             if (!res[0]) return console.warn('[uCharts]:未找到节点', _this);
             const context = node.getContext('2d');
-            width = (width ? width : 320) * pixelRatio;
-            height = (height ? height : 180) * pixelRatio;
+            // ucharts的画布大小算法(猜测),
+            // chartOption里的margin得加进去
+            const optonMargin = data?.margin || [0, 0, 0, 0];
+            // 防0就最宽和传高
+            if (!width) {
+                width = uni.getSystemInfoSync().windowWidth;
+                width = width + optonMargin[1] + optonMargin[3];
+            }
+            if (!height) {
+                height = props.height;
+                height = height + optonMargin[0] + optonMargin[2];
+            }
+            // 防模糊
+            width = width * pixelRatio;
+            height = height * pixelRatio;
             // 防止变模糊
             node.width = width;
             node.height = height;
@@ -71,8 +85,11 @@ function tap(e) {
     // 为了保持兼容性,这里不修改ucharts,把它错误的在这里修正.
     // 根据ucharts y = (touches.pageY - e.currentTarget.offsetTop - (opts.height / opts.pix / 2) * (opts.pix - 1)) * opts.pix;
     // 所以只需要给pageY加上opts.height / opts.pix / 2 * (opts.pix - 1) 即可
-    e.changedTouches[0].clientX -= margin.left;
-    e.changedTouches[0].pageY += (opts.height / opts.pix / 2) * (opts.pix - 1);
+    // console.log('ucharts的bug',props.option, e.changedTouches[0].clientX, e.changedTouches[0].pageY)
+    if(props.option.type == 'column'){
+        e.changedTouches[0].clientX -= margin.left;
+        e.changedTouches[0].pageY += (opts.height / opts.pix / 2) * (opts.pix - 1);
+    }
     emits('select', chart, e);
 }
 </script>

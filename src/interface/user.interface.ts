@@ -1,7 +1,7 @@
 export type PilotItem = {
     name: string,
-    id: number,
-    code: string,
+    userId: number,
+    pcode: string,
     techs: { acType: string, techNo: string, techName: string }[],
 }
 export type CrewItem = {

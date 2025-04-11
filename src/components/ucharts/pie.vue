@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, PropType } from 'vue'
+import { computed, onBeforeUnmount, PropType } from 'vue'
 import ucharts from './ucharts.vue'
 
 const props = defineProps({
@@ -25,13 +25,14 @@ const chartOption = computed(() => ({
     animation: false,
     rotate: false,
     rotateLock: false,
-    padding: [20, 0, 0, 20],
+    padding: [20, 10, 10, 20],
     dataLabel: props.showLabel,
     series: [{
         data: props.data.map(item => ({
             ...item,
             labelText: `${item.name} ${((item.value / totalValue.value) * 100).toFixed(1)}%`
-        }))
+        })),
+
     }],
     title: props.title ? {
         name: props.title,
@@ -56,6 +57,7 @@ const chartOption = computed(() => ({
 function handleSelect(chart, event) {
     const index = chart.getCurrentDataIndex(event)
     const item = props.data[index]
+    // console.log(index)
     const percent = ((item.value / totalValue.value) * 100).toFixed(2)
 
     chart.showToolTip(event, {
@@ -66,4 +68,9 @@ function handleSelect(chart, event) {
         ]
     })
 }
+onBeforeUnmount(() => {
+    // 组件卸载时销毁图表
+    // const chart = (ucharts as any).getInstanceByDom(ucharts as any)
+    // ucharts.destroy()
+})
 </script>

@@ -65,13 +65,13 @@
                 "navigationBarBackgroundColor": "#D13419"
             }
         },
-        {
-            "path": "pages/pilot/stat",
-            "style": {
-                "navigationBarTitleText": "疲劳分析",
-                "navigationBarBackgroundColor": "#FFFFFF"
-            }
-        },
+        // {
+        //     "path": "pages/pilot/stat",
+        //     "style": {
+        //         "navigationBarTitleText": "疲劳分析",
+        //         "navigationBarBackgroundColor": "#FFFFFF"
+        //     }
+        // },
         {
             "path": "pages/pilot/portrait",
             "style": {

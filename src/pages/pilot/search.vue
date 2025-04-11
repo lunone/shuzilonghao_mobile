@@ -30,7 +30,8 @@ const filteredUsers = computed(() => {
     if (isEnglishOrNumber && searchText.value.length < 2) return []
     return (pilotStore.arr || []).filter(user =>
         user?.name?.includes(searchText.value) ||
-        user?.userId?.includes(searchText.value)
+        user?.userId?.includes(searchText.value) ||
+        user?.abbr?.includes(searchText.value)
     ).slice(0, 10) // 限制最多显示10条
 })
 

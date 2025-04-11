@@ -23,8 +23,8 @@ export const CONFIG = {
         statByAircraft: '/stat/by/aircraft',
         statByStation: '/stat/by/station',
         crewMate: '/stat/crew/mate',
-        crewAirline: '/stat/crew/airline',
-        crewTime: '/stat/crew/time',
+        crewFatigue: '/stat/crew/fatigue',
+        // crewTime: '/stat/crew/time',
         //
         crewFlights: '/crew/list',
         //

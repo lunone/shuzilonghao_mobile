@@ -15,25 +15,24 @@
                         <trackVue :pcode="pcode" />
                     </div>
                 </div>
-                <Stat :pcode="pcode" />
+                <Fatigue :pcode="pcode" />
             </press-tab>
         </press-tabs>
     </div>
 </template>
 <script setup lang="ts">
+import dayjs from 'dayjs';
 import { CONFIG } from '@/config';
 import { api } from '@/utils/api';
 import { computed, Ref, ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { usePilotStore } from '@/store/pilot.store';
-import trackVue from './track.vue';
-import dayjs from 'dayjs';
-import { call } from '@/utils/tools';
-import Stat from './stat.vue';
-import Card from './portrait/card.vue';
-import BasicInfo from './portrait/basicInfo.vue';
-import Technical from './portrait/technical.vue';
-const { getTech, fetchPilots } = usePilotStore();
+import trackVue from '@/pages/pilot/track.vue';
+import Stat from '@/pages/pilot/portrait/fatigue.vue';
+import Card from '@/pages/pilot/portrait/card.vue';
+import BasicInfo from '@/pages/pilot/portrait/basicInfo.vue';
+import Technical from '@/pages/pilot/portrait/technical.vue';
+const { getTech, fetchPilots, getPilot } = usePilotStore();
 
 const pilot = ref({}) as Ref<Record<string, any>>;
 const pcode = ref('');
@@ -46,9 +45,12 @@ onLoad(e => {
     console.log('onLoad', e)
     if (!e.pcode) return;
     pcode.value = e.pcode;
-    const userData = { userId: e.pcode, idType: 'pcode' }
+    const pilot2 = getPilot(e.pcode)
+    if (pilot2?.userId) {
+        pilot.value = { userId: pilot2.userId, name: pilot2.name, }
+    }
     Promise.allSettled([
-        fetchPilots(), api(CONFIG.url.pilotProfile, userData).then(res => pilot.value = res || {}),
+        fetchPilots(), api(CONFIG.url.pilotProfile, { userId: e.pcode, idType: 'pcode' }).then(res => pilot.value = res || {}),
     ])
         .then(res => { console.log('allSettled:', res) })
         .catch(err => console.log('error', err));
