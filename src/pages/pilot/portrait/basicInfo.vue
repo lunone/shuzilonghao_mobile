@@ -20,12 +20,12 @@
 
                 <div class="info-item">
                     <label class="cert-label">政治面貌</label>
-                    <span class="cert-value">{{ pilot.party }}</span>
+                    <span class="cert-value">{{ pilot.partyName }}</span>
                 </div>
 
                 <div class="info-item">
                     <label class="cert-label">在职状态</label>
-                    <span class="cert-value">{{ pilot.status }}</span>
+                    <span class="cert-value">{{ pilot.statusName }}</span>
                 </div>
 
                 <div class="info-item">
@@ -45,7 +45,7 @@
                 </div>
                 <div class="info-item">
                     <label class="cert-label">学位</label>
-                    <span class="cert-value">{{ pilot.culture }}</span>
+                    <span class="cert-value">{{ pilot.cultureName }}</span>
                 </div>
                 <div class="cert-item">
                     <div class="cert-label">毕业时间</div>
@@ -76,7 +76,7 @@
             </div>
         </div>
 
-     
+
         <!-- 工作履历 -->
         <div class="card">
             <h3 class="title"><i class="zl-icon-dep" /> 工作信息</h3>

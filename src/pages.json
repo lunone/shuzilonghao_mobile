@@ -55,7 +55,7 @@
             "path": "pages/pilot/pilot",
             "style": {
                 "navigationBarTitleText": "飞行员",
-                "navigationBarBackgroundColor": "#FFFFFF"
+                "navigationBarBackgroundColor": "#D13419"
             }
         },
         {
@@ -83,7 +83,7 @@
             "path": "pages/pilot/portrait",
             "style": {
                 "navigationBarTitleText": "人员画像",
-                "navigationBarBackgroundColor": "#FFFFFF"
+                "navigationBarBackgroundColor": "#D13419"
             }
         },
         {
