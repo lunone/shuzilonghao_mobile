@@ -55,7 +55,7 @@
             "path": "pages/pilot/pilot",
             "style": {
                 "navigationBarTitleText": "飞行员",
-                "navigationBarBackgroundColor": "#D13419"
+                "navigationBarBackgroundColor": "#FFFFFF"
             }
         },
         {
@@ -65,13 +65,20 @@
                 "navigationBarBackgroundColor": "#D13419"
             }
         },
-        // {
-        //     "path": "pages/pilot/stat",
-        //     "style": {
-        //         "navigationBarTitleText": "疲劳分析",
-        //         "navigationBarBackgroundColor": "#FFFFFF"
-        //     }
-        // },
+        {
+            "path": "pages/pilot/fatigue",
+            "style": {
+                "navigationBarTitleText": "疲劳分析",
+                "navigationBarBackgroundColor": "#FFFFFF"
+            }
+        },
+        {
+            "path": "pages/pilot/technical",
+            "style": {
+                "navigationBarTitleText": "技术分析",
+                "navigationBarBackgroundColor": "#FFFFFF"
+            }
+        },
         {
             "path": "pages/pilot/portrait",
             "style": {

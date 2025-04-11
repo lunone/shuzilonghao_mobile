@@ -55,18 +55,18 @@ const chartOption = computed(() => ({
 
 // 点击事件处理
 function handleSelect(chart, event) {
-    const index = chart.getCurrentDataIndex(event)
-    const item = props.data[index]
-    // console.log(index)
-    const percent = ((item.value / totalValue.value) * 100).toFixed(2)
+    // const index = chart.getCurrentDataIndex(event)
+    // const item = props.data[index]
+    // // console.log(index)
+    // const percent = ((item.value / totalValue.value) * 100).toFixed(2)
 
-    chart.showToolTip(event, {
-        textList: [
-            { text: item.name, color: null },
-            { text: `数值: ${item.value}`, color: "#1890FF" },
-            { text: `占比: ${percent}%`, color: "#91CB74" }
-        ]
-    })
+    // chart.showToolTip(event, {
+    //     textList: [
+    //         { text: item.name, color: null },
+    //         { text: `数值: ${item.value}`, color: "#1890FF" },
+    //         { text: `占比: ${percent}%`, color: "#91CB74" }
+    //     ]
+    // })
 }
 onBeforeUnmount(() => {
     // 组件卸载时销毁图表

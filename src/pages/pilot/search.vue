@@ -27,7 +27,7 @@ const filteredUsers = computed(() => {
 
     // 英文或数字需要至少2个字符才显示建议
     const isEnglishOrNumber = /^[a-zA-Z0-9]+$/.test(searchText.value)
-    if (isEnglishOrNumber && searchText.value.length < 2) return []
+    if (isEnglishOrNumber && searchText.value.length < 1) return []
     return (pilotStore.arr || []).filter(user =>
         user?.name?.includes(searchText.value) ||
         user?.userId?.includes(searchText.value) ||
@@ -53,8 +53,6 @@ pilotStore.fetchPilots();
 .search-container {
     position: relative;
     padding: 10px;
-    background: #f8f8f8;
-
 
     .search-box {
         display: flex;

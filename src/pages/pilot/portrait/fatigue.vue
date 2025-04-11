@@ -7,32 +7,31 @@
                 {{ item.label }}
             </div>
         </div>
-        <div class="item">
-            <span>{{ startDateText }}</span>至<span>{{ dayjs().format('YYYY-MM-DD') }}</span>
-        </div>
         <!-- 统计项 -->
         <div class="item">
-            <h3>产值</h3>
-            <div class="time-stat">{{ sum.flightHours }}小时, {{ sum.count }}班</div>
+            <h3>工作量</h3>
+            <span>从{{ startDateText }}</span>至<span>今天({{ dayjs().format('YYYY-MM-DD') }})</span>
+            <div>共{{ dayjs().diff(startDateText, 'day') }}天,飞了 {{ sum.days }}天</div>
+            <div>合计{{ sum.flightHours }}小时, {{ sum.count }}班</div>
         </div>
 
         <div class="item">
-            <h3>最近飞行航线(往返)</h3>
+            <h3>航线分析</h3>
             <PieChart :data="siteData" />
         </div>
 
         <div class="item">
-            <h3>最近飞行时长</h3>
+            <h3>飞行时长分析</h3>
             <PieChart :data="flightHourData" />
         </div>
 
         <div class="item">
-            <h3>最近起飞时间(24小时分布)</h3>
+            <h3>起飞分析(24小时分布图)</h3>
             <BarChart :data="atdData" />
         </div>
 
         <div class="item">
-            <h3>最近队友</h3>
+            <h3>机搭子分析</h3>
             最近经常和一下人员一起飞行：
             <div class="mates">
                 <div v-for="mate in mates" :key="mate.pcode" class="mate" @click="select(mate.pcode)">
@@ -89,7 +88,7 @@ watch([activeRange, () => props.pcode], ([range]) => {
             airlines.value = res.airlines;
             atds.value = res.atds;
             flightHours.value = res.flightHours;
-            sum.value = { count: res.totalCount, flightHours: res.totalFlightHours, }
+            sum.value = { count: res.totalCount, flightHours: res.totalFlightHours, days: res.totalDays }
         }),
     ])
 }, { immediate: true, deep: true });
@@ -104,7 +103,7 @@ function getName(mate: { pcode: string, userId: string, flightCount: number }) {
     return pilot ? pilot : mate.pcode
 }
 // const flightHours = ref('120')
-const sum = ref({ count: 0, flightHours: 0 })
+const sum = ref({ count: 0, flightHours: 0, days: 0 })
 
 const siteData = computed(() => {
     if (!airlines.value) return [];
@@ -125,7 +124,7 @@ const flightHourData = computed(() => {
     if (!flightHours.value) return [];
     const arr = _.cloneDeep(flightHours.value);
     const res = arr.map(item => {
-        const name = `${item.value}班${item.name}小时`;
+        const name = `${item.name}小时(${item.value}班)`;
         return { name, value: item.value }
     });
     return res;
@@ -179,12 +178,13 @@ onMounted(() => {
     }
 
     .item {
-        margin: 0 0 30px 0;
+        margin: 8px 0 8px 0;
 
         h3 {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-size: 16px;
             color: #333;
+            font-weight: bold;
         }
 
         .time-stat {

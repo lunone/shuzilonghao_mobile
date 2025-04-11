@@ -15,10 +15,9 @@ const showMore = () => {
     showLink.value = !showLink.value;
 };
 const links = ref([[
-    { size: 6, link: '/pages/pilot/rank', class: 'health', text: '月度排名', error: '' },
-    { size: 6, link: '/pages/pilot/stat', class: 'location', text: '疲劳分析', error: '' },
-    { size: 6, link: '/pages/analysis/airlines', class: 'location', text: '技术能力分析', error: '' },
-    { size: 6, link: '/pages/analysis/airlines', class: 'location', text: '近期计划', error: '' },
+    { size: 6, link: '/pages/pilot/rank', class: 'rank', text: '月度排名', error: '' },
+    { size: 6, link: '/pages/pilot/fatigue', class: 'battery', text: '疲劳分析', error: '' },
+    { size: 6, link: '/pages/pilot/technical', class: 'zoom', text: '能力分析', error: '' },
 ]]);
 const select = (pcode: any) => {
     console.log('sel', pcode);

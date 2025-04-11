@@ -37,7 +37,7 @@ function draw(data) {
         // 执行所有的请求。请求结果按请求次序构成数组，在 callback 的第一个参数中返回。
         .exec(res => {
             let { node, width, height, left, right, top, bottom } = res[0] || {};
-            console.log('此时图表的宽高', width, height, left, right, top, bottom)
+            // console.log('此时图表的宽高', width, height, left, right, top, bottom)
             margin.left = left, margin.right = right, margin.top = top, margin.bottom = bottom;
             if (!res[0]) return console.warn('[uCharts]:未找到节点', _this);
             const context = node.getContext('2d');
@@ -86,9 +86,15 @@ function tap(e) {
     // 根据ucharts y = (touches.pageY - e.currentTarget.offsetTop - (opts.height / opts.pix / 2) * (opts.pix - 1)) * opts.pix;
     // 所以只需要给pageY加上opts.height / opts.pix / 2 * (opts.pix - 1) 即可
     // console.log('ucharts的bug',props.option, e.changedTouches[0].clientX, e.changedTouches[0].pageY)
-    if(props.option.type == 'column'){
+    // console.log('type', props.option.type)
+    if (props.option.type == 'column') {
         e.changedTouches[0].clientX -= margin.left;
         e.changedTouches[0].pageY += (opts.height / opts.pix / 2) * (opts.pix - 1);
+    } else if (props.option.type == 'ring') {
+        // todo:这里也有问题
+        // console.log('点击', e.changedTouches[0], (opts.height / opts.pix / 2) * (opts.pix - 1))
+        e.changedTouches[0].clientX -= margin.left;
+        e.changedTouches[0].pageY += 44;
     }
     emits('select', chart, e);
 }

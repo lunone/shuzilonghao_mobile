@@ -28,7 +28,7 @@ import { computed, Ref, ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { usePilotStore } from '@/store/pilot.store';
 import trackVue from '@/pages/pilot/track.vue';
-import Stat from '@/pages/pilot/portrait/fatigue.vue';
+import Fatigue from '@/pages/pilot/portrait/fatigue.vue';
 import Card from '@/pages/pilot/portrait/card.vue';
 import BasicInfo from '@/pages/pilot/portrait/basicInfo.vue';
 import Technical from '@/pages/pilot/portrait/technical.vue';
