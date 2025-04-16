@@ -32,21 +32,22 @@ onMounted(() => { });
 
 .pilot-container {
     padding: 10px;
-}
 
-.pilot-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    width: 100%;
-}
 
-.links {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 10px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    .pilot-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+    }
+
+    .links {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
 }
 </style>

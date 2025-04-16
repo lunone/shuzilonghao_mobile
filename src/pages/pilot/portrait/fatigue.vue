@@ -1,15 +1,16 @@
 <template>
-    <div class="stat-container">
-        <!-- loading遮罩层 -->
-        <div v-if="loading" class="loading-overlay">
-            <uni-load-more status="loading"></uni-load-more>
-        </div>
 
-        <!-- 错误提示 -->
-        <div v-if="error" class="error-message">
-            <uni-icons type="info" size="24" color="#ff4d4f"></uni-icons>
-            <span>数据加载失败，请稍后重试</span>
-        </div>
+    <!-- loading遮罩层 -->
+    <div v-if="loading" class="loading-overlay">
+        加载中……
+    </div>
+
+    <!-- 错误提示 -->
+    <div v-else-if="error" class="error-message">
+        <!-- <uni-icons type="info" size="24" color="#ff4d4f"></uni-icons> -->
+        <span>数据加载失败，请稍后重试</span>
+    </div>
+    <div class="stat-container" v-else>
         <!-- 胶囊样式时间选择器 -->
         <div class="time-range">
             <div v-for="item in timeRanges" :key="item.value"
@@ -82,6 +83,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 </template>
 
@@ -195,11 +197,7 @@ onMounted(() => {
 
 <style scoped lang="less">
 .loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+
     background: rgba(255, 255, 255, 0.7);
     display: flex;
     justify-content: center;
@@ -220,21 +218,7 @@ onMounted(() => {
 }
 
 .stat-container {
-    .mates {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 8px;
 
-        .mate {
-            padding: 6px 12px;
-            background: #f0f7ff;
-            border-radius: 16px;
-            color: #1890ff;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-    }
 
     .time-range {
         display: flex;
@@ -417,7 +401,23 @@ onMounted(() => {
                 }
             }
         }
-
     }
+
+    .mates {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+
+        .mate {
+            padding: 6px 12px;
+            background: #f0f7ff;
+            border-radius: 16px;
+            color: #1890ff;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+    }
+
 }
 </style>
