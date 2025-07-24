@@ -17,13 +17,11 @@ export const useUserStore = defineStore('user', () => {
         }
     };
 
-    const getStaff = computed(() => (userId: string, idType = 'userId'): UserItem => {
-        if (idType === 'userId') {
+    const getStaff = {
+        value: (userId: string): UserItem => {
             return staff.value[userId] || {} as UserItem;
-        } else if (idType === 'name') {
-            return Object.values(staff.value).find(user => user.name === userId) || {} as UserItem;
         }
-    });
+    };
 
     const myself = async (refresh = false) => {
         const mySelf = await api(CONFIG.url.init) as UserItem;
@@ -57,6 +55,7 @@ export const useUserStore = defineStore('user', () => {
         token: computed(() => token.value),
         myself,
         staff: computed(() => Object.values(staff.value)),
+        staffRaw: staff,
         getStaff,
         setToken,
         fetchStaff,

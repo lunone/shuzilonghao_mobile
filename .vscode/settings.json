@@ -1,3 +1,8 @@
 {
-    "marscode.chatLanguage": "cn"
+    "marscode.chatLanguage": "cn",
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#531C01",
+        "titleBar.activeBackground": "#742702",
+        "titleBar.activeForeground": "#FFFBF9"
+    }
 }

@@ -14,6 +14,30 @@
             }
         },
         {
+            "path": "pages/public/product",
+            "style": {
+                "navigationBarTitleText": "产品案例"
+            }
+        },
+        {
+            "path": "pages/public/bid/bid",
+            "style": {
+                "navigationBarTitleText": "招标信息"
+            }
+        },
+        {
+            "path": "pages/public/service/service",
+            "style": {
+                "navigationBarTitleText": "服务支持"
+            }
+        },
+        {
+            "path": "pages/public/about",
+            "style": {
+                "navigationBarTitleText": "关于龙浩"
+            }
+        },
+        {
             "path": "pages/analysis/analysis",
             "style": {
                 "navigationBarTitleText": "运行分析"
@@ -98,11 +122,35 @@
             "style": {
                 "navigationBarTitleText": "人力资源"
             }
+        },
+        {
+            "path": "pages/admin/dutyAct",
+            "style": {
+                "navigationBarTitleText": "排班"
+            }
+        },
+        {
+            "path": "pages/role/employee",
+            "style": {
+                "navigationBarTitleText": "员工界面"
+            }
+        },
+        {
+            "path": "pages/role/leader",
+            "style": {
+                "navigationBarTitleText": "领导界面"
+            }
+        },
+        {
+            "path": "pages/role/agent",
+            "style": {
+                "navigationBarTitleText": "供应商界面"
+            }
         }
     ],
     "globalStyle": {
         "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "uni-app",
+        "navigationBarTitleText": "数字龙浩",
         "navigationBarBackgroundColor": "#F8F8F8",
         "backgroundColor": "#F8F8F8"
     },
@@ -112,7 +160,10 @@
         "custom": {
             // uni-ui 规则如下配置
             "^press-(.*)": "press-ui/press-$1/press-$1.vue",
-            "^zl-(.*)": "@/components/zl/$1.vue"
+            "^zl-(.*)": "@/components/zl/$1.vue",
+            // uni-ui 规则如下配置
+            "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
+            "^wd-(.*)": "wot-design-uni/components/wd-$1/wd-$1.vue"
         }
     }
 }
