@@ -5,7 +5,7 @@ import { CONFIG } from '@/config';
 import { UserItem } from '@/interface/user.interface';
 
 export const useUserStore = defineStore('user', () => {
-    const isLoading = { staff: false };
+    const isLoading = { staff: false, myself: false };
     const staff = ref<Record<string, UserItem>>({});
     const self = ref({}) as Ref<UserItem>;
     const token = ref('');
@@ -23,6 +23,7 @@ export const useUserStore = defineStore('user', () => {
         }
     };
 
+
     const myself = async (refresh = false) => {
         const mySelf = await api(CONFIG.url.init) as UserItem;
         if (mySelf?.id) {
@@ -30,7 +31,20 @@ export const useUserStore = defineStore('user', () => {
         }
         return self.value;
     };
+    const fetchSelf = async () => {
+        if (isLoading.staff) return; // 复用 isLoading.staff 状态，或者可以创建独立的 isLoading.self
+        isLoading.staff = true;
 
+        // 检查 self.value 是否已有数据
+        if (!self.value || !self.value.id) {
+            const mySelf = await api(CONFIG.url.init) as UserItem;
+            if (mySelf?.id) {
+                self.value = mySelf;
+            }
+        }
+
+        isLoading.staff = false;
+    };
 
     const fetchStaff = async () => {
         if (isLoading.staff) return;
@@ -54,10 +68,12 @@ export const useUserStore = defineStore('user', () => {
         staffObj,
         token: computed(() => token.value),
         myself,
+        selfObj: computed(() => self.value),
         staff: computed(() => Object.values(staff.value)),
         staffRaw: staff,
         getStaff,
         setToken,
+        fetchSelf,
         fetchStaff,
     };
 });

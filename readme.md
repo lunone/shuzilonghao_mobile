@@ -36,3 +36,18 @@
 #085E7B #1B4C5C #023D50 #389CBD #5BA5BD
 互补色:
 #049033 #1D6C38 #015E21 #36C867 #5DC881
+
+
+## 修改
+1. 引入Wot UI后修改了日历，在node_modules\wot-design-uni\components\wd-calendar-view\month\monuth.vue里面handleDateClick函数里面加入了 
+
+```
+// 新加的
+const dayClick = inject('dayClick') as Function
+// 原来就有的
+function handleDateClick(index: number) {
+    const date = days.value[index]
+    // 新加的
+    dayClick && dayClick({ value: getDate(date.date) })
+    ……
+```

@@ -44,16 +44,30 @@ export const useDepartmentStore = defineStore('department', () => {
     });
 
     // 获取目标名称的所有子部门ID
-    const getSubIds = computed(() => (targetName: string): (string | number)[] => {
+    // 根据部门ID获取所有子部门ID
+    const getSubIdsById = computed(() => (targetId: string): (string | number)[] => {
+        // 直接调用 getSubIds 方法
+        return getSubIds(targetId, 'id');
+    });
+
+    // 根据部门名称获取所有子部门ID
+    const getSubIdsByName = computed(() => (targetName: string): (string | number)[] => {
+        // 直接调用 getSubIds 方法
+        return getSubIds(targetName, 'name');
+    });
+    const getSubIds = (targetName: string, method: 'name' | 'id'): (string | number)[] => {
         // const deptMap = getDeptMap.value;
         const childMap = getChildMap.value;
         const result = new Set<string | number>();
         const queue: (string | number)[] = [];
 
         // 将匹配的目标名称部门ID加入队列
-        departments.value
-            .filter(dept => dept.name === targetName)
-            .forEach(dept => queue.push(dept.id));
+        for (let i = 0; i < departments.value.length; i++) {
+            const dept = departments.value[i];
+            if (dept[method] == targetName) {
+                queue.push(dept.id);
+            }
+        }
 
         // 广度优先搜索获取所有子部门ID
         while (queue.length > 0) {
@@ -65,7 +79,7 @@ export const useDepartmentStore = defineStore('department', () => {
         }
 
         return Array.from(result);
-    });
+    };
 
     // 获取目标ID的路径
     const getPath = computed(() => (targetId: string | number, str: string = '/'): string => {
@@ -92,7 +106,6 @@ export const useDepartmentStore = defineStore('department', () => {
     const fetchDepartments = async () => {
         if (isLoading.department) return; // 如果正在加载则直接返回
         isLoading.department = true; // 标记为正在加载
-
         if (!departments.value.length) {
             const res = await api(CONFIG.url.departments) as DepartmenItem[];
             departments.value = res.length ? res : []; // 更新部门列表
@@ -101,12 +114,37 @@ export const useDepartmentStore = defineStore('department', () => {
         isLoading.department = false; // 加载完成
     };
 
+    // 在 useDepartmentStore 中添加以下函数
+    // 在 useDepartmentStore 中替换原有的 getAncestor 函数
+    const getAncestor = computed(() => (targetId: string): string[] => {
+        const deptMap = getDeptMap.value;
+        let currentId: string | undefined = targetId;
+        const ancestors: string[] = [];
+
+        // 沿着父子关系向上查找，直到根节点
+        while (currentId && deptMap.has(+currentId)) {
+            const currentDept = deptMap.get(+currentId);
+            if (!currentDept) break;
+
+            // 如果存在父节点，则添加到祖先数组中
+            if (currentDept.parentId) {
+                ancestors.unshift(currentDept.parentId.toString()); // 添加到数组开头以保持正确顺序
+            }
+
+            // 移动到父节点继续查找
+            currentId = currentDept.parentId?.toString();
+        }
+
+        return ancestors;
+    });
     // 返回公共方法和属性
     return {
         list: computed(() => departments.value),
         tree,
-        getSubIds,
+        getSubIdsById,
+        getSubIdsByName,
         getPath,
+        getAncestor,
         fetchDepartments,
     };
 });
