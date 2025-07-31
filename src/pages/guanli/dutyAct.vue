@@ -3,7 +3,8 @@
         <!-- 排班日历 -->
         <calendar :staff-obj="userStore.staffObj" />
         <!-- 排班人员 -->
-        <arrange :staff-list="staffList" />
+        <arrange />
+        <!-- <test /> -->
         <div class="action-section">
             <press-button type="primary" @click="generateDuty" :disabled="hasCurrentMonthData">
                 生成本月排班
@@ -17,9 +18,8 @@ import { ref, computed, watch, onMounted } from 'vue';
 import dayjs from 'dayjs';
 import { useUserStore } from '@/store/user.store';
 import type { UserItem } from '@/interface/user.interface';
-import calendar from '@/pages/admin/duty/dutyCalendar.vue';
-import arrange from '@/pages/admin/duty/dutyArrange.vue';
-
+import calendar from '@/pages/guanli/paiban/dutyCalendar.vue';
+import arrange from '@/pages/guanli/paiban/dutyArrange.vue';
 const userStore = useUserStore();
 const loading = ref(true);
 
@@ -28,7 +28,7 @@ const loading = ref(true);
 // const pickerRef = ref();
 
 // 可排班人员列表
-const staffList = ref<UserItem[]>([]);
+// const staffList = ref<UserItem[]>([]);
 
 // 处理人员列表更新
 // const handleStaffListUpdate = (newList: UserItem[]) => {

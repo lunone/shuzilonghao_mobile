@@ -11,6 +11,7 @@
         <!-- <zl-shortcut :links="links" class="links" /> -->
         <!-- <News /> -->
         <DutyAct />
+        <!-- <test /> -->
         <!-- 保留原有注释代码 -->
         <!-- <div class="public-wrapper">
         <lhaVue />
@@ -24,7 +25,7 @@ import { ref } from 'vue'
 import Swiper from './swiper.vue'
 import News from './news.vue'
 import Duty from '../staff/duty.vue'
-import DutyAct from '@/pages/admin/dutyAct.vue'
+import DutyAct from '@/pages/guanli/dutyAct.vue'
 
 const links = ref([
     { size: 6, class: 'location', text: '公司介绍', link: 'public/about', },

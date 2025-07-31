@@ -15,7 +15,8 @@ import { ref, computed, watch, onMounted, provide } from 'vue';
 import dayjs from 'dayjs';
 import { useUserStore } from '@/store/user.store';
 import type { UserItem } from '@/interface/user.interface';
-import DutyDialog from '@/pages/admin/duty/dutyDialog.vue';
+import DutyDialog from '@/pages/guanli/paiban/dutyDialog.vue';
+import { useDepartmentStore } from '@/store/department.store';
 
 interface StaffObj { [key: string]: UserItem; }
 
@@ -24,6 +25,7 @@ const props = defineProps<{
 }>();
 
 const userStore = useUserStore();
+const departmentStore = useDepartmentStore();
 const emit = defineEmits(['day-click']);
 
 const minDate = dayjs().add(-1, 'month').startOf('month').valueOf();
@@ -91,11 +93,13 @@ watch(() => [userStore.staffObj, dutyData], async () => {
 // 可排班人员列表
 // const staffList = ref<UserItem[]>([]);
 // todo:网络请求可排班人员
-
 onMounted(async () => {
+    userStore.fetchSelf()
+    userStore.fetchStaff()
+    departmentStore.fetchDepartments()
     // todo:请求服务器排班数据
     await setTimeout(() => {
-        console.log('请求排班数据')
+        // console.log('请求排班数据')
         dutyData.value = [
             { id: 1, userId: 'A00725', start: new Date(2025, 6, 28).getTime(), end: new Date(2025, 6, 21).getTime() },
             { id: 2, userId: 'A00732', start: new Date(2025, 6, 29).getTime(), end: new Date(2025, 6, 22).getTime() },

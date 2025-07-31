@@ -14,14 +14,13 @@ const getMateUsers = async (): Promise<UserItem[]> => {
         departmentStore.fetchDepartments()
     ]);
 
-    // 获取当前用户
-    const currentUser = userStore.selfObj;
-    if (!currentUser || !currentUser.department) {
-        return [];
+    if (!userStore.selfObj?.id || !userStore.selfObj?.department || !departmentStore.list.length || !userStore.staff.length) {
+        // console.log('尚缺条件', userStore.selfObj, departmentStore.list.length, userStore.staff)
+        return []
     }
 
     // 获取部门相关信息并筛选用户
-    const ancestorIds = departmentStore.getAncestor(currentUser.department + '');
+    const ancestorIds = departmentStore.getAncestor(userStore.selfObj.department + '');
     if (!ancestorIds.length) {
         return [];
     }
