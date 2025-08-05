@@ -1,15 +1,13 @@
 <template>
     <view class="container">
-        <view class="grid-container">
-            <view class="grid-item" v-for="(item, index) in items" :key="itemKey ? item[itemKey] : index"
+        <view class="grid-container" id="gridContainer">
+            <view class="grid-item" v-for="(item, index) in localItems" :key="`${index}_${forceUpdateKey}`"
                 :class="{ 'active': currentIndex === index }" :style="getPositionStyle(index)"
-                @touchstart="handleTouchStart($event, index)" @touchmove.stop.prevent="handleTouchMove($event)"
+                @touchstart="handleTouchStart($event, index)" @touchmove.stop.prevent="handleTouchMove"
                 @touchend="handleTouchEnd">
                 <view class="item-content">
                     <view class="item-icon">
-                        <slot name="icon" :item="item" :index="index">
-                            <uni-icons :type="item.icon || 'star'" size="24"></uni-icons>
-                        </slot>
+                        <slot name="icon" :item="item" :index="index" />
                     </view>
                     <view class="item-name">
                         <slot name="name" :item="item" :index="index">
@@ -23,240 +21,273 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { getContainerWidth } from '@/utils/ui';
+import _ from 'lodash';
+import { ref, onMounted, watch, onUnmounted, nextTick } from 'vue'
 
 const props = withDefaults(defineProps<{
-    items: any[];
-    itemKey?: string;
-    columns?: number;
-    itemSize?: number;
-    itemGap?: number;
+    items: any[]
+    // itemKey?: string
+    columns?: number
+    itemSize?: number
+    itemGap?: number
 }>(), {
     items: () => [],
-    columns: 4,
-    itemSize: 80,
-    itemGap: 15
-});
+    itemSize: 60
+})
 
-const emit = defineEmits(['update:items', 'sort-complete']);
+const emit = defineEmits(['update:items', 'sort-complete'])
 
 // 网格配置
-const columns = ref(props.columns);
-const itemSize = ref(props.itemSize);
-const itemGap = ref(props.itemGap);
+const columns = ref(props.columns)
+const itemSize = ref(props.itemSize)
+const itemGap = ref(props.itemGap)
+const localItems = ref([...props.items])
 
 // 拖拽状态
-const currentIndex = ref(-1); // 当前拖拽的项目索引
-const startX = ref(0);       // 触摸开始X坐标
-const startY = ref(0);       // 触摸开始Y坐标
-// const moveOffsetX = ref(0);  // X轴移动的距离
-// const moveOffsetY = ref(0);  // Y轴移动的距离
-const positions = ref<any[]>([]);   // 所有项目的位置
-const isDragging = ref(false); // 是否正在拖拽
-
-// 监听 props 变化
-watch(() => props.columns, (newVal) => {
-    columns.value = newVal;
-    initPositions();
-});
+const currentIndex = ref(-1)
+const startX = ref(0)
+const startY = ref(0)
+const isDragging = ref(false)
+const dragPosition = ref({ x: 0, y: 0 })
+const containerWidth = ref(0)
 
 watch(() => props.itemSize, (newVal) => {
-    itemSize.value = newVal;
-    initPositions();
-});
+    itemSize.value = newVal
+    initPositions()
+})
 
 watch(() => props.itemGap, (newVal) => {
-    itemGap.value = newVal;
-    initPositions();
-});
+    itemGap.value = newVal
+    initPositions()
+})
 
-watch(() => props.items, () => {
-    initPositions();
-}, { deep: true });
+watch(() => props.items, (newItems) => {
+    localItems.value = [...newItems]
+    initPositions()
+}, { deep: true })
+
+// 居中对齐函数
+// const centerItems = () => {
+//     if (columns.value <= 0 || itemSize.value <= 0) return
+
+//     // 计算总项目宽度（包括间隙）
+//     const totalItemsWidth = columns.value * itemSize.value + (columns.value - 1) * itemGap.value
+
+//     // 如果总宽度大于容器宽度，则不进行居中处理
+//     if (totalItemsWidth >= containerWidth.value) {
+//         return
+//     }
+
+//     // 计算均匀分布的间隔
+//     const availableSpace = containerWidth.value - (columns.value * itemSize.value)
+//     const distributedGap = columns.value > 1 ? availableSpace / (columns.value - 1) : 0
+
+//     // 重新计算每个项目的位置（仅用于居中对齐显示）
+//     localItems.value.forEach((_, index) => {
+//         const row = Math.floor(index / columns.value)
+//         const col = index % columns.value
+//         // 这里不再更新 positions 数组，仅用于计算居中显示
+//     })
+// }
+
+// 计算列数
+const calculateColumns = async () => {
+    try {
+        const containerWidth = await getContainerWidth()
+        return Math.max(1, Math.floor((containerWidth + itemGap.value) / (itemSize.value + itemGap.value)))
+    } catch (error) {
+        return props.columns || 3
+    }
+}
+
+// 自动调整列数
+const autoAdjustColumns = async () => {
+    if (props.columns) {
+        columns.value = props.columns
+    } else {
+        const newColumns = await calculateColumns()
+        if (newColumns !== columns.value) {
+            columns.value = newColumns
+        }
+    }
+    initPositions()
+}
 
 // 初始化所有项目的位置
 const initPositions = () => {
-    positions.value = [];
-
-    props.items.forEach((_, index) => {
-        const row = Math.floor(index / columns.value);
-        const col = index % columns.value;
-
-        // 计算项目位置
-        positions.value.push({
-            x: col * (itemSize.value + itemGap.value),
-            y: row * (itemSize.value + itemGap.value),
-            zIndex: 1
-        });
-    });
-};
+    // 不再需要维护 positions 数组
+    // centerItems()
+}
+const forceUpdateKey = ref(0);
+// 为每个项目生成唯一 key
 
 // 获取项目定位样式
 const getPositionStyle = (index: number) => {
-    if (!positions.value[index]) return '';
+    const width = `${itemSize.value}px`,
+        height = `${itemSize.value}px`
 
-    const position = positions.value[index];
+    // 如果是当前拖拽的元素，使用临时位置
+    if (index === currentIndex.value && isDragging.value) {
+        return {
+            transform: `translate3d(${dragPosition.value.x}px, ${dragPosition.value.y}px, 0)`,
+            width, height, zIndex: 10
+        }
+    }
+    // 否则按正常网格位置排列
+    const row = Math.floor(index / columns.value)
+    const col = index % columns.value
 
+    // 计算均匀分布的间隔（用于居中对齐）
+    let x = col * (itemSize.value + itemGap.value);
+    let y = row * (itemSize.value + itemGap.value)
+    // x位置修正
+    const totalItemsWidth = columns.value * itemSize.value + (columns.value - 1) * itemGap.value
+    if (totalItemsWidth < containerWidth.value) {
+        const availableSpace = containerWidth.value - (columns.value * itemSize.value)
+        const distributedGap = columns.value > 1 ? availableSpace / (columns.value - 1) : 0
+        x = col * (itemSize.value + distributedGap)
+    }
     return {
-        transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
-        width: `${itemSize.value}px`,
-        height: `${itemSize.value}px`,
-        zIndex: position.zIndex || 1
-    };
-};
+        transform: `translate3d(${x}px, ${y}px, 0)`,
+        width, height, zIndex: 1
+    }
+}
 
 // 处理触摸开始
 const handleTouchStart = (event: TouchEvent, index: number) => {
-    if (isDragging.value) return;
+    if (isDragging.value) return
 
-    const touch = event.touches[0];
-    currentIndex.value = index;
-    startX.value = touch.clientX;
-    startY.value = touch.clientY;
-    // moveOffsetX.value = 0;
-    // moveOffsetY.value = 0;
-    isDragging.value = true;
+    // #ifdef MP-WEIXIN
+    const touch = event.changedTouches[0]
+    // #endif
+    // #ifdef H5
+    // const touch = event.touches[0]
+    // #endif
 
-    // 提升当前项的层级
-    if (positions.value[index]) {
-        positions.value[index].zIndex = 10;
+    currentIndex.value = index
+    startX.value = touch.clientX
+    startY.value = touch.clientY
+    isDragging.value = true
+
+    // 记录初始位置
+    const row = Math.floor(index / columns.value)
+    const col = index % columns.value
+    dragPosition.value = {
+        x: col * (itemSize.value + itemGap.value),
+        y: row * (itemSize.value + itemGap.value)
     }
-};
+}
 
 // 处理触摸移动
 const handleTouchMove = (event: TouchEvent) => {
-    if (currentIndex.value === -1 || !isDragging.value) return;
+    if (currentIndex.value === -1 || !isDragging.value) return
 
-    const touch = event.touches[0];
+    // #ifdef MP-WEIXIN
+    const touch = event.changedTouches[0]
+    // #endif
+    // #ifdef H5
+    // const touch = event.touches[0]
+    // #endif
+
     // 计算移动距离
-    const deltaX = touch.clientX - startX.value;
-    const deltaY = touch.clientY - startY.value;
-    console.log('移动距离', deltaX, deltaY, 'yuanyou', JSON.stringify(positions.value[currentIndex.value]))
-    // moveOffsetX.value += deltaX;
-    // moveOffsetY.value += deltaY;
+    const deltaX = touch.clientX - startX.value
+    const deltaY = touch.clientY - startY.value
 
-    // 更新拖拽项的位置
-    if (positions.value[currentIndex.value]) {
-        positions.value[currentIndex.value].x += deltaX;
-        positions.value[currentIndex.value].y += deltaY;
-    }
-
-    // 更新开始位置，用于下一次移动计算
-    startX.value = touch.clientX;
-    startY.value = touch.clientY;
-
-    // 检查是否需要交换位置
-    checkForSwap();
-};
+    // 更新拖拽元素的位置
+    dragPosition.value.x += deltaX
+    dragPosition.value.y += deltaY
+    // 这部分是平滑移动，每次都移动微小距离。
+    // 重置开始位置
+    startX.value = touch.clientX
+    startY.value = touch.clientY
+}
 
 // 处理触摸结束
 const handleTouchEnd = () => {
-    if (currentIndex.value === -1) return;
+    if (currentIndex.value === -1) return
 
-    // 重置拖拽项的层级
-    if (positions.value[currentIndex.value]) {
-        positions.value[currentIndex.value].zIndex = 1;
+    // 保存当前索引用于后续处理
+    const oldIndex = currentIndex.value
+
+    // 计算拖拽元素应该插入的新位置
+    const newIndex = calculateNewIndex()
+    // 先重置拖拽状态
+    isDragging.value = false
+    currentIndex.value = -1
+
+    // 然后更新数据
+    if (newIndex !== oldIndex) {
+        const newList = [...localItems.value]
+        const [movedItem] = newList.splice(oldIndex, 1)
+        newList.splice(newIndex, 0, movedItem)
+
+        localItems.value = newList
+        console.log('排序结束', _.map(localItems.value, 'name'))
+        emit('update:items', newList)
     }
 
-    // 将所有项吸附到网格
-    snapAllItemsToGrid();
+    // 强制触发更新
+    forceUpdateKey.value++
+    emit('sort-complete', [...localItems.value])
 
-    // 重置拖拽状态
-    isDragging.value = false;
-    currentIndex.value = -1;
-    // moveOffsetX.value = 0;
-    // moveOffsetY.value = 0;
+}
 
-    // 触发排序完成事件
-    emit('sort-complete', [...props.items]);
-    emit('update:items', [...props.items]);
-};
+// 计算新索引位置
+const calculateNewIndex = () => {
+    // 根据拖拽元素的当前位置计算应该插入的位置
+    const centerX = dragPosition.value.x + itemSize.value / 2
+    const centerY = dragPosition.value.y + itemSize.value / 2
 
-// 将所有项吸附到网格
-const snapAllItemsToGrid = () => {
-    props.items.forEach((_, index) => {
-        const row = Math.floor(index / columns.value);
-        const col = index % columns.value;
+    // 计算当前行列
+    const col = Math.max(0, Math.min(columns.value - 1, Math.floor(centerX / (itemSize.value + itemGap.value))))
+    const row = Math.max(0, Math.floor(centerY / (itemSize.value + itemGap.value)))
 
-        if (!positions.value[index]) {
-            positions.value[index] = { x: 0, y: 0, zIndex: 1 };
-        }
+    // 计算索引
+    let newIndex = row * columns.value + col
 
-        positions.value[index] = {
-            x: col * (itemSize.value + itemGap.value),
-            y: row * (itemSize.value + itemGap.value),
-            zIndex: 1
-        };
-    });
-};
+    // 确保不超过数组长度
+    newIndex = Math.max(0, Math.min(localItems.value.length - 1, newIndex))
 
-// 检查是否需要交换位置
-const checkForSwap = () => {
-    if (currentIndex.value === -1) return;
+    return newIndex
+}
 
-    const currentPos = positions.value[currentIndex.value];
-    let closestIndex = -1;
-    let minDistance = Number.MAX_VALUE;
-
-    // 找出与当前拖拽项距离最近的项
-    positions.value.forEach((pos, index) => {
-        if (index !== currentIndex.value) {
-            // 计算中心点之间的距离
-            const centerX1 = currentPos.x + itemSize.value / 2;
-            const centerY1 = currentPos.y + itemSize.value / 2;
-            const centerX2 = pos.x + itemSize.value / 2;
-            const centerY2 = pos.y + itemSize.value / 2;
-
-            const distance = Math.sqrt(
-                Math.pow(centerX1 - centerX2, 2) +
-                Math.pow(centerY1 - centerY2, 2)
-            );
-
-            // 只考虑距离小于阈值的项
-            const threshold = (itemSize.value + itemGap.value) * 0.6;
-            if (distance < threshold && distance < minDistance) {
-                minDistance = distance;
-                closestIndex = index;
-            }
-        }
-    });
-
-    // 如果找到了足够近的项，交换位置
-    if (closestIndex !== -1) {
-        console.log('交换姿势，再来一次')
-        swapItems(currentIndex.value, closestIndex);
+// 窗口尺寸变化处理
+let resizeTimer: number | null = null
+const handleResize = () => {
+    if (resizeTimer) {
+        clearTimeout(resizeTimer)
     }
-};
-
-// 交换两个项目
-const swapItems = (fromIndex: number, toIndex: number) => {
-    // 交换菜单列表中的项
-    const newList = [...props.items];
-    [newList[fromIndex], newList[toIndex]] = [newList[toIndex], newList[fromIndex]];
-
-    // 更新父组件数据
-    emit('update:items', newList);
-
-    // 交换位置信息
-    if (positions.value[fromIndex] && positions.value[toIndex]) {
-        [positions.value[fromIndex], positions.value[toIndex]] =
-            [positions.value[toIndex], positions.value[fromIndex]];
-    }
-
-    // 更新当前拖拽的索引
-    currentIndex.value = toIndex;
-};
+    resizeTimer = setTimeout(() => {
+        autoAdjustColumns()
+    }, 300) as any
+}
 
 onMounted(() => {
-    initPositions();
-});
-</script>
+    autoAdjustColumns()
 
-<script lang="ts">
-// 兼容选项 API 的写法（如果需要）
-export default {
-    name: 'DragGrid'
-}
+    // #ifdef H5
+    window.addEventListener('resize', handleResize)
+    // #endif
+
+    // #ifdef MP-WEIXIN
+    uni.onWindowResize(handleResize)
+    // #endif
+})
+
+onUnmounted(() => {
+    // #ifdef H5
+    window.removeEventListener('resize', handleResize)
+    // #endif
+
+    // #ifdef MP-WEIXIN
+    uni.offWindowResize(handleResize)
+    // #endif
+
+    if (resizeTimer) {
+        clearTimeout(resizeTimer)
+    }
+})
 </script>
 
 <style scoped>

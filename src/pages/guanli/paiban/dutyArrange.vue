@@ -4,7 +4,7 @@
         <DragList 
             :items="staffList" 
             item-key="userId" 
-            :columns="6"
+           
             :item-size="70"
             :item-gap="10"
             @update:items="staffList = $event"
@@ -12,7 +12,7 @@
             <!-- <template #icon="{ item }">
                 <div style="padding: 8px 12px; background-color: #409eff; color: white; border-radius: 4px; font-size: 14px;">
                     {{ item.name }}
-                </div>
+                </div> :columns="3"
             </template> -->
         </DragList>
     </div>
