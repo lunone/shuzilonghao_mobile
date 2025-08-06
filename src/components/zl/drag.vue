@@ -1,9 +1,9 @@
 <template>
-    <view class="grid-container" id="gridContainer">
+    <view class="grid-container" id="gridContainer" :style="{ height: containerHeight + 'px' }">
         <view class="grid-item" v-for="(item, index) in localItems" :key="`${index}_${forceUpdateKey}`"
-            :class="{ 'active': currentIndex === index, 'dragging': isDragging && currentIndex === index }" :style="getPositionStyle(index)"
-            @touchstart="handleTouchStart($event, index)" @touchmove.stop.prevent="handleTouchMove"
-            @touchend="handleTouchEnd">
+            :class="{ 'active': currentIndex === index, 'dragging': isDragging && currentIndex === index }"
+            :style="getPositionStyle(index)" @touchstart="handleTouchStart($event, index)"
+            @touchmove.stop.prevent="handleTouchMove" @touchend="handleTouchEnd">
             <view class="item-content">
                 <slot name="name" :item="item" :index="index">
                     {{ item.name }}
@@ -25,8 +25,8 @@ const props = withDefaults(defineProps<{
     itemGap?: number
 }>(), {
     items: () => [],
-    itemSize: 60,
-    itemGap: 2
+    itemSize: 70,
+    itemGap: 10
 })
 
 const emit = defineEmits(['update:items', 'sort-complete'])
@@ -36,7 +36,7 @@ const columns = ref(props.columns)
 const itemSize = ref(props.itemSize)
 const itemGap = ref(props.itemGap)
 const localItems = ref([...props.items])
-
+const forceUpdateKey = ref(0)
 // 拖拽状态
 const currentIndex = ref(-1)
 const startX = ref(0)
@@ -44,27 +44,24 @@ const startY = ref(0)
 const isDragging = ref(false)
 const dragPosition = ref({ x: 0, y: 0 })
 const containerWidth = ref(0)
+const containerHeight = ref(0) // 容器高度
 
-watch(() => props.itemSize, (newVal) => {
-    itemSize.value = newVal
-    initPositions()
-})
-
-watch(() => props.itemGap, (newVal) => {
-    itemGap.value = newVal
-    initPositions()
-})
-
-watch(() => props.items, (newItems) => {
+// 合并监听 props.itemSize、props.itemGap 和 props.items 的变化
+watch([() => props.itemSize, () => props.itemGap, () => props.items], ([newItemSize, newItemGap, newItems]) => {
+    itemSize.value = newItemSize
+    itemGap.value = newItemGap
     localItems.value = [...newItems]
-    initPositions()
+    nextTick(() => {
+        updateContainerHeight()
+    })
 }, { deep: true })
 
 // 计算列数
 const calculateColumns = async () => {
     try {
-        const containerWidth = await getContainerWidth()
-        return Math.max(1, Math.floor((containerWidth + itemGap.value) / (itemSize.value + itemGap.value)))
+        const width = await getContainerWidth()
+        containerWidth.value = width // 更新容器宽度
+        return Math.max(1, Math.floor((width + itemGap.value) / (itemSize.value + itemGap.value)))
     } catch (error) {
         return props.columns || 3
     }
@@ -81,6 +78,7 @@ const autoAdjustColumns = async () => {
         }
     }
     initPositions()
+    updateContainerHeight()
 }
 
 // 初始化所有项目的位置
@@ -88,7 +86,49 @@ const initPositions = () => {
     // 不再需要维护 positions 数组
 }
 
-const forceUpdateKey = ref(0);
+// 更新容器高度
+const updateContainerHeight = () => {
+    if (localItems.value.length === 0) {
+        containerHeight.value = 0
+        return
+    }
+
+    // 计算行数
+    const rows = Math.ceil(localItems.value.length / columns.value)
+    // 计算内容总高度：行数 * 元素高度 + (行数 - 1) * 间隙
+    const contentHeight = rows * (itemSize.value / 2) + Math.max(0, (rows - 1) * itemGap.value)
+    // 添加上下padding，使内容垂直居中
+    const totalHeight = contentHeight + 20
+    containerHeight.value = totalHeight
+}
+
+// 计算居中对齐的x位置
+const calculateCenteredX = (col: number) => {
+    const totalItemsWidth = columns.value * itemSize.value + (columns.value - 1) * itemGap.value;
+
+    if (containerWidth.value > 0 && totalItemsWidth < containerWidth.value) {
+        // 计算两边的空白距离
+        const sidePadding = (containerWidth.value - totalItemsWidth) / 2;
+        // 每个元素的x位置 = 两边空白 + 元素和间隙的累积宽度
+        return sidePadding + col * (itemSize.value + itemGap.value);
+    } else {
+        // 如果容器宽度未知或者元素总宽度超过容器宽度，则使用默认计算
+        return col * (itemSize.value + itemGap.value);
+    }
+}
+
+// 计算居中对齐的y位置
+const calculateCenteredY = (row: number) => {
+    // 计算内容总高度
+    const rows = Math.ceil(localItems.value.length / columns.value)
+    const contentHeight = rows * (itemSize.value / 2) + Math.max(0, (rows - 1) * itemGap.value)
+
+    // 计算垂直方向的空白
+    const verticalPadding = (containerHeight.value - contentHeight - 20) / 2
+
+    // 每个元素的y位置 = 垂直空白 + 元素和间隙的累积高度
+    return Math.max(0, verticalPadding) + row * (itemSize.value / 2 + itemGap.value) + 10 // +10 是上padding
+}
 
 // 获取项目定位样式
 const getPositionStyle = (index: number) => {
@@ -103,22 +143,16 @@ const getPositionStyle = (index: number) => {
             width, height, zIndex: 10
         }
     }
+
     // 否则按正常网格位置排列
     const row = Math.floor(index / columns.value)
     const col = index % columns.value
 
-    // 计算x位置
-    let x = col * (itemSize.value + itemGap.value);
-    // x位置修正（居中对齐）
-    const totalItemsWidth = columns.value * itemSize.value + (columns.value - 1) * itemGap.value
-    if (totalItemsWidth < containerWidth.value) {
-        const availableSpace = containerWidth.value - (columns.value * itemSize.value)
-        const distributedGap = columns.value > 1 ? availableSpace / (columns.value - 1) : 0
-        x = col * (itemSize.value + distributedGap)
-    }
+    // 计算居中对齐的x位置
+    const x = calculateCenteredX(col);
 
-    // 计算y位置（高度为宽度的一半）
-    const y = row * (itemSize.value / 2 + itemGap.value)
+    // 计算居中对齐的y位置
+    const y = calculateCenteredY(row);
 
     return {
         transform: `translate3d(${x}px, ${y}px, 0)`,
@@ -153,9 +187,10 @@ const handleTouchStart = (event: TouchEvent, index: number) => {
     // 记录初始位置
     const row = Math.floor(index / columns.value)
     const col = index % columns.value
+    // 使用居中对齐的x位置和y位置
     dragPosition.value = {
-        x: col * (itemSize.value + itemGap.value),
-        y: row * (itemSize.value / 2 + itemGap.value)
+        x: calculateCenteredX(col),
+        y: calculateCenteredY(row)
     }
 }
 
@@ -220,9 +255,18 @@ const calculateNewIndex = () => {
     const centerY = dragPosition.value.y + itemSize.value / 4
 
     // 计算当前行列
-    const col = Math.max(0, Math.min(columns.value - 1, Math.floor(centerX / (itemSize.value + itemGap.value))))
+    let col = Math.max(0, Math.min(columns.value - 1, Math.floor((centerX - (containerWidth.value > 0 ?
+        (containerWidth.value - (columns.value * itemSize.value + (columns.value - 1) * itemGap.value)) / 2 : 0))
+        / (itemSize.value + itemGap.value))))
+
+    // 计算垂直居中对齐的行
+    const rows = Math.ceil(localItems.value.length / columns.value)
+    const contentHeight = rows * (itemSize.value / 2) + Math.max(0, (rows - 1) * itemGap.value)
+    const verticalPadding = (containerHeight.value - contentHeight - 20) / 2
+    const adjustedCenterY = centerY - Math.max(0, verticalPadding) - 10 // 减去padding
+
     // 行高为宽度的一半加上间距
-    const row = Math.max(0, Math.floor(centerY / (itemSize.value / 2 + itemGap.value)))
+    const row = Math.max(0, Math.floor(adjustedCenterY / (itemSize.value / 2 + itemGap.value)))
 
     // 计算索引
     let newIndex = row * columns.value + col
@@ -273,54 +317,68 @@ onUnmounted(() => {
 
 <style lang="less" scoped>
 .grid-container {
-  position: relative;
-  width: 100%;
-  min-height: 500rpx;
-  overflow: hidden;
-  padding: 10rpx;
-  background-color: #f7f7f7;
+    position: relative;
+    width: 100%;
+    min-height: 10rpx;
+    height: auto;
+    border-radius: 8rpx;
+    border: solid 1rpx #d8d8d8;
+    overflow: hidden;
+    // padding: 10rpx; // 这个 padding 可能导致左边有空白
+    background-color: #e0e0e0;
 
-  .grid-item {
-    position: absolute;
-    left: 0;
-    top: 0;
-    transition: transform 0.2s ease;
-    will-change: transform;
+    // 添加 box-sizing 确保 padding 正确计算
+    box-sizing: border-box;
 
-    &.active {
-      transition: none;
-      transform: scale(1.02);
-      z-index: 10;
+    .grid-item {
+        position: absolute;
+        left: 0;
+        top: 0;
+        transition: transform 0.2s ease;
+        will-change: transform;
+        border-radius: 6px;
+        overflow: hidden;
+        // &.active {
+        //     transition: none;
+        //     transform: scale(1.02);
+        //     z-index: 10;
+        // }
+
+        // 拖拽中的元素样式
+        &.dragging {
+            // transform: scale(1.05);
+            z-index: 20;
+            // box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.2);
+
+            .item-content {
+                background-color: #e3f2fd; // 蓝色背景表示正在拖拽
+                font-size: 1.2rem;
+                color: #777;
+                // border: 2rpx dashed #2196f3;
+                // box-shadow: 0 4rpx 12rpx rgba(33, 150, 243, 0.3);
+            }
+        }
+
+        .item-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            // background-color: #ffffff;
+            border-radius: 6rpx;
+            // box-shadow: 0 1rpx 3rpx rgba(0, 0, 0, 0.1);
+            padding: 0;
+            color: #333;
+            text-align: center;
+            line-height: 1.1;
+            font-size: 1rem;
+            // 超出显示省略号……
+            white-space: nowrap; // 不换行
+            overflow: hidden; // 超出部分隐藏
+            text-overflow: ellipsis; // 超出显示省略号
+
+        }
     }
-
-    // 拖拽中的元素样式
-    &.dragging {
-      transform: scale(1.05);
-      z-index: 20;
-      box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.2);
-      
-      .item-content {
-        background-color: #e3f2fd; // 蓝色背景表示正在拖拽
-        border: 2rpx dashed #2196f3;
-        box-shadow: 0 4rpx 12rpx rgba(33, 150, 243, 0.3);
-      }
-    }
-
-    .item-content {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: #ffffff;
-      border-radius: 6rpx;
-      box-shadow: 0 1rpx 3rpx rgba(0, 0, 0, 0.1);
-      padding: 0;
-      font-size: 24rpx;
-      color: #333;
-      text-align: center;
-      line-height: 1.1;
-    }
-  }
 }
 </style>
