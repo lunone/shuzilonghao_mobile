@@ -1,7 +1,7 @@
 <template>
     <view class="grid-container" id="gridContainer">
         <view class="grid-item" v-for="(item, index) in localItems" :key="`${index}_${forceUpdateKey}`"
-            :class="{ 'active': currentIndex === index }" :style="getPositionStyle(index)"
+            :class="{ 'active': currentIndex === index, 'dragging': isDragging && currentIndex === index }" :style="getPositionStyle(index)"
             @touchstart="handleTouchStart($event, index)" @touchmove.stop.prevent="handleTouchMove"
             @touchend="handleTouchEnd">
             <view class="item-content">
@@ -141,6 +141,14 @@ const handleTouchStart = (event: TouchEvent, index: number) => {
     startX.value = touch.clientX
     startY.value = touch.clientY
     isDragging.value = true
+
+    // 设备振动反馈
+    // #ifdef MP-WEIXIN
+    uni.vibrateShort()
+    // #endif
+    // #ifdef H5
+    // H5端没有振动API，可以忽略或者使用其他反馈方式
+    // #endif
 
     // 记录初始位置
     const row = Math.floor(index / columns.value)
@@ -283,6 +291,19 @@ onUnmounted(() => {
       transition: none;
       transform: scale(1.02);
       z-index: 10;
+    }
+
+    // 拖拽中的元素样式
+    &.dragging {
+      transform: scale(1.05);
+      z-index: 20;
+      box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.2);
+      
+      .item-content {
+        background-color: #e3f2fd; // 蓝色背景表示正在拖拽
+        border: 2rpx dashed #2196f3;
+        box-shadow: 0 4rpx 12rpx rgba(33, 150, 243, 0.3);
+      }
     }
 
     .item-content {

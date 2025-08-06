@@ -4,9 +4,6 @@
         <DragList 
             :items="staffList" 
             item-key="userId" 
-           
-            :item-size="70"
-            :item-gap="10"
             @update:items="staffList = $event"
         >
             <!-- <template #icon="{ item }">
