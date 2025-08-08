@@ -5,8 +5,8 @@
             :style="getPositionStyle(index)" @touchstart="handleTouchStart($event, index)"
             @touchmove.stop.prevent="handleTouchMove" @touchend="handleTouchEnd">
             <view class="item-content">
-                <slot name="name" :item="item" :index="index">
-                    {{ item.name }}
+                <slot name="default" :item="item" :index="index">
+                    {{ item }}
                 </slot>
             </view>
         </view>
@@ -29,7 +29,7 @@ const props = withDefaults(defineProps<{
     itemGap: 10
 })
 
-const emit = defineEmits(['update:items', 'sort-complete'])
+const emit = defineEmits(['sort'])
 
 // 网格配置
 const columns = ref(props.columns)
@@ -237,14 +237,11 @@ const handleTouchEnd = () => {
         newList.splice(newIndex, 0, movedItem)
 
         localItems.value = newList
-        console.log('排序结束', _.map(localItems.value, 'name'))
-        emit('update:items', newList)
+        emit('sort', newList)
+        // 强制触发更新
+        forceUpdateKey.value++
+
     }
-
-    // 强制触发更新
-    forceUpdateKey.value++
-    emit('sort-complete', [...localItems.value])
-
 }
 
 // 计算新索引位置

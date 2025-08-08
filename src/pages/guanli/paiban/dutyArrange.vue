@@ -1,17 +1,10 @@
 <template>
     <div class="staff-section">
-        <div class="title">可排班人员</div>
-        <DragList 
-            :items="staffList" 
-            item-key="userId" 
-            @update:items="staffList = $event"
-        >
-            <!-- <template #icon="{ item }">
-                <div style="padding: 8px 12px; background-color: #409eff; color: white; border-radius: 4px; font-size: 14px;">
-                    {{ item.name }}
-                </div> :columns="3"
-            </template> -->
-        </DragList>
+        <div class="title">
+            <span>值班人员</span>
+            <span class="action" @click="modify">修改</span>
+        </div>
+        <DragList :items="staffList" item-key="userId" @update:items="staffList = $event" />
     </div>
 </template>
 
@@ -25,13 +18,11 @@ import type { UserItem } from '@/interface/user.interface';
 
 const staffList = ref<UserItem[]>([]);
 
-// 获取用户和部门store
-const userStore = useUserStore();
-const departmentStore = useDepartmentStore();
+const emit = defineEmits(['modify']);
+function modify() {
+    emit('modify');
+}
 
-watch(() => [userStore.selfObj, userStore.staffObj, departmentStore.list], async () => {
-    staffList.value = await getMateUsers();
-}, { immediate: true });
 </script>
 
 <style scoped lang="less">
@@ -39,9 +30,28 @@ watch(() => [userStore.selfObj, userStore.staffObj, departmentStore.list], async
     margin-bottom: 24px;
 
     .title {
+        display: flex;
+        align-items: center;
         margin-bottom: 12px;
         font-size: 16px;
         font-weight: bold;
+
+        .action {
+            margin-left: 12px;
+            color: #007aff;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: normal;
+
+            &:hover {
+                color: #0056cc;
+                text-decoration: underline;
+            }
+
+            &:active {
+                color: #004499;
+            }
+        }
     }
 }
 </style>

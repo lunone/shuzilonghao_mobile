@@ -1,6 +1,6 @@
 <template>
-    <wd-popup v-model="localShow" position="bottom" closable custom-style="height: 60vh;" @close="handleClose">
-        <!-- 部门筛选区 -->
+    <wd-popup v-model="show" position="bottom" closable custom-style="height: 60vh;">
+        <!-- 筛选条件区 -->
         <view class="filter-container">
             <view class="filter-tabs">
                 <view class="filter-tab all" :class="{ active: filterType === 'all' }"
@@ -25,12 +25,14 @@
         </view>
 
         <!-- 员工列表区 -->
-        <view class="staff-list" :style="{ height: '35vh' }">
-            <view v-for="staff in filteredStaff" :key="staff.value" class="staff-item" :class="{
-                selected: staff.status, unselected: !staff.status, disabled: staff.disabled
-            }" @click="toggleStaff(staff)">
-                <div>{{ staff.label }}</div>
-                <div>{{ staff.status ? '√' : '' }}</div>
+        <view class="options">
+            <view v-for="option in filteredOptions" :key="option.value" class="option" :class="{
+                selected: option.status, unselected: !option.status, disabled: option.disabled
+            }" @click="toggle(option)">
+                <slot name="default" :item="option">
+                    <div>{{ option.label }}</div>
+                </slot>
+                <div>{{ option.status ? '√' : '' }}</div>
             </view>
         </view>
 
@@ -45,173 +47,108 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import type { UserItem } from '@/interface/user.interface';
 import { useUserStore } from '@/store/user.store';
 import { useDepartmentStore } from '@/store/department.store';
+import _ from 'lodash';
 
-interface DutyItem {
-    id: number;
-    userId: string;
-    start: number;
-    end: number;
-}
 
-interface StaffItem {
+
+interface Option {
     value: string;
     label: string;
     status: boolean;
     disabled: boolean;
-    department: string;
+    meta?: any;
+    department?: string;
 }
-
 const props = withDefaults(defineProps<{
     show: boolean;
-    // selectedDate: Date | null;
-    // dutyData: DutyItem[];
-    // staffList: UserItem[];
+    options: Option[];
+    selected: string[]
     isSingle?: boolean;
+    group: Option[]
 }>(), {
     isSingle: true
 });
 
 const emit = defineEmits(['update:show', 'confirm']);
-const localShow = ref(props.show);
+// 可以合并为一个双向绑定的 watch
+const show = computed({
+    get: () => props.show,
+    set: val => emit('update:show', val)
+});
 const filterType = ref<'all' | 'selected' | 'unselected'>('all');
 const activeDept = ref('');
-
-watch(localShow, newVal => emit('update:show', newVal));
-watch(() => props.show, newVal => localShow.value = newVal);
-
-const userStore = useUserStore();
-const departmentStore = useDepartmentStore();
-const mateUsers = ref<UserItem[]>([]);
-
-// 将 staffOptions 改为响应式引用
-const staffOptions = ref<StaffItem[]>([]);
-
-// 新增一个初始化函数
-function initStaffOptions() {
-    const result: StaffItem[] = [];
-
-    for (const user of mateUsers.value) {
-        const temp = {
-            value: user.userId,
-            label: user.name,
-            status: false,
-            disabled: false, // 默认不禁用
-            department: user.department + ''
-        };
-
-        // 如果是单选模式，且当前用户已在 dutyData 中，则标记为已选中并禁用
-        // && props.dutyData.some(item => item.userId === user.userId)
-        if (props.isSingle) {
-            temp.disabled = true;
-            temp.status = true;
-        }
-
-        result.push(temp);
-    }
-
-    staffOptions.value = result;
-}
-
-// 在 mateUsers 更新时初始化 staffOptions
-watch(mateUsers, () => {
-    initStaffOptions();
-}, { immediate: true });
-
-
+const departmentOptions = computed(() => {
+    return props.group
+})
 
 // 筛选后的员工列表
-const filteredStaff = computed(() => {
-    let result = staffOptions.value;
-
+const filteredOptions = computed(() => {
     // 按状态筛选
     if (filterType.value === 'selected') {
-        result = result.filter(staff => staff.status);
+        return localOptions.value.filter(staff => staff.status);
     } else if (filterType.value === 'unselected') {
-        result = result.filter(staff => !staff.status);
+        return localOptions.value.filter(staff => !staff.status);
     }
-
     // 按部门筛选（当有选中部门时）
     if (activeDept.value) {
-        result = result.filter(staff => staff.department === activeDept.value);
+        return localOptions.value.filter(staff => staff.department === activeDept.value);
     }
-
-    return result;
+    // 未筛选状态返回全部
+    return localOptions.value;
 });
 
+// 提交数据
+function handleConfirm() {
+    const result = localOptions.value.filter(staff => staff.status).map(staff => staff.value)
+    console.log(result, localOptions.value.filter(staff => staff.status))
+    emit('confirm', result);
+    show.value = false;
+}
 // 切换员工选中状态
-function toggleStaff(staff: StaffItem) {
+function toggle(selectedOption: Option) {
     // 如果是禁用状态，不能切换
-    if (staff.disabled) return;
-
-    staff.status = !staff.status;
-
+    if (selectedOption.disabled) return;
+    // 状态置反
+    selectedOption.status = !selectedOption.status;
+    // 单选模式下，提交
     if (props.isSingle) {
         // 单选模式下，取消其他所有选项的选中状态
-        staffOptions.value.forEach(item => {
-            // console.log(item.label, item.label, item.status)
-            if (item !== staff) {
-                item.status = false;
+        localOptions.value.forEach(option => {
+            if (option.value !== selectedOption.value) {
+                option.status = false;
             }
         });
+        handleConfirm()
     }
-    emit('confirm', staff.value);
 }
 
-// 多选模式确认
-function handleConfirm() {
-    const selectedStaff = staffOptions.value.filter(staff => staff.status);
-    if (selectedStaff.length === 0) return;
+// 创建本地选项副本
+const localOptions = ref<Option[]>([]);
 
-    emit('confirm', {
-        // timestamp,
-        userIds: selectedStaff.map(staff => staff.value)
+// 监听 props.options 的变化
+watch(() => props.options, (newOptions) => {
+    localOptions.value = _.cloneDeep(newOptions); // 使用 lodash 深拷贝
+    // 更新状态
+    updateStatus();
+}, { immediate: true, deep: true });
+
+// 监听 selected 的变化
+watch(() => props.selected, () => {
+    updateStatus();
+}, { immediate: true });
+
+// 更新选项状态的函数
+function updateStatus() {
+    localOptions.value.forEach(option => {
+        option.status = props.selected.includes(option.value);
     });
-
-    localShow.value = false;
 }
 
-// 原有store和mateUsers逻辑
-watch(() => [userStore.selfObj, userStore.staffObj, departmentStore.list], updateMateUsers, { immediate: true });
+// 然后在模板和其他地方使用 localOptions 而不是 props.options
 
-function updateMateUsers() {
-    const currentUser = userStore.selfObj;
-    if (!currentUser || !currentUser.department) {
-        mateUsers.value = [];
-        return;
-    }
-
-    const ancestorIds = departmentStore.getAncestor(currentUser.department + '');
-    if (!ancestorIds.length) {
-        mateUsers.value = [];
-        return;
-    }
-
-    const ancestorId = ancestorIds[2];
-    const subIds = departmentStore.getSubIdsById(ancestorId);
-    const allUsers = Object.values(userStore.staffObj);
-    mateUsers.value = allUsers.filter(user =>
-        user.department && subIds.includes(+user.department)
-    );
-}
-
-const departmentOptions = computed(() => {
-    const depts = new Set<string>();
-    mateUsers.value.forEach(user => depts.add(user.department + ''));
-
-    return Array.from(depts).map(deptId => ({
-        value: deptId,
-        label: departmentStore.list.find(d => d.id === +deptId)?.name || '未知部门'
-    }));
-});
-
-function handleClose() {
-    localShow.value = false;
-}
 </script>
-
 <style lang="less" scoped>
 // 选中状态颜色
 @selected-color: #409eff;
@@ -252,11 +189,12 @@ function handleClose() {
     }
 }
 
-.staff-list {
+.options {
     padding: 0 16px;
     overflow: hidden;
+    height: 35vh;
 
-    .staff-item {
+    .option {
         display: flex;
         flex-direction: row;
         padding: 6px 10px;
