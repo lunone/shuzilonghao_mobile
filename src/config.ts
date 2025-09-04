@@ -42,6 +42,12 @@ export const CONFIG = {
         pilotDuty: '/pilot/duty',
         pilotAbsence: '/pilot/absence',
         pilotTraining: '/pilot/training',
+        //
+        // 权限相关接口（通过用户信息API统一获取，无需单独接口）
+        // userPermissions: '/user/permissions', // 已移除，权限数据包含在用户信息中
+        // roles: '/role/list', // 可选，用于后台管理
+        // permissions: '/permission/list', // 可选，用于后台管理
+        // 注意：所有接口都通过POST方法调用，符合项目现有的api.ts设计
     },
     page: {
         index: '/pages/index',

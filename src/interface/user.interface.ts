@@ -32,7 +32,7 @@ export type WatchUser = {
     remark?: string,
     state?: number,
 }
-// 
+//
 export type UserItem = {
     id: string,
     userId: string,
@@ -51,5 +51,8 @@ export type UserItem = {
     idCard?: string,
     district?: string,
     address?: string,
-    status: number
+    status: number,
+    // 角色和权限相关字段
+    roles?: string[], // 角色代码数组
+    permissions?: string[] // 权限代码数组
 }

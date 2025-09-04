@@ -5,17 +5,28 @@
             <StatVue class="year" />
         </div>
         <zl-shortcut class="shortcut" :links="links" />
-        <div class="section income">
-            <IncomeVue />
-        </div>
+
+        <!-- 使用权限组件控制显示 -->
+        <Permission permission="sale:read">
+            <div class="section income">
+                <IncomeVue />
+            </div>
+        </Permission>
 
         <div class="section asset">
             <AircraftVue class="aircraft" />
             <HrVue class="hr" />
         </div>
 
-        <todayFlightVue class="section flight" />
-        <PlanVue class="section plan" />
+        <!-- 使用权限指令控制显示 -->
+        <todayFlightVue v-permission="'flight:read'" class="section flight" />
+        <PlanVue v-permission="'flight:read'" class="section plan" />
+
+        <!-- 使用角色指令控制显示 -->
+        <div v-role="'admin'" class="section admin-only">
+            <text>管理员专用区域</text>
+        </div>
+
         <dividerVue class="more">其他值得放在首页的项</dividerVue>
     </div>
 </template>
@@ -27,6 +38,7 @@ import AircraftVue from '@/pages/airplane/aircraft.vue';
 import PlanVue from '../flight/plan.vue';
 import dividerVue from '@/components/zl/divider.vue';
 import IncomeVue from '../sale/income.vue';
+import Permission from '@/components/Permission.vue';
 const links = [
     [
         { size: 12, link: '/pages/analysis/analysis', class: 'analysis', text: '运行分析' },
