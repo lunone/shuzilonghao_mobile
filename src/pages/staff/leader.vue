@@ -21,10 +21,10 @@
 </template>
 <script lang="ts" setup>
 import StatVue from './stat.vue';
-import todayFlightVue from './today.vue';
-import HrVue from './hr.vue';
+import todayFlightVue from '../flight/today.vue';
+import HrVue from '../hr/keyStaff.vue';
 import AircraftVue from './aircraft.vue';
-import PlanVue from './plan.vue';
+import PlanVue from '../flight/plan.vue';
 import dividerVue from '@/components/zl/divider.vue';
 import IncomeVue from './income.vue';
 const links = [

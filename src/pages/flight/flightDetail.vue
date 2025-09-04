@@ -1,0 +1,336 @@
+<template>
+  <view v-if="visible" class="flight-detail-overlay" @click="closeDetail">
+    <view class="flight-detail-panel" @click.stop>
+      <view class="detail-header">
+        <text class="detail-title">航班详情</text>
+        <button class="close-btn" @click="closeDetail">✕</button>
+      </view>
+
+      <view v-if="loading" class="loading">
+        <text>加载中...</text>
+      </view>
+
+      <view v-else-if="flightDetail" class="detail-content">
+        <view class="detail-section">
+          <text class="section-title">基本信息</text>
+          <view class="detail-row">
+            <text class="detail-label">航班号:</text>
+            <text class="detail-value">{{ flightDetail.flightNo }}</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">飞机编号:</text>
+            <text class="detail-value">{{ flightDetail.acReg }}</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">机型:</text>
+            <text class="detail-value">{{ flightDetail.acType }}</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">航司:</text>
+            <text class="detail-value">{{ flightDetail.carrier }}</text>
+          </view>
+        </view>
+
+        <view class="detail-section">
+          <text class="section-title">时间信息</text>
+          <view class="detail-row">
+            <text class="detail-label">计划起飞:</text>
+            <text class="detail-value">{{ formatTime(flightDetail.std) }}</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">预计起飞:</text>
+            <text class="detail-value">{{ flightDetail.etd ? formatTime(flightDetail.etd) : '--' }}</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">实际起飞:</text>
+            <text class="detail-value">{{ flightDetail.atd ? formatTime(flightDetail.atd) : '--' }}</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">计划到达:</text>
+            <text class="detail-value">{{ formatTime(flightDetail.sta) }}</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">预计到达:</text>
+            <text class="detail-value">{{ flightDetail.eta ? formatTime(flightDetail.eta) : '--' }}</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">实际到达:</text>
+            <text class="detail-value">{{ flightDetail.ata ? formatTime(flightDetail.ata) : '--' }}</text>
+          </view>
+        </view>
+
+        <view class="detail-section">
+          <text class="section-title">状态信息</text>
+          <view class="detail-row">
+            <text class="detail-label">航班性质:</text>
+            <text class="detail-value">{{ flightDetail.flightKind || '正班' }}</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">国际/国内:</text>
+            <text class="detail-value">{{ flightDetail.abroad ? '国际' : '国内' }}</text>
+          </view>
+          <view class="detail-row" v-if="flightDetail.isDelay">
+            <text class="detail-label">延误:</text>
+            <text class="detail-value abnormal">是</text>
+          </view>
+          <view class="detail-row" v-if="flightDetail.isCancle">
+            <text class="detail-label">取消:</text>
+            <text class="detail-value abnormal">是</text>
+          </view>
+          <view class="detail-row" v-if="flightDetail.isAltn">
+            <text class="detail-label">备降:</text>
+            <text class="detail-value warning">是</text>
+          </view>
+          <view class="detail-row" v-if="flightDetail.cancleType">
+            <text class="detail-label">取消类型:</text>
+            <text class="detail-value">{{ flightDetail.cancleType }}</text>
+          </view>
+        </view>
+
+        <view class="detail-section">
+          <text class="section-title">其他信息</text>
+          <view class="detail-row">
+            <text class="detail-label">起飞机场:</text>
+            <text class="detail-value">{{ flightDetail.depName }} ({{ flightDetail.dep }})</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">目的机场:</text>
+            <text class="detail-value">{{ flightDetail.arrName }} ({{ flightDetail.arr }})</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">机位:</text>
+            <text class="detail-value">{{ flightDetail.bay }}</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">载重:</text>
+            <text class="detail-value">{{ flightDetail.netWeightCargo }}kg</text>
+          </view>
+        </view>
+      </view>
+
+      <view v-else class="error">
+        <text>获取航班详情失败</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="ts">
+import { ref, watch, onMounted } from 'vue'
+import type { FlightItem } from '@/interface/flight.interface'
+
+// Props
+interface Props {
+  visible: boolean
+  flightId?: number
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  visible: false,
+  flightId: undefined
+})
+
+// Emits
+const emit = defineEmits<{
+  close: []
+}>()
+
+// 响应式数据
+const loading = ref(false)
+const flightDetail = ref<FlightItem | null>(null)
+
+// 模拟从服务器获取数据
+const fetchFlightDetail = async (id: number) => {
+  loading.value = true
+  try {
+    // 模拟API调用
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    // 模拟数据 - 在实际项目中，这里应该是API调用
+    const mockData: FlightItem = {
+      id: id,
+      date: '2024-09-03',
+      bay: 'A1',
+      flightNo: 'CA1234',
+      carrier: '中国国航',
+      abroad: false,
+      acReg: 'B-1234',
+      acType: 'B737',
+      acLinkLine: 1,
+      flightKind: '客运正班',
+      std: '08:00',
+      etd: '08:05',
+      atd: '08:03',
+      sta: '10:30',
+      eta: '10:35',
+      ata: '10:32',
+      dep: 'PEK',
+      depName: '北京首都',
+      arr: 'SHA',
+      arrName: '上海虹桥',
+      isAltn: false,
+      isCancle: false,
+      isDelay: false,
+      isNoRelease: false,
+      isPatch: false,
+      isPrint: true,
+      isRelease: true,
+      isReturn: false,
+      isTelegram: false,
+      netWeightCargo: 15000
+    }
+
+    flightDetail.value = mockData
+  } catch (error) {
+    console.error('获取航班详情失败:', error)
+    flightDetail.value = null
+  } finally {
+    loading.value = false
+  }
+}
+
+// 监听flightId变化
+watch(() => props.flightId, (newId) => {
+  if (newId && props.visible) {
+    fetchFlightDetail(newId)
+  }
+})
+
+// 监听visible变化
+watch(() => props.visible, (visible) => {
+  if (visible && props.flightId) {
+    fetchFlightDetail(props.flightId)
+  } else if (!visible) {
+    flightDetail.value = null
+  }
+})
+
+// 初始化
+onMounted(() => {
+  if (props.visible && props.flightId) {
+    fetchFlightDetail(props.flightId)
+  }
+})
+
+// 方法
+const closeDetail = () => {
+  emit('close')
+}
+
+const formatTime = (time: string) => {
+  return time || '--'
+}
+</script>
+
+<style lang="less" scoped>
+.flight-detail-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flight-detail-panel {
+  background: white;
+  border-radius: 8px;
+  width: 90vw;
+  max-width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+
+    .detail-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #666;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .loading, .error {
+    padding: 40px 20px;
+    text-align: center;
+    color: #666;
+  }
+
+  .detail-content {
+    padding: 20px;
+
+    .detail-section {
+      margin-bottom: 20px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .section-title {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+        display: block;
+      }
+
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        align-items: center;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .detail-label {
+          font-size: 14px;
+          color: #666;
+          flex: 1;
+        }
+
+        .detail-value {
+          font-size: 14px;
+          color: #333;
+          flex: 2;
+          text-align: right;
+
+          &.abnormal {
+            color: #dc3545;
+            font-weight: bold;
+          }
+
+          &.warning {
+            color: #ffc107;
+            font-weight: bold;
+          }
+        }
+      }
+    }
+  }
+}
+</style>

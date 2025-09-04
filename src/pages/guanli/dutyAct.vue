@@ -1,23 +1,45 @@
 <template>
     <div class="duty-container">
         <!-- 排班日历 -->
-        <calendar :staff-obj="userStore.staffObj" :dutyData="dutyData" @dayClick="handleDayClick" />
+        <div class="calendar-wrapper">
+            <calendar :staff-obj="userStore.staffObj" :dutyData="dutyData" @dayClick="handleDayClick"
+                :disabled="loading.calendar" />
+            <!-- Loading遮罩 -->
+            <div v-if="loading.calendar" class="calendar-loading">
+                <wd-loading type="outline" />
+            </div>
+        </div>
+
         <!-- 排班人员 -->
         <div class="staff-section">
             <div class="title">
                 <span>值班人员</span>
-                <span class="action" @click="handleModifyDuty">修改</span>
+                <span class="action" @click="handleModifyDuty" :class="{ disabled: loading.staff }">
+                    修改
+                </span>
             </div>
-            <DragList :items="dutyUserIds" item-key="userId" @sort="handleSortChange">
-                <template #="{ item }">
-                    {{ userStore.staffObj[item]?.name }}
-                </template>
-            </DragList>
+
+            <!-- 值班人员列表 -->
+            <div class="staff-list-wrapper">
+                <DragList :items="dutyUserIds" item-key="userId" @sort="handleSortChange" :disabled="loading.staff">
+                    <template #="{ item }">
+                        {{ userStore.staffObj[item]?.name }}
+                    </template>
+                </DragList>
+
+                <!-- 值班人员列表 Loading 遮罩 -->
+                <div v-if="loading.staff" class="staff-loading">
+                    <wd-loading type="outline" />
+                </div>
+            </div>
         </div>
+
         <DutyDialog v-model:show="showDialog" :options="userOptions" :group="departmentOptions"
             :selected="selectedUserIds" :isSingle="isSingle" @confirm="handleConfirmSelection" />
+
         <div class="action-section">
-            <press-button type="primary" @click="generateDuty" :disabled="hasCurrentMonthData">
+            <press-button type="primary" @click="generateDuty"
+                :disabled="hasCurrentMonthData || loading.calendar || loading.staff">
                 生成本月排班
             </press-button>
         </div>
@@ -25,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted, reactive } from 'vue';
 import dayjs from 'dayjs';
 import { useUserStore } from '@/store/user.store';
 import { useDepartmentStore } from '@/store/department.store';
@@ -53,7 +75,10 @@ interface Duty {
 const userStore = useUserStore();
 // 排班数据
 const dutyData = ref<Duty[]>([]);
-const loading = ref(true);
+const loading = reactive({
+    calendar: false,
+    staff: false
+});
 const departmentStore = useDepartmentStore();
 
 // 用户选项数据
@@ -82,62 +107,85 @@ function handleDayClick(date: Date, userId: string) {
 
 // 修改值班人员
 function handleModifyDuty() {
+    // 如果正在加载，则不执行操作
+    if (loading.staff) return;
+
     currentAction = 'sort';
     selectedUserIds.value = dutyUserIds.value;
     isSingle.value = false;
     showDialog.value = true;
 }
 
-// 确认选择处理
-// 确认选择处理
-function handleConfirmSelection(data: string[]) {
+// 确认选择处理 - 调度函数
+async function handleConfirmSelection(data: string[]) {
     if (currentAction === 'calendar') {
-        // 处理日历选择
-        if (!selectedDate.value || !data.length) return;
-        
-        const date = selectedDate.value.getTime();
-        const userId = data[0];
-        
-        // 查找是否已有该日期的排班
-        const existingIndex = dutyData.value.findIndex(d => d.date === date);
-        
-        if (existingIndex >= 0) {
-            // 更新已有排班
-            dutyData.value[existingIndex].userId = userId;
-        } else {
-            // 新增排班
-            const newId = dutyData.value.length > 0 
-                ? Math.max(...dutyData.value.map(d => d.id)) + 1 
-                : 1;
-            dutyData.value.push({
-                id: newId,
-                userId,
-                date
-            });
-        }
+        console.log('5秒延迟')
+        loading.calendar = true;
+        // 更新已有排班 - 添加5秒延迟
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        loading.calendar = false;
+        console.log('5秒延迟后')
+        handleCalendarSelection(data);
     } else if (currentAction === 'sort') {
-        // 处理值班人员列表修改
-
-        // 找出新增的人员（在新数据中但不在原数据中）
-        const addedUsers = _.difference(data, dutyUserIds.value);
-
-        // 找出被移除的人员（在原数据中但不在新数据中）
-        const removedUsers = _.difference(dutyUserIds.value, data);
-
-        // 如果有新增人员，添加到末尾
-        // 如果有移除人员，从原数组中移除
-        if (addedUsers.length > 0 || removedUsers.length > 0) {
-            // 移除被删除的人员
-            let updatedList = _.difference(dutyUserIds.value, removedUsers);
-            // 添加新增的人员到末尾
-            updatedList = [...updatedList, ...addedUsers];
-
-            dutyUserIds.value = updatedList;
-        } else {
-            // 如果没有新增也没有移除，保持原有顺序但按新选择的顺序排列
-            dutyUserIds.value = data;
-        }
+        handleSortSelection(data);
     }
+}
+
+// 处理日历选择
+function handleCalendarSelection(data: string[]) {
+    if (!selectedDate.value || !data.length) return;
+
+    loading.calendar = true;
+
+    const date = selectedDate.value.getTime();
+    const userId = data[0];
+
+    // 查找是否已有该日期的排班
+    const existingIndex = dutyData.value.findIndex(d => d.date === date);
+    if (existingIndex >= 0) {
+        dutyData.value[existingIndex].userId = userId;
+    } else {
+        // 新增排班
+        const newId = dutyData.value.length > 0
+            ? Math.max(...dutyData.value.map(d => d.id)) + 1
+            : 1;
+        dutyData.value.push({
+            id: newId,
+            userId,
+            date
+        });
+    }
+
+    loading.calendar = false;
+}
+
+// 处理值班人员列表修改
+function handleSortSelection(data: string[]) {
+    // 设置加载状态
+    loading.staff = true;
+
+    // 找出新增的人员（在新数据中但不在原数据中）
+    const addedUsers = _.difference(data, dutyUserIds.value);
+
+    // 找出被移除的人员（在原数据中但不在新数据中）
+    const removedUsers = _.difference(dutyUserIds.value, data);
+
+    // 如果有新增人员，添加到末尾
+    // 如果有移除人员，从原数组中移除
+    if (addedUsers.length > 0 || removedUsers.length > 0) {
+        // 移除被删除的人员
+        let updatedList = _.difference(dutyUserIds.value, removedUsers);
+        // 添加新增的人员到末尾
+        updatedList = [...updatedList, ...addedUsers];
+
+        dutyUserIds.value = updatedList;
+    } else {
+        // 如果没有新增也没有移除，保持原有顺序但按新选择的顺序排列
+        dutyUserIds.value = data;
+    }
+
+    // 取消加载状态
+    loading.staff = false;
 }
 
 // 排序变化处理
@@ -218,7 +266,7 @@ watch(() => [userStore.selfObj, userStore.staffObj, departmentStore.list],
 
 onMounted(async () => {
     await userStore.fetchStaff();
-    loading.value = false;
+    // loading.value = false;
     defaultUserIds.push('A00725', 'A00479');
     dutyUserIds.value = [...defaultUserIds];
 
@@ -233,4 +281,92 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="less">
-// ... 样式部分保持不变</style>
+.calendar-wrapper {
+    position: relative;
+    margin-bottom: 24px;
+
+    .calendar-loading {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: var(--calendar-height, 500px);
+        background-color: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+    }
+}
+
+.staff-section {
+    margin-bottom: 24px;
+
+    .title {
+        margin-bottom: 12px;
+        font-size: 16px;
+        font-weight: bold;
+
+        .action {
+            cursor: pointer;
+
+            &.disabled {
+                color: #ccc;
+                cursor: not-allowed;
+            }
+        }
+    }
+
+    .staff-list-wrapper {
+        position: relative;
+
+        .staff-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+    }
+
+    .staff-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .staff-item {
+        cursor: move;
+    }
+}
+
+.calendar-section {
+    margin-bottom: 24px;
+
+    .calendar {
+        --calendar-height: 500px;
+
+        /* 日期文字变小 */
+        :deep(.van-calendar__day) {
+            font-size: 12px;
+        }
+
+        /* bottomInfo字体变大且颜色加深 */
+        :deep(.van-calendar__bottom-info) {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+    }
+}
+
+.action-section {
+    display: flex;
+    justify-content: center;
+}
+</style>

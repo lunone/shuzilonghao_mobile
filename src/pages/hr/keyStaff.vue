@@ -28,8 +28,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
-import {useUserStore} from '@/store/user.store';
-import {useDepartmentStore} from '@/store/department.store';
+import { useUserStore } from '@/store/user.store';
+import { useDepartmentStore } from '@/store/department.store';
 const userStore = useUserStore();
 const departmentStore = useDepartmentStore();
 const stat = computed(() => {
@@ -38,7 +38,7 @@ const stat = computed(() => {
     const ids = {}
     const map = { wx: '维修工程部', fx: '飞行部', fg: '飞行技术管理部', yk: '运行控制部' }
     for (let key in map) {
-        ids[key] = departmentStore.getSubIds(map[key]);
+        ids[key] = departmentStore.getSubIdsByName(map[key]);
     }
     for (let userId in staff) {
         const user = staff[userId];

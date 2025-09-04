@@ -35,6 +35,7 @@ export const CONFIG = {
         staff: '/user/staff',
         userProfile: '/user/profile',
         departments: '/department/list',
+        dutyToday: '/duty/today',
         //
         pilots: '/pilot/list',
         pilotProfile: '/pilot/profile',

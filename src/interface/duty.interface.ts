@@ -3,3 +3,8 @@ export interface Duty {
     userId: string;
     date: number;
 }
+
+export interface DutyResponse {
+    departmentId: string;
+    userId: string;
+}

@@ -4,13 +4,13 @@
 
         <!-- 快捷按钮 -->
         <!-- <view class="quick-actions">
-            <view v-for="(action, idx) in actions" :key="idx" class="action-item" @click="handleAction(action)">
-                {{ action.name }}
+            <view v-for="(action, idx) in links" :key="idx" class="action-item" @click="handleAction(action)">
+                {{ action.text }}
             </view>
         </view> -->
-        <!-- <zl-shortcut :links="links" class="links" /> -->
+        <zl-shortcut :links="links" class="links" />
         <!-- <News /> -->
-        <DutyAct />
+
         <!-- <test /> -->
         <!-- 保留原有注释代码 -->
         <!-- <div class="public-wrapper">
@@ -24,8 +24,6 @@ import lhaVue from './lha.vue'
 import { ref } from 'vue'
 import Swiper from './swiper.vue'
 import News from './news.vue'
-import Duty from '../staff/duty.vue'
-import DutyAct from '@/pages/guanli/dutyAct.vue'
 
 const links = ref([
     { size: 6, class: 'location', text: '公司介绍', link: 'public/about', },
