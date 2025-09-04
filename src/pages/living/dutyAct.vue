@@ -51,8 +51,8 @@ import { ref, computed, watch, onMounted, reactive } from 'vue';
 import dayjs from 'dayjs';
 import { useUserStore } from '@/store/user.store';
 import { useDepartmentStore } from '@/store/department.store';
-import calendar from '@/pages/guanli/paiban/dutyCalendar.vue';
-import DutyDialog from '@/pages/guanli/paiban/dutyDialog.vue';
+import calendar from '@/pages/living/paiban/dutyCalendar.vue';
+import DutyDialog from '@/pages/living/paiban/dutyDialog.vue';
 import DragList from '@/components/zl/drag.vue';
 import _ from 'lodash';
 

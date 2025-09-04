@@ -124,7 +124,7 @@
             }
         },
         {
-            "path": "pages/guanli/dutyAct",
+            "path": "pages/living/dutyAct",
             "style": {
                 "navigationBarTitleText": "排班"
             }
