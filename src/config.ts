@@ -1,7 +1,11 @@
+/// <reference path="../shims-uni.d.ts" />
+
+declare const API_BASE_URL: string;
+
 export const CONFIG = {
     url: {
         timeout: 30e3,
-        api: 'https://app.airlonghao.com/sz',
+        api: API_BASE_URL,
         init: '/user/init',
         login: '/login/wx',
         activate: '/login/activate',
@@ -43,11 +47,40 @@ export const CONFIG = {
         pilotAbsence: '/pilot/absence',
         pilotTraining: '/pilot/training',
         //
-        // 权限相关接口（通过用户信息API统一获取，无需单独接口）
-        // userPermissions: '/user/permissions', // 已移除，权限数据包含在用户信息中
-        // roles: '/role/list', // 可选，用于后台管理
-        // permissions: '/permission/list', // 可选，用于后台管理
-        // 注意：所有接口都通过POST方法调用，符合项目现有的api.ts设计
+        // 权限管理接口
+        permissionCreate: '/system/permission/create',
+        permissionUpdate: '/system/permission/update',
+        permissionDelete: '/system/permission/delete',
+        permissionDetail: '/system/permission/detail',
+        permissionList: '/system/permission/list',
+        permissionTree: '/system/permission/tree',
+        permissionBatchCreate: '/system/permission/batchCreate',
+        permissionBatchUpdate: '/system/permission/batchUpdate',
+        permissionBatchDelete: '/system/permission/batchDelete',
+
+        // 角色管理接口
+        roleCreate: '/system/role/create',
+        roleUpdate: '/system/role/update',
+        roleDelete: '/system/role/delete',
+        roleDetail: '/system/role/detail',
+        roleDetailByCode: '/system/role/detailByCode',
+        roleList: '/system/role/list',
+        roleAssignPermissions: '/system/role/assignPermissions',
+        rolePermissions: '/system/role/rolePermissions',
+        rolePermissionIds: '/system/role/rolePermissionIds',
+        roleEnabledRoles: '/system/role/enabledRoles',
+        roleCheckCode: '/system/role/checkCode',
+
+        // 用户角色管理接口
+        userAssignRoles: '/user/assignRoles',
+        userRoles: '/user/userRoles',
+        userPermissions: '/user/userPermissions',
+        userPermissionCodes: '/user/userPermissionCodes',
+        userHasPermission: '/user/hasPermission',
+        userHasRole: '/user/hasRole',
+        userAddUserRole: '/user/addUserRole',
+        userRemoveUserRole: '/user/removeUserRole',
+        userClearUserRoles: '/user/clearUserRoles',
     },
     page: {
         index: '/pages/index',

@@ -135,3 +135,41 @@ export function checkPermission(props: PermissionProps): boolean {
 
     return true; // 如果没有指定权限或角色，默认显示
 }
+
+/**
+ * 权限相关的组合式函数（非入侵方案）
+ */
+export function usePermission() {
+    // 检查单个权限
+    const hasPermission = (permissionCode: string) => {
+        return permission.hasPermission(permissionCode);
+    };
+
+    // 检查多个权限（任意一个）
+    const hasAnyPermission = (permissionCodes: string[]) => {
+        return permission.hasAnyPermission(permissionCodes);
+    };
+
+    // 检查多个权限（全部满足）
+    const hasAllPermissions = (permissionCodes: string[]) => {
+        return permission.hasAllPermissions(permissionCodes);
+    };
+
+    // 检查角色
+    const hasRole = (roleCode: string) => {
+        return permission.hasRole(roleCode);
+    };
+
+    // 检查多个角色（任意一个）
+    const hasAnyRole = (roleCodes: string[]) => {
+        return permission.hasAnyRole(roleCodes);
+    };
+
+    return {
+        hasPermission,
+        hasAnyPermission,
+        hasAllPermissions,
+        hasRole,
+        hasAnyRole
+    };
+}

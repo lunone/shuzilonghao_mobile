@@ -2,7 +2,15 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { useUserStore } from '@/store/user.store';
 import { CONFIG } from '@/config';
 
-const store = useUserStore();
+// 延迟初始化store，避免在模块顶层调用useUserStore
+let store: ReturnType<typeof useUserStore> | null = null;
+
+const getStore = () => {
+    if (!store) {
+        store = useUserStore();
+    }
+    return store;
+};
 
 let isRefreshing = false; // 是否正在刷新的flag
 let isShowNetworkErrorModal = false; // 确保对话框弹出一个的标志
@@ -42,7 +50,7 @@ const instance = axios.create(option)
 
 const beforeRequest = async (config) => {
     // todo:判断白名单
-    config.headers[CONFIG.key.token] = store.token;
+    config.headers[CONFIG.key.token] = getStore().token;
     return config
 }
 // 请求拦截器
@@ -80,7 +88,7 @@ instance.interceptors.response.use(
 
 // 响应-处理401的token竞争问题
 instance.interceptors.response.use(response => {
-    console.log('401竞争', response, response.config.url)
+    // console.log('401竞争', response, response.config.url)
     return response
 }, (error: AxiosError) => {
     const response = error.response;
@@ -104,7 +112,7 @@ instance.interceptors.response.use(response => {
 instance.interceptors.response.use((response: AxiosResponse) => {
     const { token, code, status } = response?.data || {};
     if (token) {// 返回如过携带了token,就是要更新token了.
-        store.setToken(token);
+        getStore().setToken(token);
         notLoginQweue.forEach(f => f());// 新token重试积压请求
         notLoginQweue = []; // 清空队列
         isRefreshing = false;

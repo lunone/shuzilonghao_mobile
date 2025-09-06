@@ -1,19 +1,45 @@
+// 权限接口 - 匹配新API结构
 export interface Permission {
-    id: string;
+    id: number;
     name: string;
     code: string; // 如 'flight:read', 'user:manage'
-    resource: string; // 资源类型：flight, user, aircraft等
-    action: string; // 操作类型：read, write, delete, manage
     description?: string;
+    parentId?: number;
+    orderNum?: number;
+    type?: number; // 权限类型：0:菜单 1:按钮 2:接口
+    path?: string;
+    method?: string; // GET/POST/PUT/DELETE
+    enabled?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
+// 角色接口 - 匹配新API结构
 export interface Role {
-    id: string;
+    id: number;
     name: string;
     code: string; // 如 'admin', 'manager', 'pilot', 'staff'
-    description: string;
-    permissions: string[]; // 权限ID数组
-    status: number; // 0:禁用 1:启用
+    description?: string;
+    orderNum?: number;
+    enabled?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+// 用户权限接口 - 匹配新API结构
+export interface UserRole {
+    id: number;
+    userId: string;
+    roleId: number;
+    createdAt?: string;
+}
+
+// 角色权限接口 - 匹配新API结构
+export interface RolePermission {
+    id: number;
+    roleId: number;
+    permissionId: number;
+    createdAt?: string;
 }
 
 export interface UserPermission {

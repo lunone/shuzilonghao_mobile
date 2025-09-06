@@ -146,6 +146,12 @@
             "style": {
                 "navigationBarTitleText": "供应商界面"
             }
+        },
+        {
+            "path": "pages/role/manage",
+            "style": {
+                "navigationBarTitleText": "权限管理"
+            }
         }
     ],
     "globalStyle": {
@@ -255,6 +261,10 @@
         "pages/sale/sale": {
             "permissions": ["sale:read"],
             "roles": ["admin", "manager", "staff"]
+        },
+        "pages/role/manage": {
+            "permissions": ["system:manage"],
+            "roles": ["admin"]
         }
     },
     "uniIdRouter": {},

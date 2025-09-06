@@ -1,9 +1,24 @@
 <template>
     <div class="main-container">
 
+
         <div class="section overview">
             <StatVue class="day" :range="`day`" />
             <StatVue class="year" />
+            <!-- 权限管理入口 -->
+        </div>
+        <!-- <Manage />   -->
+        <div class="section permission-section">
+            <!-- <div class="" v-if="canManageSystem"> -->
+            <div class="permission-card" @click="goToPermissionManage">
+                <div class="permission-icon">🔐</div>
+                <div class="permission-content">
+                    <h3 class="permission-title">权限管理</h3>
+                    <p>管理系统用户权限和角色分配。</p>
+                </div>
+                <div class="permission-arrow">→</div>
+            </div>
+            <!-- </div> -->
         </div>
         <!-- <DutyAct /> -->
         <div class="section duty">
@@ -17,10 +32,27 @@
 
 <script lang="ts" setup>
 
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import permission from '@/utils/permission'
 import StatVue from '@/pages/staff/stat.vue';
 import Duty from '../staff/duty.vue';
 import Flight from '../flight/flight.vue';
 import DutyAct from '@/pages/living/dutyAct.vue'
+import manage from './manage.vue';
+import Manage from './manage.vue';
+
+// 权限检查
+const canManageSystem = computed(() => permission.canManageSystem())
+
+// 路由跳转
+const router = useRouter()
+
+const goToPermissionManage = () => {
+    uni.navigateTo({
+        url: '/pages/role/manage'
+    })
+}
 
 </script>
 <style lang="less" scoped>
@@ -74,5 +106,51 @@ import DutyAct from '@/pages/living/dutyAct.vue'
     }
 
     &>.duty {}
+
+    &>.permission-section {
+        .permission-card {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: white;
+            border-radius: @radius-base;
+            box-shadow: @shadow-base;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            }
+
+            .permission-icon {
+                font-size: 32px;
+                margin-right: 15px;
+                color: @color-primary;
+            }
+
+            .permission-content {
+                flex: 1;
+
+                .permission-title {
+                    margin: 0 0 5px 0;
+                    color: @color-text;
+                    font-size: 18px;
+                }
+
+                p {
+                    margin: 0;
+                    color: #666;
+                    font-size: 14px;
+                }
+            }
+
+            .permission-arrow {
+                font-size: 20px;
+                color: #999;
+                margin-left: 15px;
+            }
+        }
+    }
 }
 </style>

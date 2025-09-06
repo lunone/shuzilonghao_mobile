@@ -18,14 +18,18 @@
             <HrVue class="hr" />
         </div>
 
-        <!-- 使用权限指令控制显示 -->
-        <todayFlightVue v-permission="'flight:read'" class="section flight" />
-        <PlanVue v-permission="'flight:read'" class="section plan" />
+        <!-- 使用权限组件控制显示（非入侵方案） -->
+        <Permission permission="flight:read">
+            <todayFlightVue class="section flight" />
+        </Permission>
+        <Permission permission="flight:read">
+            <PlanVue class="section plan" />
+        </Permission>
 
-        <!-- 使用角色指令控制显示 -->
-        <div v-role="'admin'" class="section admin-only">
+        <!-- 使用权限组件控制角色显示 -->
+        <Permission role="admin" class="section admin-only">
             <text>管理员专用区域</text>
-        </div>
+        </Permission>
 
         <dividerVue class="more">其他值得放在首页的项</dividerVue>
     </div>

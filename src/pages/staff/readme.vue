@@ -96,7 +96,7 @@ const close = () => {
         text-align: center;
         border-top: 1px solid #ebeef5;
 
-        button {
+        .close-btn {
             padding: 6px 30px;
             background: @color-primary;
             color: white;
