@@ -23,7 +23,7 @@
                     @permission-updated="$emit('permissionUpdated')"
                 />
             </div>
-            *****
+
         </div>
     </div>
 </template>

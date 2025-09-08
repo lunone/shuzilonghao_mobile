@@ -1,87 +1,68 @@
 <template>
     <div class="permission-manage">
-        <!-- 用户信息展示 -->
-        <div v-if="selectedUser" class="user-info-card" @click="showUserSelector = true">
-            <div class="user-header">
-                <div class="user-avatar">
-                    <text>{{ selectedUser.name?.charAt(0) || 'U' }}</text>
-                </div>
-                <div class="user-details">
-                    <h3>{{ selectedUser.name || '未选择用户' }}</h3>
-                    <p class="user-id">{{ selectedUser.id }}</p>
-                </div>
-                <div class="user-status">
-                    <span class="status-badge active">已选择</span>
-                    <div class="change-user-hint">
-                        <text>点击重新选择</text>
+        <!-- 第一部分：人员选择区域 -->
+        <div class="section-card user-selection-section">
+            <div class="section-header">
+                <h3>人员选择</h3>
+                <div class="user-display">
+                    <div class="user-name-display">
+                        <span v-if="selectedUser">{{ selectedUser.name }}</span>
+                        <span v-else class="placeholder">未选择人员</span>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 空状态提示 -->
-        <div v-else class="empty-user-state">
-            <div class="empty-content">
-                <div class="empty-icon">👤</div>
-                <wd-button type="primary" @click="showUserSelector = true">
-                    选择用户
-                </wd-button>
-            </div>
-        </div>
-
-        <!-- 主要内容区域 -->
-        <div v-if="selectedUser" class="content-area">
-            <!-- 用户角色管理组件 -->
-            <UserRoleManager
-                :user-roles="userRoles"
-                :selected-role="selectedRole"
-                @select-role="handleSelectRole"
-                @remove-user-role="handleRemoveUserRole"
-                @show-create-role-dialog="showCreateRoleDialog = true"
-                @show-role-dialog="showRoleDialog = true"
-            />
-
-            <!-- 角色权限管理组件 -->
-            <RolePermissionManager
-                v-if="selectedRole"
-                :selected-role="selectedRole"
-                :all-permissions="allPermissions"
-                :selected-permission-ids="selectedPermissionIds"
-                @save-role-permissions="handleSaveRolePermissions"
-                @load-role-permissions="handleLoadRolePermissions"
-                @toggle-permission="handleTogglePermission($event, true)"
-            />
-
-            <!-- 用户权限查看 -->
-            <div v-else class="section-card">
-                <div class="section-header">
-                    <h3>用户权限</h3>
-                    <wd-button type="info" @click="loadUserPermissions">
-                        刷新权限
+                    <wd-button type="primary" @click="showUserSelector = true">
+                        选择人员
                     </wd-button>
                 </div>
+            </div>
+        </div>
 
-                <div class="permission-list">
-                    <div v-for="permission in userPermissions" :key="permission.id" class="permission-item">
-                        <div class="permission-info">
-                            <div class="permission-main">
-                                <h4>{{ permission.name }}</h4>
-                                <div class="permission-tags">
-                                    <span class="permission-code">{{ permission.code }}</span>
-                                    <span class="permission-type" :class="'type-' + permission.type">
-                                        {{ getPermissionTypeText(permission.type) }}
-                                    </span>
-                                </div>
-                            </div>
-                            <p class="permission-desc">{{ permission.description || '无描述' }}</p>
+        <!-- 第二部分：系统所有角色 -->
+        <div class="section-card roles-section">
+            <div class="section-header">
+                <h3>系统角色</h3>
+                <div class="header-actions">
+                    <span class="action-icon" @click="$emit('showCreateRoleDialog')" title="创建角色">➕</span>
+                    <span class="action-icon" @click="$emit('showRoleDialog')" title="分配角色">👥</span>
+                </div>
+            </div>
+            <div class="roles-list">
+                <div v-for="role in allRoles" :key="role.id"
+                     :class="['role-item', { 'selected': selectedRole?.id === role.id }]"
+                     @click="handleSelectRole(role)">
+                    <div class="role-info">
+                        <div class="role-main">
+                            <h4 class="role-name">{{ role.name }}</h4>
+                            <span class="role-code">{{ role.code }}</span>
                         </div>
-                    </div>
-                    <div v-if="userPermissions.length === 0" class="empty-state">
-                        <div class="empty-icon">🔑</div>
-                        <text>该用户尚无任何权限</text>
-                        <p class="empty-hint">请先为用户分配角色获取权限</p>
+                        <p class="role-desc">{{ role.description || '无描述' }}</p>
                     </div>
                 </div>
+                <div v-if="allRoles.length === 0" class="empty-state">
+                    <div class="empty-icon">🔒</div>
+                    <div>暂无角色</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第三部分：系统所有权限树 -->
+        <div class="section-card permissions-section">
+                <div class="section-header">
+                    <h3>{{ selectedRole ? `${selectedRole.name}权限` : (selectedUser ? `${selectedUser.name}权限` : '系统权限') }}</h3>
+                    <div class="header-actions">
+                        <span v-if="selectedRole" class="action-icon" @click="openCreateRootPermissionDialog" title="添加根权限">➕</span>
+                        <span v-if="selectedRole && hasPermissionChanges" class="action-icon update-btn" @click="saveRolePermissions" title="更新权限">💾</span>
+                    </div>
+                </div>
+            <div class="permission-tree-container">
+                <PermissionTree
+                    :all-permissions="allPermissions"
+                    :selected-permission-ids="selectedRole ? selectedPermissionIds : userPermissionIds"
+                    :read-only="!selectedRole"
+                    @toggle-permission="handleTogglePermission"
+                    @edit-node="handleEditNode"
+                    @delete-node="handleDeleteNode"
+                    @add-child="handleAddChild"
+                />
             </div>
         </div>
 
@@ -94,7 +75,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="search-box">
-                        <wd-input v-model="userSearchKeyword" placeholder="搜索用户姓名或ID" />
+                        <wd-input v-model="userSearchKeyword" placeholder="搜索用户姓名或ID" @input="realTimeSearchUsers" />
                         <wd-button @click="searchUsers">搜索</wd-button>
                     </div>
                     <div class="user-list">
@@ -172,6 +153,58 @@
             </div>
         </div>
 
+        <!-- 创建权限弹窗 -->
+        <div v-if="showCreatePermissionDialog" class="modal-overlay" @click="showCreatePermissionDialog = false">
+            <div class="modal-content" @click.stop>
+                <div class="modal-header">
+                    <h3>{{ newPermission.parentId === 0 ? '创建根权限' : '创建子权限' }}</h3>
+                    <button class="close-btn" @click="showCreatePermissionDialog = false">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>权限名称</label>
+                        <wd-input v-model="newPermission.name" placeholder="请输入权限名称" />
+                    </div>
+                    <div class="form-group">
+                        <label>权限编码</label>
+                        <wd-input v-model="newPermission.code" placeholder="请输入权限编码" />
+                    </div>
+                    <div class="form-group">
+                        <label>权限类型</label>
+                        <wd-radio-group v-model="newPermission.type">
+                            <wd-radio :value="0">菜单</wd-radio>
+                            <wd-radio :value="1">按钮</wd-radio>
+                            <wd-radio :value="2">接口</wd-radio>
+                        </wd-radio-group>
+                    </div>
+                    <div class="form-group" v-if="newPermission.type === 2">
+                        <label>接口路径</label>
+                        <wd-input v-model="newPermission.path" placeholder="请输入接口路径" />
+                    </div>
+                    <div class="form-group" v-if="newPermission.type === 2">
+                        <label>请求方法</label>
+                        <wd-radio-group v-model="newPermission.method">
+                            <wd-radio value="GET">GET</wd-radio>
+                            <wd-radio value="POST">POST</wd-radio>
+                            <wd-radio value="PUT">PUT</wd-radio>
+                            <wd-radio value="DELETE">DELETE</wd-radio>
+                        </wd-radio-group>
+                    </div>
+                    <div class="form-group">
+                        <label>权限描述</label>
+                        <wd-textarea v-model="newPermission.description" placeholder="请输入权限描述" :maxlength="-1" />
+                    </div>
+                    <div class="form-group">
+                        <wd-checkbox v-model="newPermission.enabled">启用状态</wd-checkbox>
+                    </div>
+                    <div class="modal-actions">
+                        <wd-button type="default" @click="cancelCreatePermission">取消</wd-button>
+                        <wd-button type="primary" @click="createPermission">创建</wd-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 加载状态 -->
         <div v-if="loading" class="loading-overlay">
             <div class="loading-spinner"></div>
@@ -181,12 +214,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import permission from '@/utils/permission'
 import { useUserStore } from '@/store/user.store'
 import type { Role, Permission } from '@/interface/permission.interface'
 import UserRoleManager from './manage/UserRoleManager.vue'
 import RolePermissionManager from './manage/RolePermissionManager.vue'
+import PermissionTree from './manage/PermissionTree.vue'
 
 // 响应式数据
 const selectedUser = ref<any>(null)
@@ -196,10 +230,13 @@ const userPermissions = ref<Permission[]>([])
 const allRoles = ref<Role[]>([])
 const allPermissions = ref<Permission[]>([])
 const selectedPermissionIds = ref<number[]>([])
+const userPermissionIds = ref<number[]>([])
+const originalPermissionIds = ref<number[]>([]) // 保存原始权限ID，用于比较变更
 const searchResults = ref<any[]>([])
 const showUserSelector = ref(false)
 const showRoleDialog = ref(false)
 const showCreateRoleDialog = ref(false)
+const showCreatePermissionDialog = ref(false)
 const userSearchKeyword = ref('')
 const selectedRoleIds = ref<number[]>([])
 const loading = ref(false)
@@ -212,8 +249,35 @@ const newRole = ref({
     enabled: true
 })
 
+// 创建权限表单数据
+const newPermission = ref({
+    name: '',
+    code: '',
+    description: '',
+    parentId: 0,
+    type: 0,
+    path: '',
+    method: '',
+    enabled: true
+})
+
 // 使用userStore
 const userStore = useUserStore()
+
+// 计算属性：检测权限是否有变更
+const hasPermissionChanges = computed(() => {
+    if (!selectedRole.value) return false
+
+    // 比较当前选中的权限ID和原始权限ID
+    const currentIds = [...selectedPermissionIds.value].sort()
+    const originalIds = [...originalPermissionIds.value].sort()
+
+    if (currentIds.length !== originalIds.length) {
+        return true
+    }
+
+    return currentIds.some((id, index) => id !== originalIds[index])
+})
 
 // 页面加载时初始化
 onMounted(async () => {
@@ -221,6 +285,10 @@ onMounted(async () => {
         loadAllRoles(),
         userStore.fetchStaff() // 预加载员工数据
     ])
+
+    // 自动输入 "23" 并查询用户
+    userSearchKeyword.value = '23'
+    await searchUsers()
 })
 
 // 加载所有角色
@@ -238,9 +306,9 @@ const loadAllRoles = async () => {
 }
 
 // 搜索用户
-const searchUsers = () => {
+const searchUsers = async () => {
     if (!userSearchKeyword.value.trim()) {
-        uni.showToast({ title: '请输入搜索关键词', icon: 'none' })
+        searchResults.value = []
         return
     }
 
@@ -258,6 +326,17 @@ const searchUsers = () => {
     if (searchResults.value.length === 0) {
         uni.showToast({ title: '未找到匹配的用户', icon: 'none' })
     }
+}
+
+// 实时搜索用户（防抖处理）
+let searchTimeout: NodeJS.Timeout | null = null
+const realTimeSearchUsers = () => {
+    if (searchTimeout) {
+        clearTimeout(searchTimeout)
+    }
+    searchTimeout = setTimeout(() => {
+        searchUsers()
+    }, 300) // 300ms 防抖
 }
 
 // 选择用户
@@ -291,7 +370,21 @@ const loadUserPermissions = async () => {
 
     try {
         loading.value = true
-        userPermissions.value = await permission.getUserPermissionsById(selectedUser.value.id)
+        // 同时加载用户权限和完整权限列表
+        const [userPerms, allPerms] = await Promise.all([
+            permission.getUserPermissionsById(selectedUser.value.id),
+            permission.getPermissionList()
+        ])
+
+        userPermissions.value = userPerms
+        allPermissions.value = allPerms.list
+
+        // 计算用户拥有的权限ID列表
+        userPermissionIds.value = userPermissions.value.map(p => p.id)
+
+        console.log('用户权限:', userPermissions.value)
+        console.log('用户权限IDs:', userPermissionIds.value)
+        console.log('完整权限列表:', allPermissions.value)
     } catch (error) {
         uni.showToast({ title: '加载用户权限失败', icon: 'none' })
         console.error('加载用户权限失败:', error)
@@ -300,20 +393,7 @@ const loadUserPermissions = async () => {
     }
 }
 
-// 移除用户角色
-const removeUserRole = async (roleId: number) => {
-    if (!selectedUser.value) return
 
-    try {
-        await permission.removeUserRole(selectedUser.value.id, roleId)
-        uni.showToast({ title: '移除角色成功' })
-        await loadUserRoles()
-        await loadUserPermissions()
-    } catch (error) {
-        uni.showToast({ title: '移除角色失败', icon: 'none' })
-        console.error('移除角色失败:', error)
-    }
-}
 
 // 分配角色
 const assignRoles = async () => {
@@ -388,19 +468,16 @@ const loadRolePermissions = async () => {
 
     try {
         loading.value = true
-        // 加载所有权限树
-        const permissions = await permission.getPermissionTree()
-        console.log('服务器返回的权限数据:', permissions)
-
-        // 将树形结构转换为扁平结构
-        const flattenedPermissions = flattenPermissionTree(permissions)
-        console.log('转换后的扁平权限数据:', flattenedPermissions)
-
-        allPermissions.value = buildPermissionTree(flattenedPermissions)
+        // 直接加载权限列表
+        const result = await permission.getPermissionList()
+        allPermissions.value = result.list
+        console.log('服务器返回的权限列表:', allPermissions.value)
 
         // 加载角色已有权限
         const rolePermissions = await permission.getRolePermissionIds(selectedRole.value.id)
         selectedPermissionIds.value = rolePermissions
+        // 保存原始权限ID，用于比较变更
+        originalPermissionIds.value = [...rolePermissions]
         console.log('角色已有权限IDs:', rolePermissions)
     } catch (error) {
         uni.showToast({ title: '加载角色权限失败', icon: 'none' })
@@ -418,6 +495,8 @@ const saveRolePermissions = async () => {
         loading.value = true
         await permission.assignPermissionsToRole(selectedRole.value.id, selectedPermissionIds.value)
         uni.showToast({ title: '保存权限成功' })
+        // 更新原始权限ID，清除变更状态
+        originalPermissionIds.value = [...selectedPermissionIds.value]
         // 刷新用户权限
         await loadUserPermissions()
     } catch (error) {
@@ -434,91 +513,72 @@ const togglePermission = (permissionId: number, checked: boolean) => {
         if (!selectedPermissionIds.value.includes(permissionId)) {
             selectedPermissionIds.value.push(permissionId)
         }
+        // 联动选择所有子节点
+        selectAllChildren(permissionId)
     } else {
         const index = selectedPermissionIds.value.indexOf(permissionId)
         if (index > -1) {
             selectedPermissionIds.value.splice(index, 1)
         }
+        // 联动取消选择所有子节点
+        deselectAllChildren(permissionId)
     }
 }
 
-// 将树形权限结构转换为扁平结构
-const flattenPermissionTree = (treeData: any[]): Permission[] => {
-    const result: Permission[] = []
-
-    const traverse = (nodes: any[], parentId: number | null = null) => {
-        nodes.forEach(node => {
-            // 创建扁平结构的权限对象
-            const permission: Permission = {
-                id: node.id,
-                name: node.name,
-                code: node.code,
-                description: node.description,
-                parentId: parentId,
-                type: node.type,
-                path: node.path,
-                method: node.method,
-                orderNum: node.orderNum,
-                enabled: node.enabled !== false,
-                createdAt: node.createdAt,
-                updatedAt: node.updatedAt
-            }
-
-            result.push(permission)
-
-            // 递归处理子节点
-            if (node.children && node.children.length > 0) {
-                traverse(node.children, node.id)
+// 递归选择所有子节点
+const selectAllChildren = (permissionId: number) => {
+    const findAndSelectChildren = (permissions: any[], parentId: number) => {
+        permissions.forEach(permission => {
+            if (permission.parentId === parentId) {
+                if (!selectedPermissionIds.value.includes(permission.id)) {
+                    selectedPermissionIds.value.push(permission.id)
+                }
+                // 递归处理子节点的子节点
+                findAndSelectChildren(permissions, permission.id)
             }
         })
     }
 
-    traverse(treeData)
-    return result
+    findAndSelectChildren(allPermissions.value, permissionId)
 }
 
-// 构建权限树结构
-const buildPermissionTree = (permissions: Permission[]): Permission[] => {
-    const result: Permission[] = []
-    const map = new Map<number, Permission & { level: number }>()
-
-    // 建立ID映射
-    permissions.forEach(permission => {
-        map.set(permission.id, { ...permission, level: 0 })
-    })
-
-    // 构建树结构
-    permissions.forEach(permission => {
-        if (permission.parentId) {
-            const parent = map.get(permission.parentId)
-            if (parent) {
-                map.get(permission.id)!.level = parent.level + 1
+// 递归取消选择所有子节点
+const deselectAllChildren = (permissionId: number) => {
+    const findAndDeselectChildren = (permissions: any[], parentId: number) => {
+        permissions.forEach(permission => {
+            if (permission.parentId === parentId) {
+                const index = selectedPermissionIds.value.indexOf(permission.id)
+                if (index > -1) {
+                    selectedPermissionIds.value.splice(index, 1)
+                }
+                // 递归处理子节点的子节点
+                findAndDeselectChildren(permissions, permission.id)
             }
-        }
-        result.push(map.get(permission.id)!)
-    })
+        })
+    }
 
-    // 按层级和顺序排序
-    return result.sort((a, b) => {
-        const aLevel = (a as any).level || 0
-        const bLevel = (b as any).level || 0
-        if (aLevel !== bLevel) {
-            return aLevel - bLevel
-        }
-        return (a.orderNum || 0) - (b.orderNum || 0)
-    })
+    findAndDeselectChildren(allPermissions.value, permissionId)
 }
+
 
 // 选择角色处理
 const handleSelectRole = async (role: Role) => {
-    selectedRole.value = role
-    await loadRolePermissions()
+    // 如果点击的是已选中的角色，则取消选中，显示用户权限
+    if (selectedRole.value && selectedRole.value.id === role.id) {
+        selectedRole.value = null
+        selectedPermissionIds.value = []
+        // 刷新用户权限显示
+        if (selectedUser.value) {
+            await loadUserPermissions()
+        }
+    } else {
+        // 否则选中该角色，显示角色权限
+        selectedRole.value = role
+        await loadRolePermissions()
+    }
 }
 
-// 移除用户角色处理
-const handleRemoveUserRole = async (roleId: number) => {
-    await removeUserRole(roleId)
-}
+
 
 // 保存角色权限处理
 const handleSaveRolePermissions = async () => {
@@ -531,8 +591,105 @@ const handleLoadRolePermissions = async () => {
 }
 
 // 切换权限处理
-const handleTogglePermission = (permissionId: number, checked: boolean) => {
+const handleTogglePermission = (permissionId: number) => {
+    // 计算当前选中状态：如果已选中则取消选中，否则选中
+    const isCurrentlySelected = selectedPermissionIds.value.includes(permissionId)
+    const checked = !isCurrentlySelected
     togglePermission(permissionId, checked)
+}
+
+// 编辑节点处理
+const handleEditNode = async (node: any) => {
+    try {
+        // 获取权限详情
+        const permissionDetail = await permission.getPermissionDetail(node.id)
+
+        // 显示编辑表单
+        uni.showModal({
+            title: '编辑权限',
+            content: `编辑权限: ${permissionDetail.name}\n\n权限编码: ${permissionDetail.code}\n\n描述: ${permissionDetail.description || '无'}`,
+            showCancel: true,
+            confirmText: '编辑',
+            cancelText: '取消',
+            success: async (res) => {
+                if (res.confirm) {
+                    // 这里可以打开一个编辑表单页面或弹窗
+                    // 暂时显示提示信息
+                    uni.showToast({
+                        title: '编辑功能待实现',
+                        icon: 'none'
+                    })
+                }
+            }
+        })
+    } catch (error) {
+        uni.showToast({
+            title: '获取权限详情失败',
+            icon: 'none'
+        })
+        console.error('获取权限详情失败:', error)
+    }
+}
+
+// 删除节点处理
+const handleDeleteNode = async (node: any) => {
+    try {
+        // 先获取权限详情，确认是否有子权限
+        const permissionDetail = await permission.getPermissionDetail(node.id)
+
+        uni.showModal({
+            title: '删除权限',
+            content: `确定要删除权限 "${permissionDetail.name}" 吗？\n\n注意：删除权限将影响所有相关用户和角色。`,
+            showCancel: true,
+            confirmText: '删除',
+            cancelText: '取消',
+            success: async (res) => {
+                if (res.confirm) {
+                    try {
+                        await permission.deletePermission(node.id)
+                        uni.showToast({
+                            title: '删除权限成功',
+                            icon: 'success'
+                        })
+                        // 刷新权限列表
+                        await refreshPermissions()
+                    } catch (error) {
+                        uni.showToast({
+                            title: '删除权限失败',
+                            icon: 'none'
+                        })
+                        console.error('删除权限失败:', error)
+                    }
+                }
+            }
+        })
+    } catch (error) {
+        uni.showToast({
+            title: '获取权限详情失败',
+            icon: 'none'
+        })
+        console.error('获取权限详情失败:', error)
+    }
+}
+
+// 添加子节点处理
+const handleAddChild = async (parentId: number) => {
+    await openCreateChildPermissionDialog(parentId)
+}
+
+// 清除角色选择
+const clearRoleSelection = () => {
+    selectedRole.value = null
+    selectedPermissionIds.value = []
+}
+
+// 刷新权限
+const refreshPermissions = async () => {
+    if (selectedRole.value) {
+        await loadRolePermissions()
+    } else {
+        await loadUserPermissions()
+    }
 }
 
 // 获取权限类型文本
@@ -544,6 +701,104 @@ const getPermissionTypeText = (type?: number): string => {
         default: return '未知'
     }
 }
+
+// 打开创建根权限弹窗
+const openCreateRootPermissionDialog = () => {
+    newPermission.value = {
+        name: '',
+        code: '',
+        description: '',
+        parentId: 0,
+        type: 0,
+        path: '',
+        method: '',
+        enabled: true
+    }
+    showCreatePermissionDialog.value = true
+}
+
+// 打开创建子权限弹窗
+const openCreateChildPermissionDialog = async (parentId: number) => {
+    try {
+        // 获取父权限详情
+        const parentPermission = await permission.getPermissionDetail(parentId)
+
+        newPermission.value = {
+            name: '',
+            code: '',
+            description: '',
+            parentId: parentId,
+            type: 0,
+            path: '',
+            method: '',
+            enabled: true
+        }
+        showCreatePermissionDialog.value = true
+    } catch (error) {
+        uni.showToast({
+            title: '获取父权限详情失败',
+            icon: 'none'
+        })
+        console.error('获取父权限详情失败:', error)
+    }
+}
+
+// 创建权限
+const createPermission = async () => {
+    if (!newPermission.value.name.trim() || !newPermission.value.code.trim()) {
+        uni.showToast({ title: '请填写权限名称和编码', icon: 'none' })
+        return
+    }
+
+    try {
+        loading.value = true
+        await permission.createPermission({
+            name: newPermission.value.name,
+            code: newPermission.value.code,
+            description: newPermission.value.description,
+            parentId: newPermission.value.parentId,
+            type: newPermission.value.type,
+            path: newPermission.value.path,
+            method: newPermission.value.method,
+            enabled: newPermission.value.enabled
+        })
+        uni.showToast({ title: '创建权限成功', icon: 'success' })
+        showCreatePermissionDialog.value = false
+        // 重置表单
+        newPermission.value = {
+            name: '',
+            code: '',
+            description: '',
+            parentId: 0,
+            type: 0,
+            path: '',
+            method: '',
+            enabled: true
+        }
+        // 刷新权限列表
+        await refreshPermissions()
+    } catch (error) {
+        uni.showToast({ title: '创建权限失败', icon: 'none' })
+        console.error('创建权限失败:', error)
+    } finally {
+        loading.value = false
+    }
+}
+
+// 取消创建权限
+const cancelCreatePermission = () => {
+    showCreatePermissionDialog.value = false
+    newPermission.value = {
+        name: '',
+        code: '',
+        description: '',
+        parentId: 0,
+        type: 0,
+        path: '',
+        method: '',
+        enabled: true
+    }
+}
 </script>
 
 <style lang="less" scoped>
@@ -553,6 +808,9 @@ const getPermissionTypeText = (type?: number): string => {
     padding: 10px;
     background: #f5f5f5;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .user-info-card {
@@ -647,6 +905,7 @@ const getPermissionTypeText = (type?: number): string => {
     border-radius: 8px;
     border: 1px solid #ddd;
     overflow: hidden;
+    transition: all 0.3s ease;
 
     .section-header {
         display: flex;
@@ -666,6 +925,36 @@ const getPermissionTypeText = (type?: number): string => {
         .header-actions {
             display: flex;
             gap: 6px;
+        }
+    }
+
+    // 用户权限模式样式
+    &.user-mode {
+        border-color: #52c41a;
+        box-shadow: 0 0 0 1px rgba(82, 196, 26, 0.2);
+
+        .section-header {
+            background: linear-gradient(135deg, #f6ffed 0%, #b7eb8f 100%);
+            border-bottom-color: #52c41a;
+
+            h3 {
+                color: #389e0d;
+            }
+        }
+    }
+
+    // 角色权限模式样式
+    &.role-mode {
+        border-color: #1890ff;
+        box-shadow: 0 0 0 1px rgba(24, 144, 255, 0.2);
+
+        .section-header {
+            background: linear-gradient(135deg, #e6f7ff 0%, #91d5ff 100%);
+            border-bottom-color: #1890ff;
+
+            h3 {
+                color: #0958d9;
+            }
         }
     }
 }
@@ -990,6 +1279,158 @@ const getPermissionTypeText = (type?: number): string => {
 
     100% {
         transform: rotate(360deg);
+    }
+}
+
+.refresh-icon {
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    &:active {
+        transform: scale(0.9);
+    }
+}
+
+.action-icon {
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    &:active {
+        transform: scale(0.9);
+    }
+}
+
+// 三部分布局样式
+.user-selection-section {
+    flex-shrink: 0;
+
+    .user-display {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+
+        .user-name-display {
+            flex: 1;
+            font-size: 14px;
+            color: @color-text;
+            font-weight: 500;
+
+            .placeholder {
+                color: #999;
+                font-style: italic;
+            }
+        }
+    }
+}
+
+.roles-section {
+    flex: 1;
+    min-height: 200px;
+    max-height: 300px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    .roles-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 6px 8px;
+
+        .role-item {
+            background: #fafafa;
+            margin-bottom: 2px;
+            padding: 4px 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+                background: #f0f0f0;
+            }
+
+            &.selected {
+                background: #e6f7ff;
+                box-shadow: 0 0 0 1px #1890ff;
+            }
+
+            .role-info {
+                flex: 1;
+
+                .role-main {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 1px;
+
+                    .role-name {
+                        margin: 0;
+                        color: @color-text;
+                        font-size: 13px;
+                        font-weight: 600;
+                    }
+                }
+
+                .role-desc {
+                    margin: 0;
+                    color: #666;
+                    font-size: 11px;
+                }
+
+                .role-code {
+                    background: @color-primary;
+                    color: white;
+                    padding: 1px 3px;
+                    border-radius: 3px;
+                    font-size: 8px;
+                    font-weight: 500;
+                }
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 15px;
+
+            .empty-icon {
+                font-size: 20px;
+                margin-bottom: 4px;
+            }
+
+            text {
+                display: block;
+                margin-bottom: 6px;
+                font-size: 12px;
+            }
+        }
+    }
+}
+
+.permissions-section {
+    flex: 2;
+    min-height: 300px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    .permission-tree-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
     }
 }
 </style>

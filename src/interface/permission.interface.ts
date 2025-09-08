@@ -2,16 +2,18 @@
 export interface Permission {
     id: number;
     name: string;
-    code: string; // 如 'flight:read', 'user:manage'
+    code: string;
     description?: string;
     parentId?: number;
-    orderNum?: number;
-    type?: number; // 权限类型：0:菜单 1:按钮 2:接口
+    type?: number; // 0: 菜单, 1: 按钮, 2: 接口
     path?: string;
-    method?: string; // GET/POST/PUT/DELETE
+    method?: string;
+    orderNum?: number;
     enabled?: boolean;
     createdAt?: string;
     updatedAt?: string;
+    children?: Permission[];
+    level?: number;
 }
 
 // 角色接口 - 匹配新API结构

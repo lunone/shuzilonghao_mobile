@@ -5,30 +5,21 @@
             <div class="section-header">
                 <h3 class="section-title">角色管理</h3>
                 <div class="header-actions">
-                    <wd-button type="primary" @click="$emit('showCreateRoleDialog')">
-                        创建角色
-                    </wd-button>
-                    <wd-button type="default" @click="$emit('showRoleDialog')">
-                        分配角色
-                    </wd-button>
+                    <span class="action-icon" @click="$emit('showCreateRoleDialog')" title="创建角色">➕</span>
+                    <span class="action-icon" @click="$emit('showRoleDialog')" title="分配角色">👥</span>
                 </div>
             </div>
 
             <div class="role-list">
                 <div v-for="role in userRoles" :key="role.id"
                      :class="['role-item', { 'selected': selectedRole?.id === role.id }]"
-                     @click="$emit('selectRole', role)">
+                     @click="handleRoleClick(role)">
                     <div class="role-info">
                         <div class="role-main">
                             <h4 class="role-name">{{ role.name }}</h4>
                             <span class="role-code">{{ role.code }}</span>
                         </div>
                         <p class="role-desc">{{ role.description || '无描述' }}</p>
-                    </div>
-                    <div class="role-actions">
-                        <wd-button type="error" size="small" @click.stop="$emit('removeUserRole', role.id)">
-                            移除
-                        </wd-button>
                     </div>
                 </div>
                 <div v-if="userRoles.length === 0" class="empty-state">
@@ -56,11 +47,21 @@ const props = defineProps<Props>()
 
 // Emits
 const emit = defineEmits<{
-    selectRole: [role: Role]
-    removeUserRole: [roleId: number]
+    selectRole: [role: Role | null]
     showCreateRoleDialog: []
     showRoleDialog: []
 }>()
+
+// 处理角色点击
+const handleRoleClick = (role: Role) => {
+    // 如果点击的是已选中的角色，则取消选中
+    if (props.selectedRole?.id === role.id) {
+        emit('selectRole', null as any) // 发送null表示取消选中
+    } else {
+        // 否则选中该角色
+        emit('selectRole', role)
+    }
+}
 </script>
 
 <style lang="less" scoped>
@@ -77,7 +78,7 @@ const emit = defineEmits<{
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 12px;
+            padding: 8px 10px;
             background: #fafafa;
             border-bottom: 1px solid #eee;
 
@@ -90,20 +91,18 @@ const emit = defineEmits<{
 
             .header-actions {
                 display: flex;
-                gap: 6px;
+                gap: 4px;
             }
         }
     }
 
     .role-list {
-        padding: 10px 12px;
+        padding: 6px 8px;
 
         .role-item {
             background: #fafafa;
-            border-radius: 6px;
-            margin-bottom: 6px;
-            padding: 8px 10px;
-            border-left: 3px solid @color-primary;
+            margin-bottom: 2px;
+            padding: 4px 6px;
             cursor: pointer;
             transition: all 0.2s ease;
 
@@ -113,7 +112,6 @@ const emit = defineEmits<{
 
             &.selected {
                 background: #e6f7ff;
-                border-left-color: #1890ff;
                 box-shadow: 0 0 0 1px #1890ff;
             }
 
@@ -124,12 +122,12 @@ const emit = defineEmits<{
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
-                    margin-bottom: 4px;
+                    margin-bottom: 1px;
 
                     .role-name {
                         margin: 0;
                         color: @color-text;
-                        font-size: 14px;
+                        font-size: 13px;
                         font-weight: 600;
                     }
                 }
@@ -137,41 +135,51 @@ const emit = defineEmits<{
                 .role-desc {
                     margin: 0;
                     color: #666;
-                    font-size: 12px;
+                    font-size: 11px;
                 }
 
                 .role-code {
                     background: @color-primary;
                     color: white;
-                    padding: 2px 6px;
-                    border-radius: 8px;
-                    font-size: 10px;
+                    padding: 1px 3px;
+                    border-radius: 3px;
+                    font-size: 8px;
                     font-weight: 500;
                 }
-            }
-
-            .role-actions {
-                display: flex;
-                gap: 4px;
-                align-items: center;
             }
         }
 
         .empty-state {
             text-align: center;
             color: #999;
-            padding: 20px;
+            padding: 15px;
 
             .empty-icon {
-                font-size: 24px;
-                margin-bottom: 6px;
+                font-size: 20px;
+                margin-bottom: 4px;
             }
 
             text {
                 display: block;
-                margin-bottom: 8px;
+                margin-bottom: 6px;
                 font-size: 12px;
             }
+        }
+    }
+
+    .action-icon {
+        cursor: pointer;
+        font-size: 16px;
+        padding: 4px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+
+        &:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        &:active {
+            transform: scale(0.9);
         }
     }
 }

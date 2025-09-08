@@ -81,6 +81,7 @@ export const CONFIG = {
         userAddUserRole: '/user/addUserRole',
         userRemoveUserRole: '/user/removeUserRole',
         userClearUserRoles: '/user/clearUserRoles',
+        permissionRoles: '/system/permission/roles', // 获取拥有某个权限的角色列表
     },
     page: {
         index: '/pages/index',
