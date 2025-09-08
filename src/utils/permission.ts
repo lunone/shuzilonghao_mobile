@@ -1,5 +1,5 @@
 import { PERMISSION_CODES, ROLE_CODES, type UserPermission, type Permission, type Role } from '@/interface/permission.interface';
-import { api } from './api';
+import { api, apiSilent, apiWithLoading, apiNoError } from './api';
 import { CONFIG } from '@/config';
 
 /**
@@ -309,8 +309,11 @@ export const permission = {
         path?: string;
         method?: string;
         enabled?: boolean;
-    }): Promise<Permission> {
-        return api(CONFIG.url.permissionCreate, { data });
+    }, options?: { showLoading?: boolean; loadingText?: string }): Promise<Permission> {
+        return api(CONFIG.url.permissionCreate, { data }, {
+            showLoading: options?.showLoading ?? false,
+            loadingText: options?.loadingText ?? '创建权限中...'
+        });
     },
 
     // 更新权限
@@ -336,8 +339,11 @@ export const permission = {
         enabled?: boolean;
         page?: number;
         pageSize?: number;
-    }): Promise<{ list: Permission[]; total: number }> {
-        return api(CONFIG.url.permissionList, params);
+    }, options?: { showLoading?: boolean; loadingText?: string }): Promise<{ list: Permission[]; total: number }> {
+        return api(CONFIG.url.permissionList, params, {
+            showLoading: options?.showLoading ?? false,
+            loadingText: options?.loadingText ?? '加载权限中...'
+        });
     },
 
     // 获取权限树
@@ -413,8 +419,11 @@ export const permission = {
         enabled?: boolean;
         page?: number;
         pageSize?: number;
-    }): Promise<{ list: Role[]; total: number }> {
-        return api(CONFIG.url.roleList, params);
+    }, options?: { showLoading?: boolean; loadingText?: string }): Promise<{ list: Role[]; total: number }> {
+        return api(CONFIG.url.roleList, params, {
+            showLoading: options?.showLoading ?? false,
+            loadingText: options?.loadingText ?? '加载角色中...'
+        });
     },
 
     // 为角色分配权限
@@ -428,8 +437,11 @@ export const permission = {
     },
 
     // 获取角色的权限ID列表
-    async getRolePermissionIds(roleId: number): Promise<number[]> {
-        return api(CONFIG.url.rolePermissionIds, { roleId });
+    async getRolePermissionIds(roleId: number, options?: { showLoading?: boolean; loadingText?: string }): Promise<number[]> {
+        return api(CONFIG.url.rolePermissionIds, { roleId }, {
+            showLoading: options?.showLoading ?? false,
+            loadingText: options?.loadingText ?? '加载角色已有权限...'
+        });
     },
 
     // 获取所有启用的角色
@@ -450,8 +462,11 @@ export const permission = {
     },
 
     // 获取用户的角色列表
-    async getUserRoles(userId: string): Promise<Role[]> {
-        return api(CONFIG.url.userRoles, { userId });
+    async getUserRoles(userId: string, options?: { showLoading?: boolean; loadingText?: string }): Promise<Role[]> {
+        return api(CONFIG.url.userRoles, { userId }, {
+            showLoading: options?.showLoading ?? false,
+            loadingText: options?.loadingText ?? '加载用户角色...'
+        });
     },
 
     // 获取用户的权限列表

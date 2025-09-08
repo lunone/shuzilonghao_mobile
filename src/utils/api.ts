@@ -158,4 +158,157 @@ instance.interceptors.response.use(response => response, error => {
 });
 
 
-export const api = (url: string, data?: any) => instance({ url, data }).then(repsonse => repsonse?.data?.data) as Promise<any>;
+// Loading状态管理
+class LoadingManager {
+    private loadingCount = 0;
+    private loadingText = '加载中...';
+    private pageLoadingCallbacks: Array<(isLoading: boolean, text?: string) => void> = [];
+
+    /**
+     * 注册页面loading回调
+     */
+    registerPageLoading(callback: (isLoading: boolean, text?: string) => void) {
+        this.pageLoadingCallbacks.push(callback);
+        return () => {
+            const index = this.pageLoadingCallbacks.indexOf(callback);
+            if (index > -1) {
+                this.pageLoadingCallbacks.splice(index, 1);
+            }
+        };
+    }
+
+    /**
+     * 显示loading
+     */
+    show(text?: string) {
+        if (text) {
+            this.loadingText = text;
+        }
+        this.loadingCount++;
+        // 总是通知页面loading组件最新的状态和文本
+        this.pageLoadingCallbacks.forEach(callback => callback(true, this.loadingText));
+    }
+
+    /**
+     * 隐藏loading
+     */
+    hide() {
+        this.loadingCount = Math.max(0, this.loadingCount - 1);
+        if (this.loadingCount === 0) {
+            // 通知所有页面loading组件
+            this.pageLoadingCallbacks.forEach(callback => callback(false));
+        }
+    }
+
+    /**
+     * 强制隐藏所有loading
+     */
+    hideAll() {
+        this.loadingCount = 0;
+        this.pageLoadingCallbacks.forEach(callback => callback(false));
+    }
+
+    /**
+     * 获取当前loading状态
+     */
+    isLoading(): boolean {
+        return this.loadingCount > 0;
+    }
+}
+
+// 创建全局loading管理器
+const loadingManager = new LoadingManager();
+
+// 导出loading管理器供外部使用
+export const loading = {
+    show: (text?: string) => loadingManager.show(text),
+    hide: () => loadingManager.hide(),
+    hideAll: () => loadingManager.hideAll(),
+    isLoading: () => loadingManager.isLoading(),
+    registerPageLoading: (callback: (isLoading: boolean, text?: string) => void) => loadingManager.registerPageLoading(callback)
+};
+
+/**
+ * 通用的API请求函数，自动处理loading
+ * @param url 请求URL
+ * @param data 请求数据
+ * @param options 配置选项
+ * @param options.showLoading 是否显示loading，默认false
+ * @param options.loadingText loading文本，默认'加载中...'
+ * @param options.hideErrorToast 是否隐藏错误提示，默认false
+ */
+export const api = (
+    url: string,
+    data: any = undefined,
+    options: {
+        showLoading?: boolean;
+        loadingText?: string;
+        hideErrorToast?: boolean;
+    } = {}
+): Promise<any> => {
+    const {
+        showLoading = false,
+        loadingText = '加载中...',
+        hideErrorToast = false
+    } = options;
+
+    // 显示loading
+    if (showLoading) {
+        loadingManager.show(loadingText);
+    }
+
+    return instance({ url, data })
+        .then(response => {
+            // 隐藏loading
+            if (showLoading) {
+                loadingManager.hide();
+            }
+            return response?.data?.data;
+        })
+        .catch(error => {
+            // 隐藏loading（只在显示了loading时才隐藏）
+            if (showLoading) {
+                loadingManager.hide();
+            }
+
+            // 如果不隐藏错误提示，则显示错误信息
+            if (!hideErrorToast) {
+                const response = error.response;
+                let errorMessage = '请求失败';
+
+                if (response?.data?.message) {
+                    errorMessage = response.data.message;
+                } else if (response?.status) {
+                    errorMessage = `请求失败 (${response.status})`;
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+
+                uni.showToast({
+                    title: errorMessage,
+                    icon: 'none',
+                    duration: 3000
+                });
+            }
+
+            throw error;
+        });
+};
+
+/**
+ * 不显示loading的API请求函数
+ */
+export const apiSilent = (url: string, data?: any) =>
+    api(url, data, { showLoading: false });
+
+/**
+ * 自定义loading文本的API请求函数
+ */
+export const apiWithLoading = (url: string, data: any = undefined, loadingText: string) =>
+    api(url, data, { showLoading: true, loadingText });
+
+/**
+ * 不显示错误提示的API请求函数
+ */
+export const apiNoError = (url: string, data?: any) =>
+    api(url, data, { hideErrorToast: true });

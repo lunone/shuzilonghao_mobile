@@ -1,28 +1,31 @@
 <template>
-    <div class="permission-manage">
-        <!-- 第一部分：人员选择区域 -->
-        <div class="section-card user-selection-section">
-            <div class="section-header">
-                <h3>人员选择</h3>
-                <div class="user-display">
-                    <div class="user-name-display">
-                        <span v-if="selectedUser">{{ selectedUser.name }}</span>
-                        <span v-else class="placeholder">未选择人员</span>
-                    </div>
+  <div class="permission-manage">
+    <!-- 页面级别的loading -->
+    <PageLoading :is-loading="pageLoading" :text="loadingText" />
+
+    <!-- 第一部分：人员选择区域 -->
+    <div class="section-card user-selection-section">
+      <div class="section-header">
+        <h3>人员选择</h3>
+        <div class="user-display">
+          <div class="user-name-display">
+            <span v-if="selectedUser">{{ selectedUser.name }}</span>
+            <span v-else class="placeholder">未选择人员</span>
+          </div>
                     <wd-button type="primary" @click="showUserSelector = true">
                         选择人员
                     </wd-button>
-                </div>
-            </div>
         </div>
+      </div>
+    </div>
 
         <!-- 第二部分：系统所有角色 -->
         <div class="section-card roles-section">
             <div class="section-header">
                 <h3>系统角色</h3>
                 <div class="header-actions">
-                    <span class="action-icon" @click="$emit('showCreateRoleDialog')" title="创建角色">➕</span>
-                    <span class="action-icon" @click="$emit('showRoleDialog')" title="分配角色">👥</span>
+                    <span class="action-icon" @click="showCreateRoleDialog = true" title="创建角色">➕</span>
+                    <span class="action-icon" @click="openRoleDialog" title="分配角色">👥</span>
                 </div>
             </div>
             <div class="roles-list">
@@ -205,22 +208,20 @@
             </div>
         </div>
 
-        <!-- 加载状态 -->
-        <div v-if="loading" class="loading-overlay">
-            <div class="loading-spinner"></div>
-            <text>加载中...</text>
-        </div>
+
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, onUnmounted } from 'vue'
 import permission from '@/utils/permission'
 import { useUserStore } from '@/store/user.store'
+import { loading } from '@/utils/api'
 import type { Role, Permission } from '@/interface/permission.interface'
 import UserRoleManager from './manage/UserRoleManager.vue'
 import RolePermissionManager from './manage/RolePermissionManager.vue'
 import PermissionTree from './manage/PermissionTree.vue'
+import PageLoading from '@/components/PageLoading.vue'
 
 // 响应式数据
 const selectedUser = ref<any>(null)
@@ -239,9 +240,6 @@ const showCreateRoleDialog = ref(false)
 const showCreatePermissionDialog = ref(false)
 const userSearchKeyword = ref('')
 const selectedRoleIds = ref<number[]>([])
-const loading = ref(false)
-
-// 创建角色表单数据
 const newRole = ref({
     name: '',
     code: '',
@@ -261,8 +259,28 @@ const newPermission = ref({
     enabled: true
 })
 
+
+
+
+// 页面级别的loading状态
+const pageLoading = ref(false)
+const loadingText = ref('加载中...')
+
 // 使用userStore
 const userStore = useUserStore()
+
+// 注册页面loading回调
+const unregisterPageLoading = loading.registerPageLoading((isLoading: boolean, text?: string) => {
+    pageLoading.value = isLoading
+    if (text) {
+        loadingText.value = text
+    }
+})
+
+// 页面卸载时取消注册
+onUnmounted(() => {
+    unregisterPageLoading()
+})
 
 // 计算属性：检测权限是否有变更
 const hasPermissionChanges = computed(() => {
@@ -281,27 +299,30 @@ const hasPermissionChanges = computed(() => {
 
 // 页面加载时初始化
 onMounted(async () => {
-    await Promise.all([
-        loadAllRoles(),
-        userStore.fetchStaff() // 预加载员工数据
-    ])
+    // 只加载角色数据，避免页面卡顿
+    await loadAllRoles()
 
-    // 自动输入 "23" 并查询用户
-    userSearchKeyword.value = '23'
-    await searchUsers()
+    // 延迟执行其他操作，避免页面卡顿
+    setTimeout(async () => {
+        // 预加载员工数据（异步，不阻塞页面）
+        userStore.fetchStaff()
+
+        // 自动输入 "23" 并查询用户
+        userSearchKeyword.value = '23'
+        await searchUsers()
+    }, 500)
 })
+
+
 
 // 加载所有角色
 const loadAllRoles = async () => {
     try {
-        loading.value = true
-        const result = await permission.getRoleList({ enabled: true })
+        const result = await permission.getRoleList({ enabled: true }, { showLoading: true, loadingText: '加载角色中...' })
         allRoles.value = result.list
     } catch (error) {
         uni.showToast({ title: '加载角色失败', icon: 'none' })
         console.error('加载角色失败:', error)
-    } finally {
-        loading.value = false
     }
 }
 
@@ -354,13 +375,10 @@ const loadUserRoles = async () => {
     if (!selectedUser.value) return
 
     try {
-        loading.value = true
-        userRoles.value = await permission.getUserRoles(selectedUser.value.id)
+        userRoles.value = await permission.getUserRoles(selectedUser.value.id, { showLoading: true, loadingText: '加载用户角色...' })
     } catch (error) {
         uni.showToast({ title: '加载用户角色失败', icon: 'none' })
         console.error('加载用户角色失败:', error)
-    } finally {
-        loading.value = false
     }
 }
 
@@ -369,11 +387,10 @@ const loadUserPermissions = async () => {
     if (!selectedUser.value) return
 
     try {
-        loading.value = true
         // 同时加载用户权限和完整权限列表
         const [userPerms, allPerms] = await Promise.all([
             permission.getUserPermissionsById(selectedUser.value.id),
-            permission.getPermissionList()
+            permission.getPermissionList({}, { showLoading: true, loadingText: '加载权限列表...' })
         ])
 
         userPermissions.value = userPerms
@@ -381,15 +398,9 @@ const loadUserPermissions = async () => {
 
         // 计算用户拥有的权限ID列表
         userPermissionIds.value = userPermissions.value.map(p => p.id)
-
-        console.log('用户权限:', userPermissions.value)
-        console.log('用户权限IDs:', userPermissionIds.value)
-        console.log('完整权限列表:', allPermissions.value)
     } catch (error) {
         uni.showToast({ title: '加载用户权限失败', icon: 'none' })
         console.error('加载用户权限失败:', error)
-    } finally {
-        loading.value = false
     }
 }
 
@@ -400,8 +411,6 @@ const assignRoles = async () => {
     if (!selectedUser.value) return
 
     try {
-        loading.value = true
-        console.log(`!!!!!!!!`, selectedRoleIds.value);
         await permission.assignRolesToUser(selectedUser.value.id, selectedRoleIds.value)
         uni.showToast({ title: '分配角色成功' })
         showRoleDialog.value = false
@@ -411,8 +420,6 @@ const assignRoles = async () => {
     } catch (error) {
         uni.showToast({ title: '分配角色失败', icon: 'none' })
         console.error('分配角色失败:', error)
-    } finally {
-        loading.value = false
     }
 }
 
@@ -424,7 +431,6 @@ const createRole = async () => {
     }
 
     try {
-        loading.value = true
         await permission.createRole({
             name: newRole.value.name,
             code: newRole.value.code,
@@ -438,8 +444,6 @@ const createRole = async () => {
     } catch (error) {
         uni.showToast({ title: '创建角色失败', icon: 'none' })
         console.error('创建角色失败:', error)
-    } finally {
-        loading.value = false
     }
 }
 
@@ -467,23 +471,22 @@ const loadRolePermissions = async () => {
     if (!selectedRole.value) return
 
     try {
-        loading.value = true
-        // 直接加载权限列表
-        const result = await permission.getPermissionList()
-        allPermissions.value = result.list
-        console.log('服务器返回的权限列表:', allPermissions.value)
+        // 并行加载权限列表和角色已有权限，保持loading状态
+        const [result, rolePermissions] = await Promise.all([
+            permission.getPermissionList({}, { showLoading: true, loadingText: '加载角色权限...' }),
+            permission.getRolePermissionIds(selectedRole.value.id, { showLoading: true, loadingText: '加载角色已有权限...' })
+        ])
 
-        // 加载角色已有权限
-        const rolePermissions = await permission.getRolePermissionIds(selectedRole.value.id)
+        allPermissions.value = result.list
         selectedPermissionIds.value = rolePermissions
         // 保存原始权限ID，用于比较变更
         originalPermissionIds.value = [...rolePermissions]
-        console.log('角色已有权限IDs:', rolePermissions)
+
+        // 保存原始权限ID，用于比较变更
+        originalPermissionIds.value = [...rolePermissions]
     } catch (error) {
         uni.showToast({ title: '加载角色权限失败', icon: 'none' })
         console.error('加载角色权限失败:', error)
-    } finally {
-        loading.value = false
     }
 }
 
@@ -492,7 +495,6 @@ const saveRolePermissions = async () => {
     if (!selectedRole.value) return
 
     try {
-        loading.value = true
         await permission.assignPermissionsToRole(selectedRole.value.id, selectedPermissionIds.value)
         uni.showToast({ title: '保存权限成功' })
         // 更新原始权限ID，清除变更状态
@@ -502,8 +504,6 @@ const saveRolePermissions = async () => {
     } catch (error) {
         uni.showToast({ title: '保存权限失败', icon: 'none' })
         console.error('保存权限失败:', error)
-    } finally {
-        loading.value = false
     }
 }
 
@@ -751,7 +751,6 @@ const createPermission = async () => {
     }
 
     try {
-        loading.value = true
         await permission.createPermission({
             name: newPermission.value.name,
             code: newPermission.value.code,
@@ -761,7 +760,7 @@ const createPermission = async () => {
             path: newPermission.value.path,
             method: newPermission.value.method,
             enabled: newPermission.value.enabled
-        })
+        }, { showLoading: true, loadingText: '创建权限中...' })
         uni.showToast({ title: '创建权限成功', icon: 'success' })
         showCreatePermissionDialog.value = false
         // 重置表单
@@ -780,8 +779,6 @@ const createPermission = async () => {
     } catch (error) {
         uni.showToast({ title: '创建权限失败', icon: 'none' })
         console.error('创建权限失败:', error)
-    } finally {
-        loading.value = false
     }
 }
 
@@ -1242,45 +1239,7 @@ const cancelCreatePermission = () => {
     border-top: 1px solid #eee;
 }
 
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.9);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
 
-    .loading-spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid @color-primary;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-bottom: 10px;
-    }
-
-    text {
-        color: @color-text;
-        font-size: 13px;
-        font-weight: 500;
-    }
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
 
 .refresh-icon {
     cursor: pointer;
@@ -1433,4 +1392,6 @@ const cancelCreatePermission = () => {
         padding: 10px;
     }
 }
+
+
 </style>
