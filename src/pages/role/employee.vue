@@ -2,7 +2,8 @@
     <div class="main-container">
 
 
-        <div class="section overview">
+        <!-- 使用 v-if 和 hasPermission 控制显示 -->
+        <div v-if="hasPermission('jingying:yuedu')" class="section overview">
             <StatVue class="day" :range="`day`" />
             <StatVue class="year" />
             <!-- 权限管理入口 -->
@@ -21,10 +22,10 @@
             <!-- </div> -->
         </div>
         <!-- <DutyAct /> -->
-        <div class="section duty">
+        <div v-if="hasPermission('hr:read')" class="section duty">
             <Duty />
         </div>
-        <div class="section ">
+        <div v-if="hasPermission('flight:read')" class="section">
             <Flight />
         </div>
     </div>
@@ -32,7 +33,7 @@
 
 <script lang="ts" setup>
 
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import permission from '@/utils/permission'
 import StatVue from '@/pages/staff/stat.vue';
@@ -41,8 +42,10 @@ import Flight from '../flight/flight.vue';
 import DutyAct from '@/pages/living/dutyAct.vue'
 import manage from './manage.vue';
 import Manage from './manage.vue';
+import { usePermission } from '@/utils/directives';
 
 // 权限检查
+const { hasPermission } = usePermission();
 const canManageSystem = computed(() => permission.canManageSystem())
 
 // 路由跳转
@@ -53,6 +56,20 @@ const goToPermissionManage = () => {
         url: '/pages/role/manage'
     })
 }
+
+// 输出当前用户权限信息到控制台
+onMounted(() => {
+    console.log('=== 当前用户权限信息 ===')
+    console.log('用户角色:', permission.getUserPermissions()?.roles || [])
+    console.log('用户权限列表:', permission.getUserPermissions()?.permissions || [])
+
+    // 检查具体权限
+    console.log('jingying:yuedu 权限:', permission.hasPermission('jingying:yuedu'))
+    console.log('hr:read 权限:', permission.hasPermission('hr:read'))
+    console.log('flight:read 权限:', permission.hasPermission('flight:read'))
+    console.log('system:manage 权限:', permission.canManageSystem())
+    console.log('========================')
+})
 
 </script>
 <style lang="less" scoped>

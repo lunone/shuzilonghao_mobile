@@ -30,12 +30,18 @@
             </div>
             <div class="roles-list">
                 <div v-for="role in allRoles" :key="role.id"
-                     :class="['role-item', { 'selected': selectedRole?.id === role.id }]"
+                     :class="['role-item', {
+                         'selected': selectedRole?.id === role.id,
+                         'user-has-role': hasUserRole(role.id),
+                         'user-no-role': !hasUserRole(role.id)
+                     }]"
                      @click="handleSelectRole(role)">
                     <div class="role-info">
                         <div class="role-main">
                             <h4 class="role-name">{{ role.name }}</h4>
                             <span class="role-code">{{ role.code }}</span>
+                            <span v-if="hasUserRole(role.id)" class="role-status owned">✓ 已拥有</span>
+                            <span v-else class="role-status not-owned">✗ 未拥有</span>
                         </div>
                         <p class="role-desc">{{ role.description || '无描述' }}</p>
                     </div>
@@ -208,6 +214,58 @@
             </div>
         </div>
 
+        <!-- 编辑权限弹窗 -->
+        <div v-if="showEditPermissionDialog" class="modal-overlay" @click="showEditPermissionDialog = false">
+            <div class="modal-content" @click.stop>
+                <div class="modal-header">
+                    <h3>编辑权限</h3>
+                    <button class="close-btn" @click="showEditPermissionDialog = false">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>权限名称</label>
+                        <wd-input v-model="editPermission.name" placeholder="请输入权限名称" />
+                    </div>
+                    <div class="form-group">
+                        <label>权限编码</label>
+                        <wd-input v-model="editPermission.code" placeholder="请输入权限编码" />
+                    </div>
+                    <div class="form-group">
+                        <label>权限类型</label>
+                        <wd-radio-group v-model="editPermission.type">
+                            <wd-radio :value="0">菜单</wd-radio>
+                            <wd-radio :value="1">按钮</wd-radio>
+                            <wd-radio :value="2">接口</wd-radio>
+                        </wd-radio-group>
+                    </div>
+                    <div class="form-group" v-if="editPermission.type === 2">
+                        <label>接口路径</label>
+                        <wd-input v-model="editPermission.path" placeholder="请输入接口路径" />
+                    </div>
+                    <div class="form-group" v-if="editPermission.type === 2">
+                        <label>请求方法</label>
+                        <wd-radio-group v-model="editPermission.method">
+                            <wd-radio value="GET">GET</wd-radio>
+                            <wd-radio value="POST">POST</wd-radio>
+                            <wd-radio value="PUT">PUT</wd-radio>
+                            <wd-radio value="DELETE">DELETE</wd-radio>
+                        </wd-radio-group>
+                    </div>
+                    <div class="form-group">
+                        <label>权限描述</label>
+                        <wd-textarea v-model="editPermission.description" placeholder="请输入权限描述" :maxlength="-1" />
+                    </div>
+                    <div class="form-group">
+                        <wd-checkbox v-model="editPermission.enabled">启用状态</wd-checkbox>
+                    </div>
+                    <div class="modal-actions">
+                        <wd-button type="default" @click="cancelEditPermission">取消</wd-button>
+                        <wd-button type="primary" @click="updatePermission">保存</wd-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
     </div>
 </template>
@@ -238,6 +296,7 @@ const showUserSelector = ref(false)
 const showRoleDialog = ref(false)
 const showCreateRoleDialog = ref(false)
 const showCreatePermissionDialog = ref(false)
+const showEditPermissionDialog = ref(false)
 const userSearchKeyword = ref('')
 const selectedRoleIds = ref<number[]>([])
 const newRole = ref({
@@ -249,6 +308,19 @@ const newRole = ref({
 
 // 创建权限表单数据
 const newPermission = ref({
+    name: '',
+    code: '',
+    description: '',
+    parentId: 0,
+    type: 0,
+    path: '',
+    method: '',
+    enabled: true
+})
+
+// 编辑权限表单数据
+const editPermission = ref({
+    id: 0,
     name: '',
     code: '',
     description: '',
@@ -296,6 +368,12 @@ const hasPermissionChanges = computed(() => {
 
     return currentIds.some((id, index) => id !== originalIds[index])
 })
+
+// 检查用户是否拥有指定角色
+const hasUserRole = (roleId: number): boolean => {
+    if (!selectedUser.value || !userRoles.value.length) return false
+    return userRoles.value.some(role => role.id === roleId)
+}
 
 // 页面加载时初始化
 onMounted(async () => {
@@ -387,20 +465,27 @@ const loadUserPermissions = async () => {
     if (!selectedUser.value) return
 
     try {
+        console.log('开始加载用户权限，用户ID:', selectedUser.value.id)
+
         // 同时加载用户权限和完整权限列表
         const [userPerms, allPerms] = await Promise.all([
             permission.getUserPermissionsById(selectedUser.value.id),
             permission.getPermissionList({}, { showLoading: true, loadingText: '加载权限列表...' })
         ])
 
+        console.log('用户权限列表:', userPerms)
+        console.log('所有权限列表:', allPerms.list)
+
         userPermissions.value = userPerms
         allPermissions.value = allPerms.list
 
         // 计算用户拥有的权限ID列表
         userPermissionIds.value = userPermissions.value.map(p => p.id)
+        console.log('用户权限ID列表:', userPermissionIds.value)
     } catch (error) {
         uni.showToast({ title: '加载用户权限失败', icon: 'none' })
         console.error('加载用户权限失败:', error)
+        console.error('错误详情:', error)
     }
 }
 
@@ -410,8 +495,13 @@ const loadUserPermissions = async () => {
 const assignRoles = async () => {
     if (!selectedUser.value) return
 
+    console.log('开始分配角色，用户ID:', selectedUser.value.id)
+    console.log('要分配的角色ID列表:', selectedRoleIds.value)
+
     try {
-        await permission.assignRolesToUser(selectedUser.value.id, selectedRoleIds.value)
+        const result = await permission.assignRolesToUser(selectedUser.value.id, selectedRoleIds.value)
+        console.log('分配角色API返回结果:', result)
+
         uni.showToast({ title: '分配角色成功' })
         showRoleDialog.value = false
         selectedRoleIds.value = []
@@ -458,6 +548,20 @@ const openRoleDialog = () => {
     showRoleDialog.value = true
     // 初始化选中当前用户已有的角色
     selectedRoleIds.value = userRoles.value.map(role => role.id)
+}
+
+// 切换角色选择状态
+const toggleRoleSelection = (roleId: number, checked: boolean) => {
+    if (checked) {
+        if (!selectedRoleIds.value.includes(roleId)) {
+            selectedRoleIds.value.push(roleId)
+        }
+    } else {
+        const index = selectedRoleIds.value.indexOf(roleId)
+        if (index > -1) {
+            selectedRoleIds.value.splice(index, 1)
+        }
+    }
 }
 
 // 选择角色
@@ -604,24 +708,21 @@ const handleEditNode = async (node: any) => {
         // 获取权限详情
         const permissionDetail = await permission.getPermissionDetail(node.id)
 
-        // 显示编辑表单
-        uni.showModal({
-            title: '编辑权限',
-            content: `编辑权限: ${permissionDetail.name}\n\n权限编码: ${permissionDetail.code}\n\n描述: ${permissionDetail.description || '无'}`,
-            showCancel: true,
-            confirmText: '编辑',
-            cancelText: '取消',
-            success: async (res) => {
-                if (res.confirm) {
-                    // 这里可以打开一个编辑表单页面或弹窗
-                    // 暂时显示提示信息
-                    uni.showToast({
-                        title: '编辑功能待实现',
-                        icon: 'none'
-                    })
-                }
-            }
-        })
+        // 填充编辑表单
+        editPermission.value = {
+            id: permissionDetail.id,
+            name: permissionDetail.name,
+            code: permissionDetail.code,
+            description: permissionDetail.description || '',
+            parentId: permissionDetail.parentId || 0,
+            type: permissionDetail.type || 0,
+            path: permissionDetail.path || '',
+            method: permissionDetail.method || '',
+            enabled: permissionDetail.enabled !== false
+        }
+
+        // 显示编辑弹窗
+        showEditPermissionDialog.value = true
     } catch (error) {
         uni.showToast({
             title: '获取权限详情失败',
@@ -794,6 +895,61 @@ const cancelCreatePermission = () => {
         path: '',
         method: '',
         enabled: true
+    }
+}
+
+// 取消编辑权限
+const cancelEditPermission = () => {
+    showEditPermissionDialog.value = false
+    editPermission.value = {
+        id: 0,
+        name: '',
+        code: '',
+        description: '',
+        parentId: 0,
+        type: 0,
+        path: '',
+        method: '',
+        enabled: true
+    }
+}
+
+// 更新权限
+const updatePermission = async () => {
+    if (!editPermission.value.name.trim() || !editPermission.value.code.trim()) {
+        uni.showToast({ title: '请填写权限名称和编码', icon: 'none' })
+        return
+    }
+
+    try {
+        await permission.updatePermission(editPermission.value.id, {
+            name: editPermission.value.name,
+            code: editPermission.value.code,
+            description: editPermission.value.description,
+            type: editPermission.value.type,
+            path: editPermission.value.path,
+            method: editPermission.value.method,
+            enabled: editPermission.value.enabled
+        })
+        uni.showToast({ title: '更新权限成功', icon: 'success' })
+        showEditPermissionDialog.value = false
+        // 重置表单
+        editPermission.value = {
+            id: 0,
+            name: '',
+            code: '',
+            description: '',
+            parentId: 0,
+            type: 0,
+            path: '',
+            method: '',
+            enabled: true
+        }
+        // 刷新权限列表
+        await refreshPermissions()
+    } catch (error) {
+        uni.showToast({ title: '更新权限失败', icon: 'none' })
+        console.error('更新权限失败:', error)
     }
 }
 </script>
@@ -1326,6 +1482,38 @@ const cancelCreatePermission = () => {
                 box-shadow: 0 0 0 1px #1890ff;
             }
 
+            // 用户拥有该角色的样式
+            &.user-has-role {
+                background: linear-gradient(135deg, #f6ffed 0%, #b7eb8f 100%);
+                border-left-color: #52c41a;
+                box-shadow: 0 0 0 1px rgba(82, 196, 26, 0.2);
+
+                &:hover {
+                    background: linear-gradient(135deg, #f6ffed 0%, #91d5ff 100%);
+                }
+
+                &.selected {
+                    background: linear-gradient(135deg, #e6f7ff 0%, #b7eb8f 100%);
+                    box-shadow: 0 0 0 1px #1890ff;
+                }
+            }
+
+            // 用户没有该角色的样式
+            &.user-no-role {
+                background: linear-gradient(135deg, #fff2f0 0%, #ffccc7 100%);
+                border-left-color: #ff4d4f;
+                box-shadow: 0 0 0 1px rgba(255, 77, 79, 0.2);
+
+                &:hover {
+                    background: linear-gradient(135deg, #fff2f0 0%, #ffd8bf 100%);
+                }
+
+                &.selected {
+                    background: linear-gradient(135deg, #e6f7ff 0%, #ffccc7 100%);
+                    box-shadow: 0 0 0 1px #1890ff;
+                }
+            }
+
             .role-info {
                 flex: 1;
 
@@ -1356,6 +1544,23 @@ const cancelCreatePermission = () => {
                     border-radius: 3px;
                     font-size: 8px;
                     font-weight: 500;
+                }
+
+                .role-status {
+                    font-size: 10px;
+                    font-weight: 600;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+
+                    &.owned {
+                        background: #52c41a;
+                        color: white;
+                    }
+
+                    &.not-owned {
+                        background: #ff4d4f;
+                        color: white;
+                    }
                 }
             }
         }

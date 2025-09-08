@@ -42,7 +42,7 @@ import AircraftVue from '@/pages/airplane/aircraft.vue';
 import PlanVue from '../flight/plan.vue';
 import dividerVue from '@/components/zl/divider.vue';
 import IncomeVue from '../sale/income.vue';
-import Permission from '@/components/Permission.vue';
+
 const links = [
     [
         { size: 12, link: '/pages/analysis/analysis', class: 'analysis', text: '运行分析' },

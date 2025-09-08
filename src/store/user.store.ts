@@ -46,9 +46,37 @@ export const useUserStore = defineStore('user', () => {
 
 
     const myself = async (refresh = false) => {
+        console.log('开始获取用户信息，调用API:', CONFIG.url.init);
         const mySelf = await api(CONFIG.url.init) as UserItem;
+        console.log('用户信息API返回结果:', mySelf);
+
         if (mySelf?.id) {
             self.value = mySelf;
+
+            // 获取用户的角色和权限信息
+            console.log('开始获取用户角色和权限');
+            try {
+                // 并行获取用户角色和权限编码
+                const [userRoles, userPermissionCodes] = await Promise.all([
+                    api(CONFIG.url.userRoles, { userId: mySelf.id }),
+                    api(CONFIG.url.userPermissionCodes, { userId: mySelf.id })
+                ]);
+
+                console.log('用户角色API返回结果:', userRoles);
+                console.log('用户权限编码API返回结果:', userPermissionCodes);
+
+                // 设置权限数据
+                const permissions: UserPermission = {
+                    roles: userRoles || [],
+                    permissions: userPermissionCodes || []
+                };
+                console.log('设置的用户权限对象:', permissions);
+                setPermissions(permissions);
+
+            } catch (error) {
+                console.error('获取用户角色和权限失败:', error);
+                clearPermissions();
+            }
         }
         return self.value;
     };
@@ -58,7 +86,10 @@ export const useUserStore = defineStore('user', () => {
 
         // 检查 self.value 是否已有数据
         if (!self.value || !self.value.id) {
+            console.log('开始获取用户信息，调用API:', CONFIG.url.init);
             const mySelf = await api(CONFIG.url.init) as UserItem;
+            console.log('用户信息API返回结果:', mySelf);
+
             if (mySelf?.id) {
                 self.value = mySelf;
                 // 从用户信息中提取角色和权限数据
@@ -73,13 +104,18 @@ export const useUserStore = defineStore('user', () => {
      * 从用户信息中提取角色和权限数据
      */
     const extractPermissionsFromUser = (user: UserItem) => {
+        console.log('用户信息中的角色数据:', user.roles);
+        console.log('用户信息中的权限数据:', user.permissions);
+
         if (user.roles && user.permissions) {
             const userPerms: UserPermission = {
                 roles: user.roles,
                 permissions: user.permissions
             };
+            console.log('提取到的用户权限对象:', userPerms);
             setPermissions(userPerms);
         } else {
+            console.log('用户信息中没有角色或权限数据，清空权限');
             // 如果用户信息中没有角色和权限数据，清空权限
             clearPermissions();
         }
