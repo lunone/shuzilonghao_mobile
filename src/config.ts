@@ -6,6 +6,9 @@ export const CONFIG = {
     url: {
         timeout: 30e3,
         api: API_BASE_URL,
+        init: '/user/init',
+        login: '/login/wx',
+        activate: '/login/activate',
     },
     page: {
         index: '/pages/index',
