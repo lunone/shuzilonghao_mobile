@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs';
 import { CONFIG } from '@/config';
-import { api } from '@/utils/api';
+import { getPilotProfile } from '@/api/pilot.api';
 import { computed, Ref, ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { usePilotStore } from '@/store/pilot.store';
@@ -52,7 +52,7 @@ onLoad(e => {
         pilot.value = { userId: pilot2.userId, name: pilot2.name, }
     }
     Promise.allSettled([
-        fetchPilots(), api(CONFIG.url.pilotProfile, { userId: e.pcode, idType: 'pcode' }).then(res => pilot.value = res || {}),
+        fetchPilots(), getPilotProfile({ userId: e.pcode, idType: 'pcode' }).then(res => pilot.value = res.data.data || {}),
     ])
         .then(res => { console.log('allSettled:', res) })
         .catch(err => console.log('error', err));

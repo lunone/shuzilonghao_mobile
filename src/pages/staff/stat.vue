@@ -18,10 +18,9 @@
     </div>
 </template>
 <script setup lang="ts">
-import { api } from '@/utils/api';
+import { getStatPeriod } from '@/api/statistics.api';
 import dayjs from 'dayjs';
 import { computed, onMounted, PropType, reactive, Ref, ref } from 'vue';
-import { CONFIG } from '@/config';
 import { numberByWan } from '@/utils/tools';
 import { StatSingle } from '@/interface/flight.interface';
 
@@ -68,8 +67,8 @@ onMounted(() => {
     const lastRange = props.range == 'year' ? { startDate: dates.firstDayOfLastYear, endDate: dates.dayBeforeOneYear } : { startDate: dates.theDayBeforeYesterday, endDate: dates.yesterday };
     const currentRange = props.range == 'year' ? { startDate: dates.firstDayOfYear, endDate: dates.now } : { startDate: dates.yesterday, endDate: dates.today };
     Promise.allSettled([
-        api(CONFIG.url.statPeriod, currentRange).then(res => currentRes.value = res as StatSingle),
-        api(CONFIG.url.statPeriod, lastRange).then(res => lastRes.value = res as StatSingle),
+        getStatPeriod(currentRange).then(res => currentRes.value = res.data.data as StatSingle),
+        getStatPeriod(lastRange).then(res => lastRes.value = res.data.data as StatSingle),
     ])
         // .then((arr) => console.log('获取信息', arr, thisYearRes.value, lastYearRes.value))
         .catch(err => console.warn('错误', err));

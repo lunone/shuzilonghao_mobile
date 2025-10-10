@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { api } from '@/utils/api';
+import { getAircrafts } from '@/api/aircraft.api';
 import dayjs from 'dayjs';
-import { CONFIG } from '@/config';
 import { AircraftItem } from '@/interface/aircraft.interface';
 
 export const useAircraftStore = defineStore('aircraft', () => {
@@ -21,7 +20,8 @@ export const useAircraftStore = defineStore('aircraft', () => {
         if (isLoading.aircraft) return;
         isLoading.aircraft = true;
         if (!aircraftsArr.value.length) {
-            const res = await api(CONFIG.url.aircrafts) as AircraftItem[];
+            const response = await getAircrafts();
+            const res = response.data as AircraftItem[];
 
             res.forEach(aircraft => {
                 aircraft.startDate = dayjs(aircraft.startDate).toDate();

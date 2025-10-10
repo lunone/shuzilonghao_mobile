@@ -29,9 +29,8 @@
     </div>
 </template>
 <script setup lang="ts">
-import { api } from '@/utils/api';
+import { getSmsVoluntarys } from '@/api/sms.api';
 import { inject, onMounted, PropType, ref, Ref, watch } from 'vue';
-import { CONFIG } from '@/config';
 import dayjs from 'dayjs';
 
 const props = defineProps({
@@ -52,10 +51,10 @@ const fetchData = async (currentPage: number = 1) => {
     emits('loading', true);
     try {
         const [startDate, endDate] = props.range;
-        const resVoluntary = await api(CONFIG.url.smsVoluntarys, { startDate, endDate });
+        const resVoluntary = await getSmsVoluntarys({ startDate, endDate });
         console.log(`resVoluntary`, resVoluntary)
 
-        voluntarys.value = voluntarys.value.concat(resVoluntary);
+        voluntarys.value = voluntarys.value.concat(resVoluntary.data.data);
     } catch (err) {
         console.error('获取事件列表失败', err);
     } finally {

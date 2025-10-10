@@ -26,13 +26,12 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, watch, Ref, onMounted } from 'vue';
-import { CONFIG } from '@/config';
-import { api } from '@/utils/api';
 import { useAirportStore } from '@/store/airport.store';
 import { StatMulti } from '@/interface/flight.interface';
 import dayjs from 'dayjs';
 import airline from './airlines/airline.vue';
 import zlDateRangePicker from '@/components/zl/dateRangePicker.vue';
+import { getStatByAirline } from '@/api/statistics.api';
 const airportStore = useAirportStore();
 // 定义 loading 和 error 状态
 const loading = ref(false);
@@ -71,10 +70,10 @@ const fetchData = async (startDate: Date, endDate: Date) => {
     loading.value = true;
     error.value = '';
     try {
-        const res = await api(CONFIG.url.statByAirline, { startDate, endDate }) as Res;
-        // airports.value = await 
-        console.log('统计', res);
-        airlineStats.value = res;
+        const res = await getStatByAirline({ startDate, endDate });
+        // airports.value = await
+        console.log('统计', res.data);
+        airlineStats.value = res.data;
         stationClick(stations.value[0]);
     } catch (err) {
         console.log(err)

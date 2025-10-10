@@ -29,9 +29,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, Ref, provide } from 'vue';
 // import NavVue from '@/components/Nav.vue';
-import { api } from '@/utils/api';
+import { getSmsStat } from '@/api/sms.api';
 import dayjs from 'dayjs';
-import { CONFIG } from '@/config';
 import ucharts from '@/components/ucharts/ucharts.vue';
 import eventsVue from '@/pages/sms/events.vue';
 import voluntarysVue from '@/pages/sms/voluntarys.vue';
@@ -81,7 +80,7 @@ const loading2 = status => {
 
 provide("showProfile", (userName: string, type = 'name') => {
     console.log('显示人员信息', userName)
-    let userId = type == 'userId' ? userName : userStore.getStaff(userName, 'name')?.userId;
+    let userId = type == 'userId' ? userName : userStore.getStaffByName(userName)?.userId;
     if (userId) {
         showProfile.value = true;
         selectUserId.value = userId;
@@ -171,8 +170,8 @@ const fetchData = async () => {
     loading.value = true;
     error.value = '';
     try {
-        const res = await api(CONFIG.url.smsStat, { startDate, endDate });
-        stats.value = res;
+        const res = await getSmsStat({ startDate, endDate });
+        stats.value = res.data.data;
         pieOption.value = getOption(res);
     } catch (err) {
         error.value = '获取事件列表失败';

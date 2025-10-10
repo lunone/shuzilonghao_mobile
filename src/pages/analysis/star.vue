@@ -15,9 +15,8 @@
 import { computed, onMounted, Ref, ref } from 'vue';
 import { useAirportStore } from '@/store/airport.store';
 import { numberByWan } from '@/utils/tools';
-import { CONFIG } from '@/config';
-import { api } from '@/utils/api';
 import dayjs from 'dayjs';
+import { getStatByStation } from '@/api/statistics.api';
 import { StatSingle } from '@/interface/flight.interface';
 
 const fields = { counter: '班', netWeightCargo: '吨', hour: '小时' }
@@ -46,7 +45,7 @@ onMounted(() => {
     const data = { station: 'ZHCC', startDate: props.startDate, endDate: props.endDate }
     Promise.all([
         fetchAirports(),
-        api(CONFIG.url.statByStation, data).then(res => starSrc.value = res || {})
+        getStatByStation(data).then(res => starSrc.value = res.data || {})
     ])
 })
 </script>

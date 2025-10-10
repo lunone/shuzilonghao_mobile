@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import { api } from '@/utils/api';
-import { CONFIG } from '@/config';
+import { ref, computed, Ref } from 'vue';
+import { getAirports } from '@/api/airport.api';
 import { AirportItem } from '@/interface/airport.interface';
 
 
@@ -36,7 +35,8 @@ export const useAirportStore = defineStore('airport', () => {
         if (isLoading.airport) return;
         isLoading.airport = true;
         if (!airportsCode4.value['ZHCC']) {
-            const res = await api(CONFIG.url.airports) as Record<string, AirportItem>;
+            const response = await getAirports();
+            const res = response.data as Record<string, AirportItem>;
             airportsCode4.value = res;
         }
         isLoading.airport = false;

@@ -17,8 +17,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useDepartmentStore } from '@/store/department.store';
 import { useUserStore } from '@/store/user.store';
-import { api } from '@/utils/api';
-import { CONFIG } from '@/config';
+import { getDutyToday } from '@/api/staff.api';
 import { DutyResponse } from '@/interface/duty.interface';
 import { call } from '@/utils/tools';
 
@@ -60,7 +59,7 @@ const callUser = (userId: string) => {
 const fetchDutyData = async () => {
     try {
         // 注释掉真实 API 调用，使用模拟数据
-        // const res = await api(CONFIG.url.dutyToday) as DutyResponse[];
+        // const res = await getDutyToday();
         // dutyData.value = res || [];
 
         // 模拟数据

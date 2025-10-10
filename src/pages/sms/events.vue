@@ -2,9 +2,8 @@
     <EventVue :data="event" v-for="event in events" :key="event.id" />
 </template>
 <script lang="ts" setup>
-import { api } from '@/utils/api';
+import { getSmsEvents } from '@/api/sms.api';
 import { onMounted, PropType, ref, Ref, watch } from 'vue';
-import { CONFIG } from '@/config';
 import EventVue from './card/event.vue';
 import dayjs from 'dayjs';
 
@@ -26,17 +25,18 @@ const fetchData = async (currentPage: number) => {
     // page.value++;
     try {
         const [startDate, endDate] = props.range;
-        const resEvents = await api(CONFIG.url.smsEvents, { startDate, endDate });
+        const resEvents = await getSmsEvents({ startDate, endDate });
         console.log(`resEvents---------`, resEvents);
-        for (let event of resEvents) {
+        const eventData = resEvents.data.data;
+        for (let event of eventData) {
             const { dep, arr, acReg } = event;
             const crews = (event.crews || '').split(/[,\s;、。\.]+/);
             event.crews = crews;
             event.acReg = (acReg || '').replace('-', '');
         }
-        events.value = events.value.concat(resEvents);
+        events.value = events.value.concat(eventData);
         loading.value = false;
-        finished.value = events.value.length > resEvents.total;
+        finished.value = events.value.length > eventData.total;
     } catch (err) {
         console.error('获取事件列表失败', err);
     } finally {

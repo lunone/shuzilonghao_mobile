@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed, Ref } from 'vue';
-import { api } from '@/utils/api';
-import { CONFIG } from '@/config';
+import { getPilots } from '@/api/pilot.api';
 import _ from 'lodash';
 import { PilotItem } from '@/interface/user.interface';
 
@@ -36,7 +35,8 @@ export const usePilotStore = defineStore('pilot', () => {
         if (isLoading.pilot) return;
         isLoading.pilot = true;
         if (!pilots.value.length) {
-            const res = await api(CONFIG.url.pilots) as PilotItem[];
+            const response = await getPilots();
+            const res = response.data as PilotItem[];
             pilots.value = res.length ? res : [];
         }
         isLoading.pilot = false;

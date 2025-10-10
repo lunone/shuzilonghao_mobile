@@ -8,9 +8,8 @@
 </template>
 <script lang="ts" setup>
 import { useAirportStore } from '@/store/airport.store';
-import { api } from '@/utils/api';
+import { getPilotTraining, getPilotDuty, getPilotAbsence } from '@/api/pilot.api';
 import dayjs from 'dayjs';
-import { CONFIG } from '@/config';
 import { computed, onMounted, PropType, Ref, ref, watch } from 'vue';
 
 const props = defineProps({
@@ -101,9 +100,9 @@ watch(() => props.pcode, () => {
     const data = { userId: props.pcode, idType: 'pcode', startDate: props.startDate, endDate: props.endDate }
     Promise.allSettled([
         airportStore.fetchAirports(),
-        api(CONFIG.url.pilotTraining, data).then(res => trainings.value = res || []),
-        api(CONFIG.url.pilotDuty, data).then(res => duties.value = res || []),
-        api(CONFIG.url.pilotAbsence, data).then(res => absences.value = res || []),
+        getPilotTraining(data).then(res => trainings.value = res.data.data || []),
+        getPilotDuty(data).then(res => duties.value = res.data.data || []),
+        getPilotAbsence(data).then(res => absences.value = res.data.data || []),
     ]).then((arr) => console.log('获取信息train,duty,absence', arr))
         .catch(err => console.warn('错误', err));
 }, { immediate: true, deep: true })

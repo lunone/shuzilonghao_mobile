@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed, Ref } from 'vue';
-import { api } from '@/utils/api';
-import { CONFIG } from '@/config';
+import { initUser, getStaffList, getUserRoles, getUserPermissionCodes } from '@/api/user.api';
 import { UserItem } from '@/interface/user.interface';
 import { UserPermission } from '@/interface/permission.interface';
 import permission from '@/utils/permission';
@@ -43,10 +42,13 @@ export const useUserStore = defineStore('user', () => {
             return staff.value[userId] || {} as UserItem;
         }
     };
-
+    function getStaffByName(name: string): UserItem | undefined {
+        return Object.values(staff.value).find(user => user.name === name);
+    }
 
     const myself = async (refresh = false) => {
-        const mySelf = await api(CONFIG.url.init) as UserItem;
+        const response = await initUser();
+        const mySelf = response.data as UserItem;
 
         if (mySelf?.id) {
             self.value = mySelf;
@@ -54,15 +56,15 @@ export const useUserStore = defineStore('user', () => {
             // 获取用户的角色和权限信息
             try {
                 // 并行获取用户角色和权限编码
-                const [userRoles, userPermissionCodes] = await Promise.all([
-                    api(CONFIG.url.userRoles, { userId: mySelf.id }),
-                    api(CONFIG.url.userPermissionCodes, { userId: mySelf.id })
+                const [userRolesResponse, userPermissionCodesResponse] = await Promise.all([
+                    getUserRoles({ userId: mySelf.id }),
+                    getUserPermissionCodes({ userId: mySelf.id })
                 ]);
 
                 // 设置权限数据
                 const permissions: UserPermission = {
-                    roles: userRoles || [],
-                    permissions: userPermissionCodes || []
+                    roles: userRolesResponse.data || [],
+                    permissions: userPermissionCodesResponse.data || []
                 };
                 setPermissions(permissions);
 
@@ -79,7 +81,8 @@ export const useUserStore = defineStore('user', () => {
 
         // 检查 self.value 是否已有数据
         if (!self.value || !self.value.id) {
-            const mySelf = await api(CONFIG.url.init) as UserItem;
+            const response = await initUser();
+            const mySelf = response.data as UserItem;
 
             if (mySelf?.id) {
                 self.value = mySelf;
@@ -111,7 +114,8 @@ export const useUserStore = defineStore('user', () => {
         if (isLoading.staff) return;
         isLoading.staff = true;
         if (!Object.keys(staff.value).length) {
-            const res = await api(CONFIG.url.staff) as UserItem[];
+            const response = await getStaffList();
+            const res = response.data as UserItem[];
             const obj: Record<string, UserItem> = {};
             if (res.length) {
                 for (let user of res) {
@@ -134,6 +138,7 @@ export const useUserStore = defineStore('user', () => {
         staffRaw: staff,
         permissions,
         getStaff,
+        getStaffByName,
         setToken,
         setPermissions,
         clearPermissions,

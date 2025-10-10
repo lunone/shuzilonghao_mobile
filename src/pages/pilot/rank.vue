@@ -71,8 +71,7 @@
 <script lang="ts" setup>
 import { ref, watch, onMounted, PropType, Ref, computed } from 'vue'
 import dayjs from 'dayjs';
-import { api } from '@/utils/api';
-import { CONFIG } from '@/config';
+import { getStatCrewFh } from '@/api/statistics.api';
 import Profile from '@/pages/hr/profile.vue';
 import { usePilotStore } from '@/store/pilot.store';
 const { getTech, fetchPilots } = usePilotStore();
@@ -145,9 +144,9 @@ watch(() => dateRange, async () => {
         uni.showToast({ title: '加载中...', icon: 'loading', mask: true, duration: 33000 })
         const startDate = dayjs(dateRange.value.join('-') + '-01').toDate();
         const endDate = dayjs(startDate).endOf('month').toDate();
-        const res = await api(CONFIG.url.statCrewFh, { startDate, endDate }) as any[];
+        const res = await getStatCrewFh({ startDate, endDate });
         uni.hideToast();
-        const stat = res.map((pilot: any) => ({
+        const stat = res.data.data.map((pilot: any) => ({
             rank: -1,
             userId: pilot.userId,
             name: pilot.name,

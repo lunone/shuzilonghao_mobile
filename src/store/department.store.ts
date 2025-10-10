@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { api } from '@/utils/api'; // 导入API工具函数
-import { CONFIG } from '@/config'; // 导入配置文件
+import { getDepartments } from '@/api/staff.api'; // 导入API工具函数
 import { DepartmenItem } from '@/interface/user.interface'; // 导入接口定义
 import { ListNode } from '@/interface/sys.interface';
 
@@ -107,7 +106,8 @@ export const useDepartmentStore = defineStore('department', () => {
         if (isLoading.department) return; // 如果正在加载则直接返回
         isLoading.department = true; // 标记为正在加载
         if (!departments.value.length) {
-            const res = await api(CONFIG.url.departments) as DepartmenItem[];
+            const response = await getDepartments();
+            const res = response.data as DepartmenItem[];
             departments.value = res.length ? res : []; // 更新部门列表
         }
 
