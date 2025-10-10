@@ -44,6 +44,51 @@ export interface RolePermission {
     createdAt?: string;
 }
 
+// 权限操作接口 - 新增
+export interface PermissionAction {
+    id: number;
+    name: string;
+    actionCode: string;
+    description?: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+// 资源接口 - 新增
+export interface Resource {
+    id: number;
+    name: string;
+    type: string; // menu, page, button, api
+    identifier: string; // 如 system:user
+    parentId?: number | null;
+    description?: string;
+    path?: string;
+    icon?: string;
+    orderNum?: number;
+    enabled?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+    children?: Resource[];
+    level?: number;
+}
+
+// 角色权限分配接口 - 新增
+export interface RolePermissionAssignment {
+    roleId: number;
+    permissions: Array<{
+        resourceId: number;
+        actionIds: number[];
+    }>;
+}
+
+// 资源权限接口 - 新增
+export interface ResourcePermission {
+    id: number;
+    resourceId: number;
+    permissionId: number;
+    createdAt?: string;
+}
+
 export interface UserPermission {
     roles: string[]; // 角色ID数组
     permissions: string[]; // 权限代码数组（扁平化，用于快速检查）
@@ -63,7 +108,7 @@ export enum PermissionResource {
 }
 
 // 权限操作类型枚举
-export enum PermissionAction {
+export enum PermissionActionType {
     READ = 'read',
     WRITE = 'write',
     DELETE = 'delete',

@@ -88,7 +88,6 @@ instance.interceptors.response.use(
 
 // 响应-处理401的token竞争问题
 instance.interceptors.response.use(response => {
-    // console.log('401竞争', response, response.config.url)
     return response
 }, (error: AxiosError) => {
     const response = error.response;
@@ -127,11 +126,9 @@ instance.interceptors.response.use((response: AxiosResponse) => {
 instance.interceptors.response.use(response => response, error => {
     const response = error.response;
     if (!response?.status) {
-        console.log('错误处理逃单', error)
         // 前面终止继续的到这里,防止报错
     } else if (response.status == 402) {
         notLoginQweue = [];// 非注册用户就不可能再401重试了,清空401队列了
-        console.log('402___跳转____', response)
         uni.reLaunch({ url: `${CONFIG.page.index}?error=402` })
     } else if (response.status == 403) {// 权限问题,弹出
         uni.showToast({ title: '权限不足', duration: 3e3 });
@@ -144,7 +141,6 @@ instance.interceptors.response.use(response => response, error => {
                 success: (res) => {
                     if (res.confirm) {
                         isShowNetworkErrorModal = false;
-                        console.log('重试队列中的所有请求', networkErrorQueue);
                         for (let id in networkErrorQueue) {// 重试队列中的所有请求
                             networkErrorQueue[id]();
                         }

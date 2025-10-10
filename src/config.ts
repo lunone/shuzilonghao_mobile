@@ -47,41 +47,51 @@ export const CONFIG = {
         pilotAbsence: '/pilot/absence',
         pilotTraining: '/pilot/training',
         //
-        // 权限管理接口
+        // 权限管理接口 (新API)
         permissionCreate: '/system/permission/create',
         permissionUpdate: '/system/permission/update',
         permissionDelete: '/system/permission/delete',
-        permissionDetail: '/system/permission/detail',
         permissionList: '/system/permission/list',
         permissionTree: '/system/permission/tree',
-        permissionBatchCreate: '/system/permission/batchCreate',
-        permissionBatchUpdate: '/system/permission/batchUpdate',
-        permissionBatchDelete: '/system/permission/batchDelete',
 
-        // 角色管理接口
+        // 权限操作管理接口 (新增)
+        permissionActionCreate: '/system/permission-action/create',
+        permissionActionUpdate: '/system/permission-action/update',
+        permissionActionDelete: '/system/permission-action/delete',
+        permissionActionDetail: '/system/permission-action/detail',
+        permissionActionList: '/system/permission-action/list',
+
+        // 角色管理接口 (新API)
         roleCreate: '/system/role/create',
         roleUpdate: '/system/role/update',
         roleDelete: '/system/role/delete',
-        roleDetail: '/system/role/detail',
-        roleDetailByCode: '/system/role/detailByCode',
         roleList: '/system/role/list',
-        roleAssignPermissions: '/system/role/assignPermissions',
-        rolePermissions: '/system/role/rolePermissions',
-        rolePermissionIds: '/system/role/rolePermissionIds',
-        roleEnabledRoles: '/system/role/enabledRoles',
-        roleCheckCode: '/system/role/checkCode',
+        roleAssignPermissions: '/system/role/assign-permissions',
+        rolePermissions: '/system/role/permissions',
 
-        // 用户角色管理接口
+        // 用户权限管理接口 (新API)
         userAssignRoles: '/user/assignRoles',
         userRoles: '/user/userRoles',
         userPermissions: '/user/userPermissions',
         userPermissionCodes: '/user/userPermissionCodes',
         userHasPermission: '/user/hasPermission',
-        userHasRole: '/user/hasRole',
-        userAddUserRole: '/user/addUserRole',
-        userRemoveUserRole: '/user/removeUserRole',
-        userClearUserRoles: '/user/clearUserRoles',
-        permissionRoles: '/system/permission/roles', // 获取拥有某个权限的角色列表
+
+        // 资源管理接口
+        resourceCreate: '/system/resource/create',
+        resourceUpdate: '/system/resource/update',
+        resourceDelete: '/system/resource/delete',
+        resourceDetail: '/system/resource/detail',
+        resourceList: '/system/resource/list',
+        resourceTree: '/system/resource/tree',
+        resourceBatchCreate: '/system/resource/batchCreate',
+        resourceBatchUpdate: '/system/resource/batchUpdate',
+        resourceBatchDelete: '/system/resource/batchDelete',
+
+        // 资源权限关联接口
+        resourceAssignPermissions: '/system/resource/assignPermissions',
+        resourcePermissions: '/system/resource/resourcePermissions',
+        resourcePermissionIds: '/system/resource/resourcePermissionIds',
+        permissionResources: '/system/permission/resources', // 获取拥有某个权限的资源列表
     },
     page: {
         index: '/pages/index',

@@ -5,16 +5,47 @@
 
     <!-- 第一部分：人员选择区域 -->
     <div class="section-card user-selection-section">
-      <div class="section-header">
-        <h3>人员选择</h3>
-        <div class="user-display">
-          <div class="user-name-display">
-            <span v-if="selectedUser">{{ selectedUser.name }}</span>
-            <span v-else class="placeholder">未选择人员</span>
+      <div class="user-search-container">
+        <!-- 当没有选择用户时显示搜索输入框 -->
+        <div v-if="!selectedUser" class="user-search-input-wrapper">
+          <wd-input
+            v-model="userSearchKeyword"
+            placeholder="输入人员姓名或ID进行搜索"
+            @input="realTimeSearchUsers"
+            @focus="showUserDropdown = true"
+            @blur="handleSearchBlur"
+            clearable
+          />
+          <div v-if="showUserDropdown && searchResults.length > 0" class="user-dropdown">
+            <div
+              v-for="user in searchResults"
+              :key="user.id"
+              class="user-dropdown-item"
+              @click="selectUser(user)"
+            >
+              <div class="user-avatar">
+                <text>{{ user.name?.charAt(0) || 'U' }}</text>
+              </div>
+              <div class="user-details">
+                <h4>{{ user.name }}</h4>
+                <p>{{ user.id }}</p>
+              </div>
+            </div>
           </div>
-                    <wd-button type="primary" @click="showUserSelector = true">
-                        选择人员
-                    </wd-button>
+          <div v-if="showUserDropdown && searchResults.length === 0 && userSearchKeyword.trim()" class="user-dropdown">
+            <div class="no-results">未找到匹配的人员</div>
+          </div>
+        </div>
+        <!-- 当已选择用户时显示用户信息 -->
+        <div v-if="selectedUser" class="selected-user-info">
+          <div class="user-avatar">
+            <text>{{ selectedUser.name?.charAt(0) || 'U' }}</text>
+          </div>
+          <div class="user-details">
+            <h4>{{ selectedUser.name }}</h4>
+            <p>{{ selectedUser.id }}</p>
+          </div>
+          <span class="clear-user" @click="clearSelectedUser" title="清除选择">×</span>
         </div>
       </div>
     </div>
@@ -53,20 +84,39 @@
             </div>
         </div>
 
-        <!-- 第三部分：系统所有权限树 -->
-        <div class="section-card permissions-section">
-                <div class="section-header">
-                    <h3>{{ selectedRole ? `${selectedRole.name}权限` : (selectedUser ? `${selectedUser.name}权限` : '系统权限') }}</h3>
-                    <div class="header-actions">
-                        <span v-if="selectedRole" class="action-icon" @click="openCreateRootPermissionDialog" title="添加根权限">➕</span>
-                        <span v-if="selectedRole && hasPermissionChanges" class="action-icon update-btn" @click="saveRolePermissions" title="更新权限">💾</span>
-                    </div>
+        <!-- 第三部分：系统所有资源 -->
+        <div class="section-card resources-section">
+            <div class="section-header">
+                <h3>系统资源</h3>
+                <div class="header-actions">
+                    <span class="action-icon" @click="openCreateResourceDialog" title="创建资源">➕</span>
+                    <span v-if="selectedResource" class="action-icon" @click="openCreateChildResourceDialog" title="添加子资源">➕</span>
+                    <span v-if="selectedResource" class="action-icon" @click="editSelectedResource" title="编辑资源">✏️</span>
+                    <span v-if="selectedResource" class="action-icon delete-btn" @click="deleteSelectedResource" title="删除资源">🗑️</span>
                 </div>
+            </div>
+            <div class="resource-tree-container">
+                <ResourceManager
+                    ref="resourceManagerRef"
+                    @resource-selected="handleResourceSelected"
+                />
+            </div>
+        </div>
+
+        <!-- 第四部分：权限树 -->
+        <div class="section-card permissions-section">
+            <div class="section-header">
+                <h3>{{ selectedResource ? `${selectedResource.name}权限` : (selectedRole ? `${selectedRole.name}权限` : (selectedUser ? `${selectedUser.name}权限` : '系统权限')) }}</h3>
+                <div class="header-actions">
+                    <span v-if="selectedResource" class="action-icon" @click="openCreateRootPermissionDialog" title="添加根权限">➕</span>
+                    <span v-if="selectedResource && hasPermissionChanges" class="action-icon update-btn" @click="saveResourcePermissions" title="更新权限">💾</span>
+                </div>
+            </div>
             <div class="permission-tree-container">
                 <PermissionTree
                     :all-permissions="allPermissions"
-                    :selected-permission-ids="selectedRole ? selectedPermissionIds : userPermissionIds"
-                    :read-only="!selectedRole"
+                    :selected-permission-ids="selectedResource ? selectedPermissionIds : (selectedRole ? rolePermissionIds : userPermissionIds)"
+                    :read-only="!selectedResource"
                     @toggle-permission="handleTogglePermission"
                     @edit-node="handleEditNode"
                     @delete-node="handleDeleteNode"
@@ -275,30 +325,35 @@ import { ref, onMounted, computed, onUnmounted } from 'vue'
 import permission from '@/utils/permission'
 import { useUserStore } from '@/store/user.store'
 import { loading } from '@/utils/api'
-import type { Role, Permission } from '@/interface/permission.interface'
+import type { Role, Permission, Resource, PermissionAction, RolePermissionAssignment } from '@/interface/permission.interface'
 import UserRoleManager from './manage/UserRoleManager.vue'
 import RolePermissionManager from './manage/RolePermissionManager.vue'
 import PermissionTree from './manage/PermissionTree.vue'
+import ResourceManager from './manage/ResourceManager.vue'
 import PageLoading from '@/components/PageLoading.vue'
 
 // 响应式数据
 const selectedUser = ref<any>(null)
 const selectedRole = ref<Role | null>(null)
+const selectedResource = ref<Resource | null>(null)
 const userRoles = ref<Role[]>([])
 const userPermissions = ref<Permission[]>([])
 const allRoles = ref<Role[]>([])
 const allPermissions = ref<Permission[]>([])
 const selectedPermissionIds = ref<number[]>([])
 const userPermissionIds = ref<number[]>([])
+const rolePermissionIds = ref<number[]>([])
 const originalPermissionIds = ref<number[]>([]) // 保存原始权限ID，用于比较变更
 const searchResults = ref<any[]>([])
 const showUserSelector = ref(false)
+const showUserDropdown = ref(false)
 const showRoleDialog = ref(false)
 const showCreateRoleDialog = ref(false)
 const showCreatePermissionDialog = ref(false)
 const showEditPermissionDialog = ref(false)
 const userSearchKeyword = ref('')
 const selectedRoleIds = ref<number[]>([])
+const resourceManagerRef = ref()
 const newRole = ref({
     name: '',
     code: '',
@@ -380,15 +435,8 @@ onMounted(async () => {
     // 只加载角色数据，避免页面卡顿
     await loadAllRoles()
 
-    // 延迟执行其他操作，避免页面卡顿
-    setTimeout(async () => {
-        // 预加载员工数据（异步，不阻塞页面）
-        userStore.fetchStaff()
-
-        // 自动输入 "23" 并查询用户
-        userSearchKeyword.value = '23'
-        await searchUsers()
-    }, 500)
+    // 预加载员工数据（异步，不阻塞页面）
+    userStore.fetchStaff()
 })
 
 
@@ -706,7 +754,9 @@ const handleTogglePermission = (permissionId: number) => {
 const handleEditNode = async (node: any) => {
     try {
         // 获取权限详情
-        const permissionDetail = await permission.getPermissionDetail(node.id)
+        // 使用权限列表获取详情（新API没有单独的详情接口）
+        const permissionList = await permission.getPermissionList({ enabled: true })
+        const permissionDetail = permissionList.list.find(p => p.id === node.id)
 
         // 填充编辑表单
         editPermission.value = {
@@ -735,8 +785,17 @@ const handleEditNode = async (node: any) => {
 // 删除节点处理
 const handleDeleteNode = async (node: any) => {
     try {
-        // 先获取权限详情，确认是否有子权限
-        const permissionDetail = await permission.getPermissionDetail(node.id)
+        // 使用权限列表获取详情（新API没有单独的详情接口）
+        const permissionList = await permission.getPermissionList({ enabled: true })
+        const permissionDetail = permissionList.list.find(p => p.id === node.id)
+
+        if (!permissionDetail) {
+            uni.showToast({
+                title: '权限不存在',
+                icon: 'none'
+            })
+            return
+        }
 
         uni.showModal({
             title: '删除权限',
@@ -821,8 +880,17 @@ const openCreateRootPermissionDialog = () => {
 // 打开创建子权限弹窗
 const openCreateChildPermissionDialog = async (parentId: number) => {
     try {
-        // 获取父权限详情
-        const parentPermission = await permission.getPermissionDetail(parentId)
+        // 使用权限列表获取父权限详情（新API没有单独的详情接口）
+        const permissionList = await permission.getPermissionList({ enabled: true })
+        const parentPermission = permissionList.list.find(p => p.id === parentId)
+
+        if (!parentPermission) {
+            uni.showToast({
+                title: '父权限不存在',
+                icon: 'none'
+            })
+            return
+        }
 
         newPermission.value = {
             name: '',
@@ -922,15 +990,21 @@ const updatePermission = async () => {
     }
 
     try {
-        await permission.updatePermission(editPermission.value.id, {
+        const updateData: any = {
             name: editPermission.value.name,
             code: editPermission.value.code,
             description: editPermission.value.description,
             type: editPermission.value.type,
-            path: editPermission.value.path,
-            method: editPermission.value.method,
             enabled: editPermission.value.enabled
-        })
+        }
+
+        // 只有当type为2（接口）时才包含path和method
+        if (editPermission.value.type === 2) {
+            updateData.path = editPermission.value.path
+            updateData.method = editPermission.value.method
+        }
+
+        await permission.updatePermission(editPermission.value.id, updateData)
         uni.showToast({ title: '更新权限成功', icon: 'success' })
         showEditPermissionDialog.value = false
         // 重置表单
@@ -951,6 +1025,86 @@ const updatePermission = async () => {
         uni.showToast({ title: '更新权限失败', icon: 'none' })
         console.error('更新权限失败:', error)
     }
+}
+
+// 资源相关函数
+const openCreateResourceDialog = () => {
+    if (resourceManagerRef.value) {
+        resourceManagerRef.value.openCreateDialog()
+    }
+}
+
+const openCreateChildResourceDialog = () => {
+    if (resourceManagerRef.value && selectedResource.value) {
+        resourceManagerRef.value.openCreateChildDialog(selectedResource.value.id)
+    }
+}
+
+const editSelectedResource = () => {
+    if (resourceManagerRef.value && selectedResource.value) {
+        resourceManagerRef.value.editResource(selectedResource.value)
+    }
+}
+
+const deleteSelectedResource = () => {
+    if (resourceManagerRef.value && selectedResource.value) {
+        resourceManagerRef.value.deleteResource(selectedResource.value)
+    }
+}
+
+const handleResourceSelected = (resource: Resource | null) => {
+    selectedResource.value = resource
+    if (resource) {
+        // 加载资源权限
+        loadResourcePermissions()
+    } else {
+        selectedPermissionIds.value = []
+    }
+}
+
+const loadResourcePermissions = async () => {
+    if (!selectedResource.value) return
+
+    try {
+        // 调用新API加载资源权限
+        const resourcePermissionIds = await permission.getResourcePermissionIds(selectedResource.value.id)
+        selectedPermissionIds.value = resourcePermissionIds
+    } catch (error) {
+        uni.showToast({ title: '加载资源权限失败', icon: 'none' })
+        console.error('加载资源权限失败:', error)
+    }
+}
+
+const saveResourcePermissions = async () => {
+    if (!selectedResource.value) return
+
+    try {
+        // 调用新API保存资源权限
+        await permission.assignPermissionsToResource(selectedResource.value.id, selectedPermissionIds.value)
+        uni.showToast({ title: '保存权限成功' })
+    } catch (error) {
+        uni.showToast({ title: '保存权限失败', icon: 'none' })
+        console.error('保存权限失败:', error)
+    }
+}
+
+// 处理搜索框失去焦点
+const handleSearchBlur = () => {
+    // 延迟隐藏下拉框，以便点击选项
+    setTimeout(() => {
+        showUserDropdown.value = false
+    }, 200)
+}
+
+// 清除选中的用户
+const clearSelectedUser = () => {
+    selectedUser.value = null
+    userRoles.value = []
+    userPermissions.value = []
+    userPermissionIds.value = []
+    selectedRole.value = null
+    selectedResource.value = null
+    selectedPermissionIds.value = []
 }
 </script>
 
@@ -1429,25 +1583,145 @@ const updatePermission = async () => {
     }
 }
 
-// 三部分布局样式
+// 四部分布局样式
 .user-selection-section {
     flex-shrink: 0;
+    overflow: visible; // 允许下拉框溢出
 
-    .user-display {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
+    .user-search-container {
+        width: 100%;
 
-        .user-name-display {
-            flex: 1;
-            font-size: 14px;
-            color: @color-text;
-            font-weight: 500;
+        .user-search-input-wrapper {
+            position: relative;
+            width: 100%;
 
-            .placeholder {
-                color: #999;
-                font-style: italic;
+            .user-dropdown {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                z-index: 10000;
+                max-height: 200px;
+                overflow-y: auto;
+                margin-top: 2px;
+
+                .user-dropdown-item {
+                    display: flex;
+                    align-items: center;
+                    padding: 8px 12px;
+                    cursor: pointer;
+                    border-bottom: 1px solid #f0f0f0;
+                    transition: background-color 0.2s;
+
+                    &:hover {
+                        background: #f5f5f5;
+                    }
+
+                    &:last-child {
+                        border-bottom: none;
+                    }
+
+                    .user-avatar {
+                        width: 32px;
+                        height: 32px;
+                        border-radius: 50%;
+                        background: @color-primary;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-weight: bold;
+                        font-size: 12px;
+                        margin-right: 8px;
+                    }
+
+                    .user-details {
+                        flex: 1;
+
+                        h4 {
+                            margin: 0 0 2px 0;
+                            font-size: 14px;
+                            font-weight: 600;
+                            color: @color-text;
+                        }
+
+                        p {
+                            margin: 0;
+                            font-size: 12px;
+                            color: #666;
+                        }
+                    }
+                }
+
+                .no-results {
+                    padding: 12px;
+                    text-align: center;
+                    color: #999;
+                    font-size: 14px;
+                }
+            }
+        }
+
+        .selected-user-info {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            border-radius: 6px;
+            margin-top: 8px;
+
+            .user-avatar {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: @color-primary;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: bold;
+                font-size: 12px;
+                margin-right: 8px;
+            }
+
+            .user-details {
+                flex: 1;
+
+                h4 {
+                    margin: 0 0 2px 0;
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: @color-text;
+                }
+
+                p {
+                    margin: 0;
+                    font-size: 12px;
+                    color: #666;
+                }
+            }
+
+            .clear-user {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: #ff4d4f;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                font-size: 12px;
+                transition: background-color 0.2s;
+
+                &:hover {
+                    background: #d4380d;
+                }
             }
         }
     }
@@ -1581,6 +1855,21 @@ const updatePermission = async () => {
                 font-size: 12px;
             }
         }
+    }
+}
+
+.resources-section {
+    flex: 1;
+    min-height: 200px;
+    max-height: 300px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    .resource-tree-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 6px 8px;
     }
 }
 
