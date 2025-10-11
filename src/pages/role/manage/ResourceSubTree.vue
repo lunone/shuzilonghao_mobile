@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Resource } from '@/interface/permission.interface'
+import type { Resource } from '@/api/permission.api'
 
 // 组件属性
 const props = defineProps<{

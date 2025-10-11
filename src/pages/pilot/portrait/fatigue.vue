@@ -88,7 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import { getPilotCrewMate, getPilotFatigue } from '@/api/pilot.api'
+import { getPilotCrewMate, getPilotFatigue, PilotFatigueResponse } from '@/api/pilot.api'
 import { computed, onMounted, ref, watch } from 'vue'
 import PieChart from '@/components/ucharts/pie.vue'
 import BarChart from '@/components/ucharts/bar.vue'

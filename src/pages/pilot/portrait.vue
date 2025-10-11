@@ -54,7 +54,7 @@ async function loadData(e) {
     try {
         const [pilotsResult, profileResult] = await Promise.allSettled([
             fetchPilots(),
-            getPilotProfile({ userId: e.pcode, idType: 'pcode' })
+            getPilotProfile({ userId: e.pcode, idType: 'code' })
         ]);
         if (profileResult.status === 'fulfilled') {
             pilot.value = profileResult.value || {};

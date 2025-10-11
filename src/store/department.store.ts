@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { getDepartments } from '@/api/staff.api'; // 导入API工具函数
-import { DepartmenItem } from '@/interface/user.interface'; // 导入接口定义
-import { ListNode } from '@/interface/sys.interface';
+import { DepartmenItem } from '@/api/user.api'; // 导入接口定义
+import { ListNode } from '@/types/sys';
 
 // 定义部门存储模块
 export const useDepartmentStore = defineStore('department', () => {

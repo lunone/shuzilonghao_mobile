@@ -50,7 +50,7 @@
 import { Ref, ref, watch } from 'vue';
 // import NavVue from '@/components/Nav.vue';
 import ProfileVue from './profile.vue';
-import { UserItem } from '@/interface/user.interface';
+import { UserItem } from '@/api/user.api';
 
 // import router from '@/router';
 import UserCardVue from './userCard.vue';

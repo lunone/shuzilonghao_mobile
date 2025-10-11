@@ -14,7 +14,7 @@
 import { onMounted, PropType, ref } from 'vue'
 import ucharts from '@/components/ucharts/ucharts.vue';
 import { useAirportStore } from '@/store/airport.store';
-import { AirportItem } from '@/interface/airport.interface';
+import { AirportItem } from '@/api/airport.api';
 
 // 定义组件props
 const props = defineProps({

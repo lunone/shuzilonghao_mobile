@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed, Ref } from 'vue';
 import { getAirports } from '@/api/airport.api';
-import { AirportItem } from '@/interface/airport.interface';
+import { AirportItem } from '@/api/airport.api';
 
 
 export const useAirportStore = defineStore('airport', () => {

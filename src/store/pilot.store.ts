@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed, Ref } from 'vue';
 import { getPilots } from '@/api/pilot.api';
 import _ from 'lodash';
-import { PilotItem } from '@/interface/user.interface';
+import { PilotItem } from '@/api/user.api';
 
 export const usePilotStore = defineStore('pilot', () => {
     const isLoading = { pilot: false };

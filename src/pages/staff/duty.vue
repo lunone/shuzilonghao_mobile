@@ -18,7 +18,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useDepartmentStore } from '@/store/department.store';
 import { useUserStore } from '@/store/user.store';
 import { getDutyToday } from '@/api/staff.api';
-import { DutyResponse } from '@/interface/duty.interface';
+import { DutyResponse } from '@/types/duty';
 import { call } from '@/utils/tools';
 
 // 初始化 store

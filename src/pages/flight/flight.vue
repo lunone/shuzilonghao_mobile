@@ -119,7 +119,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import type { FlightItem } from '@/interface/flight.interface'
+import type { FlightItem } from '@/api/flight.api'
 import FlightDetail from '@/pages/flight/flightDetail.vue'
 import { getFlightsByDate } from '@/api/flight.api'
 import dayjs from 'dayjs'

@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Role } from '@/interface/permission.interface'
+import type { Role } from '@/api/permission.api'
 
 // Props
 interface Props {

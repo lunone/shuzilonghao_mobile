@@ -43,7 +43,7 @@
 
 </template>
 <script setup lang="ts">
-import { StatMulti } from '@/interface/flight.interface';
+import { StatMulti } from '@/api/flight.api';
 import { onMounted, PropType, ref, watch } from 'vue';
 const props = defineProps({
     dep: { type: String, default: '', },

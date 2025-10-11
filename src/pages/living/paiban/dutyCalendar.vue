@@ -13,9 +13,9 @@
 import { ref, computed, watch, onMounted, provide } from 'vue';
 import dayjs from 'dayjs';
 import { useUserStore } from '@/store/user.store';
-import type { UserItem } from '@/interface/user.interface';
+import type { UserItem } from '@/api/user.api';
 import { useDepartmentStore } from '@/store/department.store';
-import type { Duty } from '@/interface/duty.interface';
+import type { Duty } from '@/types/duty';
 
 interface StaffObj { [key: string]: UserItem; }
 

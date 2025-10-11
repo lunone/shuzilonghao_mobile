@@ -3,69 +3,34 @@
     <press-calendar />
     <div v-if="loading" class="loading">加载中...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
-    <div>
-
-        <div class="button-group">
-            <span class="btn" :class="currentStation == code4 ? `hover` : ``" v-for="code4 in stations" :key="code4"
-                @click="stationClick(code4)">
-                {{ getCity(code4) }}
-            </span>
-        </div>
-        <div class="way">
-            <div class="arr">进港</div>
-            <switch @change="isDep = !isDep" :size="20" />
-            <div class="dep">出港</div>
-        </div>
-
+    <div v-else>
         <div class="airlines">
-            <airline v-for="(stats, code4) in filterStation" :key="code4" :stats="stats"
-                :dep="getCity(isDep ? currentStation : code4)" :arr="getCity(!isDep ? currentStation : code4)" />
+            <!-- 注意: 这里需要修改子组件 airline.vue 以接收 airlineStat prop，或者在此处创建一个新的简单布局来展示航空公司数据。以下是一个简化的示例布局。-->
+            <div v-for="stat in airlineStats" :key="stat.airlineCode" class="airline-card">
+                <h4>{{ stat.airlineName }} ({{ stat.airlineCode }})</h4>
+                <p>航班数: {{ stat.flightCount }}</p>
+                <p>总小时: {{ stat.totalHours }}</p>
+                <p>市场份额: {{ (stat.marketShare * 100).toFixed(2) }}%</p>
+            </div>
         </div>
-
     </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, watch, Ref, onMounted } from 'vue';
-import { useAirportStore } from '@/store/airport.store';
-import { StatMulti } from '@/interface/flight.interface';
+import { ref, watch, Ref } from 'vue';
 import dayjs from 'dayjs';
-import airline from './airlines/airline.vue';
 import zlDateRangePicker from '@/components/zl/dateRangePicker.vue';
-import { getStatByAirline } from '@/api/statistics.api';
-const airportStore = useAirportStore();
+import { getStatByAirline, AirlineStats } from '@/api/statistics.api';
+
 // 定义 loading 和 error 状态
 const loading = ref(false);
 const error = ref('');
 
-
-const currentStation = ref('');
-// ZHCC-ZHYC:{'B220M':{avgNEtcargo:number……}}
-type Res = Record<string, Record<string, StatMulti>>
-const isDep: Ref<boolean> = ref(false);
-const airlineStats = ref({}) as Ref<Res>;
+const airlineStats: Ref<AirlineStats[]> = ref([]);
 
 const dateRange = ref([
     dayjs().add(-11, 'day').toDate(),
     dayjs().add(-1, 'day').endOf('day').toDate()
 ]) as Ref<[Date, Date]>;
-const getCity = code => airportStore.getCity(code, 'city');
-const stationClick = (name: string) => currentStation.value = name;
-const stations = computed(() => {
-    if (!airlineStats.value) return [];
-    return [...new Set(Object.keys(airlineStats.value).reduce((acc, cur) => [...acc, ...cur.split('-')], []))];
-})
-const filterStation = computed(() => {
-    const temp = {} as Record<string, Record<string, StatMulti>>;
-    for (let key in airlineStats.value) {
-        const [dep, arr] = key.split('-');
-        let selectStation = isDep.value ? dep : arr;
-        let otherStation = isDep.value ? arr : dep;
-        if (selectStation === currentStation.value) {
-            temp[otherStation] = airlineStats.value[key];
-        }
-    }
-    return temp;
-});
 const fetchData = async (startDate: Date, endDate: Date) => {
     loading.value = true;
     error.value = '';
@@ -73,7 +38,6 @@ const fetchData = async (startDate: Date, endDate: Date) => {
         const data = await getStatByAirline({ startDate, endDate });
         console.log('统计', data);
         airlineStats.value = data;
-        stationClick(stations.value[0]);
     } catch (err) {
         console.log(err)
         error.value = '获取信息失败';
@@ -84,7 +48,6 @@ const fetchData = async (startDate: Date, endDate: Date) => {
 watch(() => dateRange.value, () => {
     const [startDate, endDate] = dateRange.value
     fetchData(startDate, endDate);
-    airportStore.fetchAirports();
 }, { immediate: true, deep: true })
 
 </script>
@@ -97,59 +60,28 @@ watch(() => dateRange.value, () => {
     margin-top: 20px;
 }
 
-.button-group {
-    display: flex;
-    flex-wrap: wrap; // 允许换行
-    gap: 10px; // 按钮之间的间距
-    justify-content: center; // 按钮水平居中
-    padding: 10px; // 添加内边距
-
-
-    .btn {
-        flex: 1 1 auto; // 自动宽度，但不会小于其内容宽度
-        min-width: 40px; // 设置最小宽度
-        max-width: 140px; // 设置最da宽度
-        padding: 6px 14px; // 按钮内边距
-        border-radius: 5px;
-        color: #414141;
-        background-color: #ecf3fa;
-        text-align: center;
-
-        &.hover {
-            background-color: #81a8d3;
-        }
-    }
-}
-
-.way {
-    display: flex;
-    justify-content: center;
-    /* 使子元素水平居中 */
-    align-items: center;
-    margin-bottom: 6px;
-    /* 添加底部间距 */
-
-    border-radius: 5px;
-
-
-
-    .dep,
-    .arr {
-        font-weight: bold;
-        color: #999;
-        margin: 0 10px;
-        /* 子元素之间的间距 */
-    }
-
-    .hover {
-        color: #333;
-    }
-}
-
 .airlines {
     border-radius: 8px;
     margin: 20px 10px;
 
+    .airline-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+        background-color: #fff;
 
+        h4 {
+            margin: 0 0 12px 0;
+            color: #fcb6b6;
+            font-size: 1.1rem;
+        }
+
+        p {
+            margin: 6px 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    }
 }
 </style>

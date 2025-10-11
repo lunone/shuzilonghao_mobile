@@ -50,7 +50,7 @@
 <script setup lang="ts">
 import { computed, onMounted, Ref, ref, watch } from 'vue';
 import { getUserProfile } from '@/api/user.api';
-import { UserItem } from '@/interface/user.interface';
+import { UserItem } from '@/api/user.api';
 import { useUserStore } from '@/store/user.store';
 import { useDepartmentStore } from '@/store/department.store';
 import Salary from './profile/salary.vue';

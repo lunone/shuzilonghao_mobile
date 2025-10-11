@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref, computed, Ref } from 'vue';
 import { initUser, getStaffList, getUserRoles, getUserPermissionCodes } from '@/api/user.api';
-import { UserItem } from '@/interface/user.interface';
-import { UserPermission } from '@/interface/permission.interface';
+import { UserItem } from '@/api/user.api';
+import { UserPermission } from '@/api/permission.api';
 import permission from '@/utils/permission';
 
 export const useUserStore = defineStore('user', () => {

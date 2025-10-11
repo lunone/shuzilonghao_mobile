@@ -325,7 +325,7 @@ import { ref, onMounted, computed, onUnmounted } from 'vue'
 import permission from '@/utils/permission'
 import { useUserStore } from '@/store/user.store'
 
-import type { Role, Permission, Resource, PermissionAction, RolePermissionAssignment } from '@/interface/permission.interface'
+import type { Role, Permission, Resource, PermissionAction, RolePermissionAssignment } from '@/api/permission.api'
 import UserRoleManager from './manage/UserRoleManager.vue'
 import RolePermissionManager from './manage/RolePermissionManager.vue'
 import PermissionTree from './manage/PermissionTree.vue'

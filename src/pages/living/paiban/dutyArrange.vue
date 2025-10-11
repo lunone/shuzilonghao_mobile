@@ -14,7 +14,7 @@ import { useUserStore } from '@/store/user.store';
 import { useDepartmentStore } from '@/store/department.store';
 import { getMateUsers } from '@/utils/user';
 import DragList from '@/components/zl/drag.vue';
-import type { UserItem } from '@/interface/user.interface';
+import type { UserItem } from '@/api/user.api';
 
 const staffList = ref<UserItem[]>([]);
 

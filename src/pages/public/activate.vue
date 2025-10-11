@@ -24,14 +24,14 @@ const doActivate = async () => {
         return error('激活码错误');
     }
     disable.value = true;
-    const jsCode = await new Promise(resolve => uni.login({ provider: 'weixin', success: res => resolve(res.code) }));
+    const jsCode = await new Promise<string>(resolve => uni.login({ provider: 'weixin', success: res => resolve(res.code) }));
     console.log('activate', activationCode.value, jsCode);
     try {
         const res = await activate({ regCode: activationCode.value, code: jsCode });
         console.log('激活结果', res);
         // 激活成功返回token
         if (res) {
-            store.setToken(res);
+            store.setToken(res.token);
             // 跳转到首页
             uni.redirectTo({ url: '/pages/index?activate=true' });
         } else {

@@ -8,7 +8,9 @@
 </template>
 <script lang="ts" setup>
 import { useAirportStore } from '@/store/airport.store';
-import { getPilotTraining, getPilotDuty, getPilotAbsence } from '@/api/pilot.api';
+import { getPilotTraining, getPilotAbsence } from '@/api/pilot.api';
+import { getFlightsByDate } from '@/api/flight.api';
+import type { FlightItem } from '@/api/flight.api';
 import dayjs from 'dayjs';
 import { computed, onMounted, PropType, Ref, ref, watch } from 'vue';
 
@@ -18,7 +20,7 @@ const props = defineProps({
     pcode: { type: String, default: '' },
 });
 const trainings = ref([]) as Ref<{ name: string, startDate: Date, endDate: Date, baseName: string }[]>;
-const duties = ref([]) as Ref<{ arr: string, dep: string, flightDate: Date, flightNo: string, flyMinute: number }[]>;
+const duties = ref<FlightItem[]>([]);
 const absences = ref([]) as Ref<{ code: string, ddoCode: string, ddoType: string, startDate: Date, endDate: Date, title: string, detail: string, userId: string }[]>;
 
 const airportStore = useAirportStore();
@@ -43,7 +45,7 @@ const days = computed(() => {
         const day = startDate.add(i, 'day').add(1, 'hour');// 加1小时是因为防止边界判断
         let className = '', index = day.format('DD'), name = '';
         const trainingsDay = trainings.value.find(t => day.isSame(t.startDate, 'day') || day.isSame(t.endDate, 'day'));
-        const dutyDay = duties.value.filter(t => day.isSame(t.flightDate, 'day'));
+        const dutyDay = duties.value.filter(t => day.isSame(t.date, 'day'));
         const absenceDay = absences.value.find(t => day.isSame(t.startDate, 'day') || day.isSame(t.endDate, 'day'));
 
         let data;
@@ -99,18 +101,35 @@ async function fetchData() {
     if (!props.pcode) return;
     const data = { userId: props.pcode, idType: 'pcode', startDate: props.startDate, endDate: props.endDate }
     try {
-        const [trainingResult, dutyResult, absenceResult] = await Promise.allSettled([
+        const [airportResult, trainingResult, dutyResult, absenceResult] = await Promise.allSettled([
             airportStore.fetchAirports(),
             getPilotTraining(data),
-            getPilotDuty(data),
+            getFlightsByDate(data),
             getPilotAbsence(data),
         ]);
+
+        if (airportResult.status === 'rejected') {
+            console.error('Failed to fetch airports:', airportResult.reason);
+        }
+
         trainings.value = trainingResult.status === 'fulfilled' ? trainingResult.value : [];
+        if (trainingResult.status === 'rejected') {
+            console.error('Failed to fetch pilot training:', trainingResult.reason);
+        }
+
         duties.value = dutyResult.status === 'fulfilled' ? dutyResult.value : [];
+        if (dutyResult.status === 'rejected') {
+            console.error('Failed to fetch pilot duty:', dutyResult.reason);
+        }
+
         absences.value = absenceResult.status === 'fulfilled' ? absenceResult.value : [];
-        console.log('获取信息train,duty,absence', [trainingResult, dutyResult, absenceResult]);
+        if (absenceResult.status === 'rejected') {
+            console.error('Failed to fetch pilot absence:', absenceResult.reason);
+        }
+
+        console.log('获取信息train,duty,absence', { trainingResult, dutyResult, absenceResult });
     } catch (err) {
-        console.warn('错误', err);
+        console.warn('An unexpected error occurred in fetchData:', err);
     }
 }
 

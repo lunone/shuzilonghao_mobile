@@ -1,17 +1,6 @@
 import request from '@/utils/request';
-import type { IdDTO, BaseEntity } from '@/interface/common.interface';
-
-interface Resource extends BaseEntity {
-  code: string;
-  name: string;
-  description?: string;
-  parentId?: number;
-  type: string;
-  url?: string;
-  sort?: number;
-}
-
-export type { Resource };
+import type { IdDTO } from '@/types/common';
+import type { Resource } from './permission.api';
 // 创建资源
 export const createResource = async (data: Partial<Resource>): Promise<Resource> => {
     return request({
@@ -21,7 +10,7 @@ export const createResource = async (data: Partial<Resource>): Promise<Resource>
 };
 
 // 更新资源
-export const updateResource = async (data: { id: number; data: Partial<Resource> }): Promise<Resource> => {
+export const updateResource = async (data: { id: number; data: Partial<Resource> }): Promise<any> => {
     return request({
         url: '/system/resource/update',
         data,

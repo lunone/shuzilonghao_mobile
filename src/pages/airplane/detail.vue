@@ -26,7 +26,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { AircraftItem } from '@/interface/flight.interface';
+import { AircraftItem } from '@/api/flight.api';
 import { PropType, ref } from 'vue';
 
 const props = defineProps({

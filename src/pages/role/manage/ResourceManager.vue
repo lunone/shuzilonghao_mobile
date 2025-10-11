@@ -175,7 +175,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import type { Resource } from '@/interface/permission.interface'
+import type { Resource } from '@/api/permission.api'
 import ResourceSubTree from './ResourceSubTree.vue'
 
 // 响应式数据

@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, Ref, provide } from 'vue';
 // import NavVue from '@/components/Nav.vue';
-import { getSmsStat } from '@/api/sms.api';
+import { getSmsStat, type SmsStatResponse } from '@/api/sms.api';
 import dayjs from 'dayjs';
 import ucharts from '@/components/ucharts/ucharts.vue';
 import eventsVue from '@/pages/sms/events.vue';
@@ -51,7 +51,7 @@ const months = ref([]);
 const events = ref([]);
 const voluntarys = ref([]);
 const select = ref({ events: 0, voluntarys: 0 })
-const stats = ref({}) as Ref<Record<string, { events, voluntarys }>>;
+const stats = ref<SmsStatResponse>({});
 
 const tabCurrent = ref(0);
 const onClickItem = e => tabCurrent.value = tabCurrent != e.currentIndex ? e.currentIndex : tabCurrent.value;

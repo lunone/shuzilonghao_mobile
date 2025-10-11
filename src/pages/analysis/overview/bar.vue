@@ -3,7 +3,7 @@
 </template>
 <script setup lang="ts">
 import ucharts from '@/components/ucharts/ucharts.vue';
-import { FlightItem } from '@/interface/flight.interface';
+import { FlightItem } from '@/api/flight.api';
 import dayjs from 'dayjs';
 import { text } from 'stream/consumers';
 import { watch, computed, ref, Ref } from 'vue';

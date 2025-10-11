@@ -17,7 +17,7 @@ import { useAirportStore } from '@/store/airport.store';
 import { numberByWan } from '@/utils/tools';
 import dayjs from 'dayjs';
 import { getStatByStation } from '@/api/statistics.api';
-import { StatSingle } from '@/interface/flight.interface';
+import { StatSingle } from '@/api/flight.api';
 
 const fields = { counter: '班', netWeightCargo: '吨', hour: '小时' }
 const { getCity, fetchAirports } = useAirportStore();

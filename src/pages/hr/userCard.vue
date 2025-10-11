@@ -21,7 +21,7 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted, Ref, watch } from 'vue';
 import Profile from '@/pages/hr/profile.vue';
-import { UserItem } from '@/interface/user.interface';
+import { UserItem } from '@/api/user.api';
 import { useUserStore } from '@/store/user.store';
 
 const userStore = useUserStore();

@@ -155,18 +155,19 @@ watch(() => dateRange, async () => {
             avgFlightHours: +(pilot.avgMinutes / 60).toFixed(2),
         }));
         // 按照总飞行小时排序飞行员
-        const sortStat = stat.sort((a, b) => b.totalFlightHours - a.totalFlightHours);
-        sortStat.map((pilot, index) => {
+        // 按照总飞行小时排序飞行员
+        processedStat.sort((a, b) => b.totalFlightHours - a.totalFlightHours);
+        processedStat.forEach((pilot, index) => {
             pilot.rank = index + 1;
         })
         // 计算参与飞行人数、总参与飞行小时和每日人均飞行小时
-        summary.value.participantCount = stat.length;
-        summary.value.totalFlightHours = parseFloat(stat.reduce((sum, pilot) => sum + pilot.totalFlightHours, 0).toFixed(2));
-        // console.log('sortStat---', sortStat[0].name, sortStat[1].name, sortStat[2].name);
-        first.value = sortStat.shift();
-        second.value = sortStat.shift();
-        third.value = sortStat.shift();
-        pilots.value = sortStat;
+        summary.value.participantCount = processedStat.length;
+        summary.value.totalFlightHours = parseFloat(processedStat.reduce((sum, pilot) => sum + pilot.totalFlightHours, 0).toFixed(2));
+        // console.log('sortStat---', processedStat[0]?.name, processedStat[1]?.name, processedStat[2]?.name);
+        first.value = processedStat.shift() as PilotStat;
+        second.value = processedStat.shift() as PilotStat;
+        third.value = processedStat.shift() as PilotStat;
+        pilots.value = processedStat;
         // 排序飞行员
     } catch (err) {
         error.value = '获取统计数据和飞行员排名失败';

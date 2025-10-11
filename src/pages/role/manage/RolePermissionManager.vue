@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Role, Permission } from '@/interface/permission.interface'
+import type { Role, Permission } from '@/api/permission.api'
 import PermissionTree from './PermissionTree.vue'
 // Props
 interface Props {

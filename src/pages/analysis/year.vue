@@ -16,7 +16,7 @@ import { CONFIG } from '@/config';
 import dayjs from 'dayjs';
 
 import { numberByWan } from '@/utils/tools';
-import { StatSingle } from '@/interface/flight.interface';
+import { StatSingle } from '@/api/flight.api';
 import { getStatMonth } from '@/api/statistics.api';
 
 type StatMulti = StatSingle & {

@@ -1,12 +1,6 @@
 import request from '@/utils/request';
-import type { IdDTO, BaseEntity } from '@/interface/common.interface';
-
-interface Role extends BaseEntity {
-  code: string;
-  name: string;
-  description?: string;
-  status: number;
-}
+import type { IdDTO } from '@/types/common';
+import type { Role, Permission } from './permission.api';
 
 // 创建角色
 export const createRole = async (data: Partial<Role>): Promise<Role> => {
@@ -17,7 +11,7 @@ export const createRole = async (data: Partial<Role>): Promise<Role> => {
 };
 
 // 更新角色
-export const updateRole = async (data: { id: number; data: Partial<Role> }): Promise<Role> => {
+export const updateRole = async (data: { id: number; data: Partial<Role> }): Promise<any> => {
     return request({
         url: '/system/role/update',
         data,
@@ -33,7 +27,7 @@ export const deleteRole = async (data: IdDTO): Promise<void> => {
 };
 
 // 获取角色列表
-export const getRoleList = async (data?: any): Promise<Role[]> => {
+export const getRoleList = async (data?: any): Promise<{ list: Role[]; total: number }> => {
     return request({
         url: '/system/role/list',
         data,
@@ -49,7 +43,7 @@ export const assignPermissions = async (data: { roleId: number; permissionIds: n
 };
 
 // 获取角色权限
-export const getRolePermissions = async (data: IdDTO): Promise<any[]> => {
+export const getRolePermissions = async (data: IdDTO): Promise<Permission[]> => {
     return request({
         url: '/system/role/permissions',
         data,

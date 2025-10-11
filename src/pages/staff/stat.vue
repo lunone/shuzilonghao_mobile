@@ -18,11 +18,10 @@
     </div>
 </template>
 <script setup lang="ts">
-import { getStatPeriod } from '@/api/statistics.api';
+import { getStatPeriod, PeriodStats } from '@/api/statistics.api';
 import dayjs from 'dayjs';
 import { computed, onMounted, PropType, reactive, Ref, ref } from 'vue';
 import { numberByWan } from '@/utils/tools';
-import { StatSingle } from '@/interface/flight.interface';
 
 
 const props = defineProps({
@@ -41,18 +40,18 @@ const dates = {
     firstDayOfLastYear: dayjs().subtract(1, 'year').startOf('year').toDate(),
 }
 
-const lastRes: Ref<StatSingle> = ref({ netWeightCargo: 0, counter: 0, hour: 0 });
-const currentRes: Ref<StatSingle> = ref({ netWeightCargo: 0, counter: 0, hour: 0 });
+const lastRes: Ref<PeriodStats> = ref({ totalFlights: 0, totalHours: 0, totalNetWeightCargo: 0, averageLoadFactor: 0 });
+const currentRes: Ref<PeriodStats> = ref({ totalFlights: 0, totalHours: 0, totalNetWeightCargo: 0, averageLoadFactor: 0 });
 
 const titles = { day: ['前日', '昨日', '变化'], year: ['去年', '今年', '变化'] }
 // 在 computed 属性后添加：
-const fields = { counter: '班', netWeightCargo: '吨', hour: '小时' }
+const fields = { totalFlights: '班', totalNetWeightCargo: '吨', totalHours: '小时' }
 
 const rate = (last: number, current: number) => last > 0 ? ((current - last) / last * 100).toFixed(1) : '--';
-const formater = (src) => ({
-    counter: numberByWan(src?.counter ?? 0),
-    netWeightCargo: numberByWan(((src?.netWeightCargo ?? 0) / 1e3) | 0),
-    hour: numberByWan((src?.hour ?? 0) | 0),
+const formater = (src: PeriodStats) => ({
+    totalFlights: numberByWan(src?.totalFlights ?? 0),
+    totalNetWeightCargo: numberByWan(((src?.totalNetWeightCargo ?? 0) / 1e3) | 0),
+    totalHours: numberByWan((src?.totalHours ?? 0) | 0),
 })
 //  Record<keyof Stat, string | number>[]
 const sections = computed(() => [
@@ -60,7 +59,7 @@ const sections = computed(() => [
     formater(currentRes.value),
     Object.keys(fields).reduce((acc, key) => ({
         ...acc, [key]: rate(lastRes.value[key] ?? 0, currentRes.value[key] ?? 0)
-    }), {} as Record<keyof StatSingle, string>),
+    }), {} as Record<keyof typeof fields, string>),
 ]);
 
 async function loadData() {
@@ -72,10 +71,10 @@ async function loadData() {
             getStatPeriod(lastRange)
         ]);
         if (currentResult.status === 'fulfilled') {
-            currentRes.value = currentResult.value as StatSingle;
+            currentRes.value = currentResult.value;
         }
         if (lastResult.status === 'fulfilled') {
-            lastRes.value = lastResult.value as StatSingle;
+            lastRes.value = lastResult.value;
         }
         // console.log('获取信息', [currentResult, lastResult], currentRes.value, lastRes.value);
     } catch (err) {

@@ -117,7 +117,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import type { FlightItem } from '@/interface/flight.interface'
+import type { FlightItem } from '@/api/flight.api'
 
 // Props
 interface Props {

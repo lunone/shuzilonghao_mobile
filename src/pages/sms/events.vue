@@ -2,12 +2,12 @@
     <EventVue :data="event" v-for="event in events" :key="event.id" />
 </template>
 <script lang="ts" setup>
-import { getSmsEvents } from '@/api/sms.api';
+import { getSmsEvents, SmsEventItem } from '@/api/sms.api';
 import { onMounted, PropType, ref, Ref, watch } from 'vue';
 import EventVue from './card/event.vue';
 import dayjs from 'dayjs';
 
-const events: Ref<any[]> = ref([]);
+const events: Ref<SmsEventItem[]> = ref([]);
 const loading = ref(false);
 const finished = ref(false);
 const page = ref(1);
@@ -28,14 +28,16 @@ const fetchData = async (currentPage: number) => {
         const eventData = await getSmsEvents({ startDate, endDate });
         console.log(`resEvents---------`, eventData);
         for (let event of eventData) {
-            const { dep, arr, acReg } = event;
-            const crews = (event.crews || '').split(/[,\s;、。\.]+/);
-            event.crews = crews;
+            const { arr, acReg } = event;
+            if (typeof event.crews === 'string') {
+                event.crews = event.crews.split(/[,\s;、。\.]+/);
+            }
             event.acReg = (acReg || '').replace('-', '');
         }
         events.value = events.value.concat(eventData);
         loading.value = false;
-        finished.value = events.value.length > eventData.total;
+        // 如果返回的数组长度小于请求的 size，说明是最后一页
+        finished.value = eventData.length < size;
     } catch (err) {
         console.error('获取事件列表失败', err);
     } finally {

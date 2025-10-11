@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { getAircrafts } from '@/api/aircraft.api';
 import dayjs from 'dayjs';
-import { AircraftItem } from '@/interface/aircraft.interface';
+import { AircraftItem } from '@/api/aircraft.api';
 
 export const useAircraftStore = defineStore('aircraft', () => {
     const isLoading = { aircraft: false };

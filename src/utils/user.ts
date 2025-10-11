@@ -1,7 +1,7 @@
 // utils/duty.utils.ts
 import { useUserStore } from '@/store/user.store';
 import { useDepartmentStore } from '@/store/department.store';
-import type { UserItem } from '@/interface/user.interface';
+import type { UserItem } from '@/api/user.api';
 
 const getMateUsers = async (): Promise<UserItem[]> => {
     const userStore = useUserStore();
