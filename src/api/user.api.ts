@@ -1,5 +1,6 @@
 import { request } from '@/utils/request';
 import type { UserIdDTO, WxActivateDTO } from '@/types/common';
+import { PermissionTree } from './permission.api'; // <--- ADD THIS IMPORT
 
 // 用户相关接口定义 (从 user.interface.ts 移动而来)
 
@@ -63,7 +64,7 @@ export type UserItem = {
 
 interface UserInitResponse {
   user: UserItem;
-  permissionTree: any[];
+  permissionTree: PermissionTree[];
 }
 
 // 初始化用户信息

@@ -1,19 +1,39 @@
 import { defineStore } from 'pinia';
 import { ref, computed, Ref } from 'vue';
-import { initUser, getStaffList, getUserRoles, getUserPermissionCodes } from '@/api/user.api';
-import { UserItem } from '@/api/user.api';
-import { UserPermission } from '@/api/permission.api';
-import permission from '@/utils/permission';
+import { initUser, getStaffList } from '@/api/user.api';
+import type { UserItem } from '@/api/user.api';
+import type { UserPermission, PermissionTree } from '@/api/permission.api';
+import { ROLE_CODES } from '@/api/permission.api';
 
 export const useUserStore = defineStore('user', () => {
-    const isLoading = { staff: false, myself: false };
+    // --- STATE ---
+    const isLoading = { staff: false, self: false };
     const staff = ref<Record<string, UserItem>>({});
     const self = ref({}) as Ref<UserItem>;
     const token = ref('');
     const userPermissions = ref<UserPermission | null>(null);
 
+    // --- GETTERS ---
     const staffObj = computed(() => staff.value);
     const permissions = computed(() => userPermissions.value);
+
+    // --- ACTIONS ---
+
+    /**
+     * 递归扁平化权限树，提取所有权限代码
+     */
+    const flattenPermissionTree = (tree: PermissionTree[]): string[] => {
+        let codes: string[] = [];
+        for (const node of tree) {
+            if (node.code) {
+                codes.push(node.code);
+            }
+            if (node.children && node.children.length > 0) {
+                codes = codes.concat(flattenPermissionTree(node.children));
+            }
+        }
+        return codes;
+    };
 
     const setToken = (newToken?: string) => {
         if (newToken) {
@@ -22,92 +42,42 @@ export const useUserStore = defineStore('user', () => {
     };
 
     /**
-     * 设置用户权限
+     * 获取当前用户信息和权限，内置防止并发请求的逻辑
      */
-    const setPermissions = (permissions: UserPermission) => {
-        userPermissions.value = permissions;
-        permission.setUserPermissions(permissions);
-    };
-
-    /**
-     * 清除用户权限
-     */
-    const clearPermissions = () => {
-        userPermissions.value = null;
-        permission.clearPermissions();
-    };
-
-    const getStaff = {
-        value: (userId: string): UserItem => {
-            return staff.value[userId] || {} as UserItem;
+    const fetchSelf = async (forceRefresh = false) => {
+        // 如果已存在用户信息且不强制刷新，则直接返回
+        if (self.value?.id && !forceRefresh) {
+            return self.value;
         }
-    };
-    function getStaffByName(name: string): UserItem | undefined {
-        return Object.values(staff.value).find(user => user.name === name);
-    }
+        // 如果正在请求中，则直接返回
+        if (isLoading.self) {
+            return;
+        }
 
-    const myself = async (refresh = false) => {
-        const response = await initUser();
-        const mySelf = (response as any).user as UserItem;
-        console.log('mySelf', response, mySelf, self.value, refresh);
-        if (mySelf?.id) {
-            self.value = mySelf;
+        try {
+            isLoading.self = true;
+            const response = await initUser();
+            const { user, permissionTree } = response;
 
-            // 获取用户的角色和权限信息
-            try {
-                // 并行获取用户角色和权限编码
-                const [userRolesResponse, userPermissionCodesResponse] = await Promise.all([
-                    getUserRoles({ userId: mySelf.id }),
-                    getUserPermissionCodes({ userId: mySelf.id })
-                ]);
+            if (user?.id) {
+                self.value = user;
 
-                // 设置权限数据
-                const permissions: UserPermission = {
-                    roles: userRolesResponse || [],
-                    permissions: userPermissionCodesResponse || []
+                // 处理权限
+                const flattenedPermissions = flattenPermissionTree(permissionTree);
+                userPermissions.value = {
+                    roles: user.roles || [],
+                    permissions: flattenedPermissions,
                 };
-                setPermissions(permissions);
-
-            } catch (error) {
-                console.error('获取用户角色和权限失败:', error);
-                clearPermissions();
             }
+        } catch (error) {
+            console.error('获取用户信息失败:', error);
+            // 清理状态
+            self.value = {} as UserItem;
+            userPermissions.value = null;
+        } finally {
+            isLoading.self = false;
         }
         return self.value;
-    };
-    const fetchSelf = async () => {
-        if (isLoading.staff) return; // 复用 isLoading.staff 状态，或者可以创建独立的 isLoading.self
-        isLoading.staff = true;
-
-        // 检查 self.value 是否已有数据
-        if (!self.value || !self.value.id) {
-            const response = await initUser();
-            const mySelf = (response as any).user as UserItem;
-
-            if (mySelf?.id) {
-                self.value = mySelf;
-                // 从用户信息中提取角色和权限数据
-                extractPermissionsFromUser(mySelf);
-            }
-        }
-
-        isLoading.staff = false;
-    };
-
-    /**
-     * 从用户信息中提取角色和权限数据
-     */
-    const extractPermissionsFromUser = (user: UserItem) => {
-        if (user.roles && user.permissions) {
-            const userPerms: UserPermission = {
-                roles: user.roles,
-                permissions: user.permissions
-            };
-            setPermissions(userPerms);
-        } else {
-            // 如果用户信息中没有角色和权限数据，清空权限
-            clearPermissions();
-        }
     };
 
     const fetchStaff = async () => {
@@ -127,22 +97,75 @@ export const useUserStore = defineStore('user', () => {
         isLoading.staff = false;
     };
 
+    // --- PERMISSION CHECKERS ---
 
+    const hasPermission = (permissionCode: string): boolean => {
+        if (!userPermissions.value) return false;
+        return userPermissions.value.permissions.includes(permissionCode);
+    };
 
+    const hasRole = (roleCode: string): boolean => {
+        if (!userPermissions.value) return false;
+        return userPermissions.value.roles.includes(roleCode);
+    };
+
+    const isAdmin = (): boolean => {
+        return hasRole(ROLE_CODES.ADMIN);
+    };
+
+    const hasAnyPermission = (permissionCodes: string[]): boolean => {
+        if (!userPermissions.value) return false;
+        return permissionCodes.some(code => userPermissions.value!.permissions.includes(code));
+    };
+
+    const hasAllPermissions = (permissionCodes: string[]): boolean => {
+        if (!userPermissions.value) return false;
+        return permissionCodes.every(code => userPermissions.value!.permissions.includes(code));
+    };
+
+    const hasAnyRole = (roleCodes: string[]): boolean => {
+        if (!userPermissions.value) return false;
+        return roleCodes.some(code => userPermissions.value!.roles.includes(code));
+    };
+
+    // --- LEGACY COMPATIBILITY ---
+
+    const getStaff = {
+        value: (userId: string): UserItem => {
+            return staff.value[userId] || {} as UserItem;
+        }
+    };
+
+    function getStaffByName(name: string): UserItem | undefined {
+        return Object.values(staff.value).find(user => user.name === name);
+    }
+
+    // --- RETURN ---
     return {
+        // State & Getters
         staffObj,
         token: computed(() => token.value),
-        myself,
         selfObj: computed(() => self.value),
         staff: computed(() => Object.values(staff.value)),
         staffRaw: staff,
         permissions,
-        getStaff,
-        getStaffByName,
-        setToken,
-        setPermissions,
-        clearPermissions,
+
+        // Actions
         fetchSelf,
         fetchStaff,
+        setToken,
+
+        // Permission Checkers
+        hasPermission,
+        hasRole,
+        hasAnyPermission,
+        hasAllPermissions,
+        hasAnyRole,
+        isAdmin,
+
+        // Legacy compatibility
+        getStaff,
+        getStaffByName,
+        // 可根据需要从旧的 utils/permission.ts 中迁移更多检查器 (isManager, isPilot, etc.)
     };
 });

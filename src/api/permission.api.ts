@@ -225,3 +225,22 @@ export const getPermissionActionDetail = async (data: any): Promise<any> => {
 export const getPermissionActionList = async (): Promise<any[]> => {
     return request('/system/permission-action/list');
 };
+
+// ADD: 在文件末尾添加以下接口定义
+export interface PermissionTree {
+  id: number;
+  code: string;
+  name: string;
+  type: 'API' | 'MENU' | 'ROUTE' | 'BUTTON' | 'PAGE';
+  parentId?: number;
+  path: string | null;
+  method: string | null;
+  component: string | null;
+  icon: string | null;
+  description: string | null;
+  orderNum: number;
+  meta: Record<string, any> | null;
+  extra: Record<string, any> | null;
+  enabled: boolean;
+  children?: PermissionTree[];
+}

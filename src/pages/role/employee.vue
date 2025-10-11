@@ -35,7 +35,7 @@
 
 import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import permission from '@/utils/permission'
+import { useUserStore } from '@/store/user.store'
 import StatVue from '@/pages/staff/stat.vue';
 import Duty from '../staff/duty.vue';
 import Flight from '../flight/flight.vue';
@@ -44,9 +44,12 @@ import manage from './manage.vue';
 import Manage from './manage.vue';
 import { usePermission } from '@/utils/directives';
 
+// 使用 userStore
+const userStore = useUserStore()
+
 // 权限检查
 const { hasPermission } = usePermission();
-const canManageSystem = computed(() => permission.canManageSystem())
+const canManageSystem = computed(() => userStore.isAdmin())
 
 // 路由跳转
 const router = useRouter()
@@ -58,16 +61,18 @@ const goToPermissionManage = () => {
 }
 
 // 输出当前用户权限信息到控制台
-onMounted(() => {
+onMounted(async () => {
+    // 等待用户信息加载完
+    await userStore.fetchSelf()
     console.log('=== 当前用户权限信息 ===')
-    console.log('用户角色:', permission.getUserPermissions()?.roles || [])
-    console.log('用户权限列表:', permission.getUserPermissions()?.permissions || [])
+    console.log('用户角色:', userStore.permissions?.roles || [])
+    console.log('用户权限列表:', userStore.permissions?.permissions || [])
 
     // 检查具体权限
-    console.log('jingying:yuedu 权限:', permission.hasPermission('jingying:yuedu'))
-    console.log('hr:read 权限:', permission.hasPermission('hr:read'))
-    console.log('flight:read 权限:', permission.hasPermission('flight:read'))
-    console.log('system:manage 权限:', permission.canManageSystem())
+    console.log('jingying:yuedu 权限:', userStore.hasPermission('jingying:yuedu'))
+    console.log('hr:read 权限:', userStore.hasPermission('hr:read'))
+    console.log('flight:read 权限:', userStore.hasPermission('flight:read'))
+    console.log('system:manage 权限:', userStore.isAdmin())
     console.log('========================')
 })
 

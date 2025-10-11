@@ -1,5 +1,15 @@
 import { Directive } from 'vue';
-import permission from './permission';
+import type { useUserStore } from '@/store/user.store';
+
+// 全局用户 store 实例，用于指令中访问
+let globalUserStore: ReturnType<typeof useUserStore> | null = null;
+
+/**
+ * 设置全局用户权限检查器（需要在应用初始化时调用）
+ */
+export function setGlobalUserStore(store: ReturnType<typeof useUserStore>) {
+    globalUserStore = store;
+}
 
 /**
  * 权限指令 v-permission="'flight:read'"
@@ -10,43 +20,32 @@ import permission from './permission';
 export const permissionDirective: Directive = {
     mounted(el: HTMLElement, binding) {
         const { value } = binding;
-
-        if (!value) return;
+        if (!value || !globalUserStore) return;
 
         let hasPermission = false;
-
         if (typeof value === 'string') {
-            // 单个权限
-            hasPermission = permission.hasPermission(value);
+            hasPermission = globalUserStore.hasPermission(value);
         } else if (Array.isArray(value)) {
-            // 多个权限，任意一个即可
-            hasPermission = permission.hasAnyPermission(value);
+            hasPermission = globalUserStore.hasAnyPermission(value);
         }
 
         if (!hasPermission) {
-            // 移除元素或隐藏
             el.style.display = 'none';
         }
     },
 
     updated(el: HTMLElement, binding) {
         const { value } = binding;
-
-        if (!value) return;
+        if (!value || !globalUserStore) return;
 
         let hasPermission = false;
-
         if (typeof value === 'string') {
-            hasPermission = permission.hasPermission(value);
+            hasPermission = globalUserStore.hasPermission(value);
         } else if (Array.isArray(value)) {
-            hasPermission = permission.hasAnyPermission(value);
+            hasPermission = globalUserStore.hasAnyPermission(value);
         }
 
-        if (hasPermission) {
-            el.style.display = '';
-        } else {
-            el.style.display = 'none';
-        }
+        el.style.display = hasPermission ? '' : 'none';
     }
 };
 
@@ -59,17 +58,13 @@ export const permissionDirective: Directive = {
 export const roleDirective: Directive = {
     mounted(el: HTMLElement, binding) {
         const { value } = binding;
-
-        if (!value) return;
+        if (!value || !globalUserStore) return;
 
         let hasRole = false;
-
         if (typeof value === 'string') {
-            // 单个角色
-            hasRole = permission.hasRole(value);
+            hasRole = globalUserStore.hasRole(value);
         } else if (Array.isArray(value)) {
-            // 多个角色，任意一个即可
-            hasRole = permission.hasAnyRole(value);
+            hasRole = globalUserStore.hasAnyRole(value);
         }
 
         if (!hasRole) {
@@ -79,22 +74,16 @@ export const roleDirective: Directive = {
 
     updated(el: HTMLElement, binding) {
         const { value } = binding;
-
-        if (!value) return;
+        if (!value || !globalUserStore) return;
 
         let hasRole = false;
-
         if (typeof value === 'string') {
-            hasRole = permission.hasRole(value);
+            hasRole = globalUserStore.hasRole(value);
         } else if (Array.isArray(value)) {
-            hasRole = permission.hasAnyRole(value);
+            hasRole = globalUserStore.hasAnyRole(value);
         }
 
-        if (hasRole) {
-            el.style.display = '';
-        } else {
-            el.style.display = 'none';
-        }
+        el.style.display = hasRole ? '' : 'none';
     }
 };
 
@@ -113,23 +102,24 @@ export interface PermissionProps {
 export function checkPermission(props: PermissionProps): boolean {
     const { permission: perm, role, requireAll = false } = props;
 
+    if (!globalUserStore) return true;
+
     if (perm) {
         if (typeof perm === 'string') {
-            return permission.hasPermission(perm);
+            return globalUserStore.hasPermission(perm);
         } else if (Array.isArray(perm)) {
             return requireAll
-                ? permission.hasAllPermissions(perm)
-                : permission.hasAnyPermission(perm);
+                ? globalUserStore.hasAllPermissions(perm)
+                : globalUserStore.hasAnyPermission(perm);
         }
     }
 
     if (role) {
         if (typeof role === 'string') {
-            return permission.hasRole(role);
+            return globalUserStore.hasRole(role);
         } else if (Array.isArray(role)) {
-            return requireAll
-                ? permission.hasAllPermissions(role.map(r => `role:${r}`)) // 临时转换
-                : permission.hasAnyRole(role);
+            // 角色不区分 requireAll，对于数组直接视为任意一个
+            return globalUserStore.hasAnyRole(role);
         }
     }
 
@@ -138,31 +128,35 @@ export function checkPermission(props: PermissionProps): boolean {
 
 /**
  * 权限相关的组合式函数（非入侵方案）
+ * 注意：这个函数需要在 Vue 组件的 setup 函数中使用，因为它需要访问 userStore
  */
 export function usePermission() {
+    // 由于这个函数可能在组件外调用，我们假定全局 store 被设置
+    // 在组件中，应该直接使用 useUserStore()
+
     // 检查单个权限
     const hasPermission = (permissionCode: string) => {
-        return permission.hasPermission(permissionCode);
+        return globalUserStore?.hasPermission(permissionCode) ?? true;
     };
 
     // 检查多个权限（任意一个）
     const hasAnyPermission = (permissionCodes: string[]) => {
-        return permission.hasAnyPermission(permissionCodes);
+        return globalUserStore?.hasAnyPermission(permissionCodes) ?? true;
     };
 
     // 检查多个权限（全部满足）
     const hasAllPermissions = (permissionCodes: string[]) => {
-        return permission.hasAllPermissions(permissionCodes);
+        return globalUserStore?.hasAllPermissions(permissionCodes) ?? true;
     };
 
     // 检查角色
     const hasRole = (roleCode: string) => {
-        return permission.hasRole(roleCode);
+        return globalUserStore?.hasRole(roleCode) ?? true;
     };
 
     // 检查多个角色（任意一个）
     const hasAnyRole = (roleCodes: string[]) => {
-        return permission.hasAnyRole(roleCodes);
+        return globalUserStore?.hasAnyRole(roleCodes) ?? true;
     };
 
     return {

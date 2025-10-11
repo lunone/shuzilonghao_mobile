@@ -1,4 +1,5 @@
-import permission from './permission';
+import type { Store } from 'pinia';
+import type { useUserStore } from '@/store/user.store';
 
 /**
  * 页面权限配置类型
@@ -20,12 +21,20 @@ interface RouterGuardConfig {
  */
 class RouterGuard {
     private config: RouterGuardConfig | null = null;
+    private userStore: ReturnType<typeof useUserStore> | null = null;
 
     /**
      * 设置路由配置
      */
     setConfig(config: RouterGuardConfig) {
         this.config = config;
+    }
+
+    /**
+     * 设置用户权限检查器
+     */
+    setUserStore(store: ReturnType<typeof useUserStore>) {
+        this.userStore = store;
     }
 
     /**
@@ -37,6 +46,11 @@ class RouterGuard {
             return true; // 如果没有配置，默认允许访问
         }
 
+        if (!this.userStore) {
+            console.warn('RouterGuard: 用户权限检查器未设置');
+            return true; // 默认允许访问
+        }
+
         const pageConfig = this.config.permissionConfig[pagePath];
         if (!pageConfig) {
             return true; // 如果页面没有配置权限，默认允许访问
@@ -46,7 +60,7 @@ class RouterGuard {
 
         // 检查权限
         if (permissions && permissions.length > 0) {
-            const hasPermission = permission.hasAnyPermission(permissions);
+            const hasPermission = this.userStore.hasAnyPermission(permissions);
             if (!hasPermission) {
                 console.warn(`RouterGuard: 用户没有访问页面 ${pagePath} 的权限`);
                 return false;
@@ -55,7 +69,7 @@ class RouterGuard {
 
         // 检查角色
         if (roles && roles.length > 0) {
-            const hasRole = permission.hasAnyRole(roles);
+            const hasRole = this.userStore.hasAnyRole(roles);
             if (!hasRole) {
                 console.warn(`RouterGuard: 用户没有访问页面 ${pagePath} 的角色权限`);
                 return false;
@@ -90,6 +104,11 @@ export const router = {
      * 设置路由配置
      */
     setConfig: (config: RouterGuardConfig) => routerGuard.setConfig(config),
+
+    /**
+     * 设置用户权限检查器
+     */
+    setUserStore: (store: ReturnType<typeof useUserStore>) => routerGuard.setUserStore(store),
 
     /**
      * 检查页面访问权限
