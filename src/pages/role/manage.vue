@@ -326,10 +326,10 @@ import permission from '@/utils/permission'
 import { useUserStore } from '@/store/user.store'
 
 import type { Role, Permission, Resource, PermissionAction, RolePermissionAssignment } from '@/api/permission.api'
-import UserRoleManager from './manage/UserRoleManager.vue'
-import RolePermissionManager from './manage/RolePermissionManager.vue'
-import PermissionTree from './manage/PermissionTree.vue'
-import ResourceManager from './manage/ResourceManager.vue'
+// import UserRoleManager from './manage/UserRoleManager.vue'
+// import RolePermissionManager from './manage/RolePermissionManager.vue'
+// import PermissionTree from './manage/PermissionTree.vue'
+// import ResourceManager from './manage/ResourceManager.vue'
 import PageLoading from '@/components/PageLoading.vue'
 
 // 响应式数据
