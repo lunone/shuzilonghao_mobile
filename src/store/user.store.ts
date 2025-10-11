@@ -49,7 +49,7 @@ export const useUserStore = defineStore('user', () => {
     const myself = async (refresh = false) => {
         const response = await initUser();
         const mySelf = (response as any).user as UserItem;
-
+        console.log('mySelf', response, mySelf, self.value, refresh);
         if (mySelf?.id) {
             self.value = mySelf;
 

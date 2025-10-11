@@ -1,4 +1,4 @@
-import request from '@/utils/request';
+import { request } from '@/utils/request';
 import type { DateRangeQueryDTO } from '@/types/common';
 
 // SMS相关接口定义 (从 sms.interface.ts 移动而来)
@@ -43,24 +43,15 @@ export type SmsStatResponse = Record<string, SmsMonthlyStat>;
 
 // 获取SMS统计
 export const getSmsStat = async (data: DateRangeQueryDTO): Promise<SmsStatResponse> => {
-    return request({
-        url: '/sms/stat',
-        data,
-    });
+    return request('/sms/stat', data);
 };
 
 // 获取SMS事件列表
 export const getSmsEvents = async (data: DateRangeQueryDTO): Promise<SmsEventItem[]> => {
-    return request({
-        url: '/sms/event/list',
-        data,
-    });
+    return request('/sms/event/list', data);
 };
 
 // 获取SMS自愿报告列表
 export const getSmsVoluntarys = async (data: DateRangeQueryDTO): Promise<SmsVoluntaryItem[]> => {
-    return request({
-        url: '/sms/voluntary/list',
-        data,
-    });
+    return request('/sms/voluntary/list', data);
 };

@@ -1,4 +1,4 @@
-import request from '@/utils/request';
+import { request } from '@/utils/request';
 import type { DateRangeQueryDTO } from '@/types/common';
 
 // 航空相关接口定义 (从 flight.interface.ts 移动而来)
@@ -74,24 +74,15 @@ export type FlightPlanStats = Record<string, Record<string, number>>;
 
 // 根据日期获取航班
 export const getFlightsByDate = async (data: DateRangeQueryDTO & { userId?: string, idType?: string }): Promise<FlightItem[]> => {
-    return request({
-        url: '/flight/date',
-        data,
-    });
+    return request('/flight/date', data);
 };
 
 // 根据ATD获取航班
 export const getFlightsByATD = async (data: DateRangeQueryDTO): Promise<FlightItem[]> => {
-    return request({
-        url: '/flight/atd',
-        data,
-    });
+    return request('/flight/atd', data);
 };
 
 // 获取航班计划
 export const getFlightPlan = async (data: DateRangeQueryDTO): Promise<FlightPlanStats> => {
-    return request({
-        url: '/flight/plan',
-        data,
-    });
+    return request('/flight/plan', data);
 };

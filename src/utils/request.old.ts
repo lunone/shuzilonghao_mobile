@@ -14,8 +14,8 @@ const getStore = () => {
 
 let isRefreshing = false; // 是否正在刷新的flag
 let isShowNetworkErrorModal = false; // 确保对话框弹出一个的标志
-let notLoginQweue: (() => void)[] = []; // 401请求队列
-let networkErrorQueue: Record<string, any> = {}; // 网络错误请求队列
+let notLoginQweue = []; // 401请求队列
+let networkErrorQueue = {} as Record<string, any>; // 网络错误请求队列
 
 const option: AxiosRequestConfig = {
     baseURL: CONFIG.url.api, method: 'POST', timeout: CONFIG.url.timeout,
@@ -35,7 +35,7 @@ const option: AxiosRequestConfig = {
             success(res) {
                 // 兼容axios的错误处理,
                 const params = { ...res, status: res.statusCode, statusText: res.errMsg, config, request: null }
-                res.statusCode >= 200 && res.statusCode < 300 ? resolve(params) : reject({ response: params });
+                res.statusCode > 200 && res.statusCode < 300 ? resolve(params) : reject({ response: params });
             },
             fail(res) {
                 reject({ ...res, status: res.statusCode, statusText: res.errMsg, config, request: null });
@@ -46,8 +46,9 @@ const option: AxiosRequestConfig = {
 
 // 创建axios实例
 const instance = axios.create(option)
+// 这个实例并不经过拦截器,虽然很丑,但是这样逻辑最简单
 
-const beforeRequest = (config: any) => {
+const beforeRequest = async (config) => {
     // todo:判断白名单
     config.headers[CONFIG.key.token] = getStore().token;
     return config
@@ -59,6 +60,10 @@ instance.interceptors.request.use(beforeRequest)
 // 404服务器不存在但是可能因为网关原因存在,500以上都是服务器错误
 // 再有内部错误都以code来处理,
 
+// 注意这里的resolve实际并没有被调用,所以返回的这个Promise一直pending,挂起状态,并不执行后续的then也不结束.
+// 但是存入队列一个可以被立即resolve的函数,后续队列被调用的时候,才会被resolve
+// 由于Promise的穿透性,这个pending的Promise会被立即执行,进而执行后续的then
+
 // 新增的响应拦截器，处理服务器导致的错误:404反代失效造成,500服务器未启动等.正常的内部错误使用200
 instance.interceptors.response.use(
     (response: AxiosResponse) => {
@@ -68,9 +73,6 @@ instance.interceptors.response.use(
     },
     (error: AxiosError) => {
         const response = error.response;
-        if (!response) {
-            return Promise.reject(error);
-        }
         const requestId = response.config.url + JSON.stringify(response.config.data); // 生成唯一的请求ID
         if (![404, 500].includes(response.status)) {// 非404,500进入下一段拦截器
             delete networkErrorQueue[requestId];
@@ -100,20 +102,24 @@ instance.interceptors.response.use(response => {
     }
     isRefreshing = true// 第一次要登录一下
     return new Promise((resolve) => uni.login({ provider: 'weixin', success: res => resolve(res.code) }))// 登录微信
-        .then(code => instance({ url: CONFIG.url.login, data: { code } }))// 重试token
+        .then(code => instance({ url: CONFIG.url.login, data: { code } }))// 刷新token
         .then(_ => instance(response.config)) // 重试本次需求
 })
+// 响应-402错误
 
 // 响应-处理内容部分,判断code问题,判断token问题.
 instance.interceptors.response.use((response: AxiosResponse) => {
-    const { token } = response?.data || {};
+    const { token, code, status } = response?.data || {};
     if (token) {// 返回如过携带了token,就是要更新token了.
         getStore().setToken(token);
         notLoginQweue.forEach(f => f());// 新token重试积压请求
         notLoginQweue = []; // 清空队列
         isRefreshing = false;
+        return response // 正常返回,防止在进入错误拦截,只不过这个结果后面不用.
     }
-    return response;
+    if (!code) {
+        return response;
+    }
 });
 
 // 最后-错误处理,默认的void返回也会触发之前pending的Promise,就不会继续进行.
@@ -125,13 +131,13 @@ instance.interceptors.response.use(response => response, error => {
         notLoginQweue = [];// 非注册用户就不可能再401重试了,清空401队列了
         uni.reLaunch({ url: `${CONFIG.page.index}?error=402` })
     } else if (response.status == 403) {// 权限问题,弹出
-        uni.showToast({ title: '权限不足', duration: 3e3, icon: 'none' });
+        uni.showToast({ title: '权限不足', duration: 3e3 });
     } else if ([404, 500].indexOf(response.status) != -1) {
         if (!isShowNetworkErrorModal) {// 只弹出一次对话框
             isShowNetworkErrorModal = true;
             uni.showModal({
                 title: '提示', confirmText: '重试', showCancel: false, confirmColor: '#f55850',
-                content: `网络出错(${response.status})，请检查网络连接`,
+                content: `网络出错${response.status}，请检查网络连接${Object.values(networkErrorQueue).length}`,
                 success: (res) => {
                     if (res.confirm) {
                         isShowNetworkErrorModal = false;
@@ -142,8 +148,9 @@ instance.interceptors.response.use(response => response, error => {
                 }
             })
         }
+    } else {
+        // 其他未知严重错误
     }
-    return Promise.reject(error);
 });
 
 
@@ -153,6 +160,9 @@ class LoadingManager {
     private loadingText = '加载中...';
     private pageLoadingCallbacks: Array<(isLoading: boolean, text?: string) => void> = [];
 
+    /**
+     * 注册页面loading回调
+     */
     registerPageLoading(callback: (isLoading: boolean, text?: string) => void) {
         this.pageLoadingCallbacks.push(callback);
         return () => {
@@ -163,33 +173,49 @@ class LoadingManager {
         };
     }
 
+    /**
+     * 显示loading
+     */
     show(text?: string) {
         if (text) {
             this.loadingText = text;
         }
         this.loadingCount++;
+        // 总是通知页面loading组件最新的状态和文本
         this.pageLoadingCallbacks.forEach(callback => callback(true, this.loadingText));
     }
 
+    /**
+     * 隐藏loading
+     */
     hide() {
         this.loadingCount = Math.max(0, this.loadingCount - 1);
         if (this.loadingCount === 0) {
+            // 通知所有页面loading组件
             this.pageLoadingCallbacks.forEach(callback => callback(false));
         }
     }
 
+    /**
+     * 强制隐藏所有loading
+     */
     hideAll() {
         this.loadingCount = 0;
         this.pageLoadingCallbacks.forEach(callback => callback(false));
     }
 
+    /**
+     * 获取当前loading状态
+     */
     isLoading(): boolean {
         return this.loadingCount > 0;
     }
 }
 
+// 创建全局loading管理器
 const loadingManager = new LoadingManager();
 
+// 导出loading管理器供外部使用
 export const loading = {
     show: (text?: string) => loadingManager.show(text),
     hide: () => loadingManager.hide(),
@@ -207,7 +233,7 @@ export const loading = {
  * @param options.loadingText loading文本，默认'加载中...'
  * @param options.hideErrorToast 是否隐藏错误提示，默认false
  */
-export const request = (
+export const api = (
     url: string,
     data: any = undefined,
     options: {
@@ -222,53 +248,43 @@ export const request = (
         hideErrorToast = false
     } = options;
 
+    // 显示loading
     if (showLoading) {
         loadingManager.show(loadingText);
     }
 
     return instance({ url, data })
         .then(response => {
+            // 隐藏loading
             if (showLoading) {
                 loadingManager.hide();
-            }
-            // 检查业务逻辑错误 (假设成功的 code 是 0 或 200)
-            if (response.data.code !== 0 && response.data.code !== 200) {
-                const errorMessage = response.data.message || '业务处理失败';
-                if (!hideErrorToast) {
-                    uni.showToast({
-                        title: errorMessage,
-                        icon: 'none',
-                        duration: 3000
-                    });
-                }
-                return Promise.reject(new Error(errorMessage));
             }
             return response?.data?.data;
         })
         .catch(error => {
+            // 隐藏loading（只在显示了loading时才隐藏）
             if (showLoading) {
                 loadingManager.hide();
             }
 
+            // 如果不隐藏错误提示，则显示错误信息
             if (!hideErrorToast) {
                 const response = error.response;
                 let errorMessage = '请求失败';
 
                 if (response?.data?.message) {
                     errorMessage = response.data.message;
-                } else if (error.message && !(error.config)) {
-                    // 只显示我们自己 reject 的业务错误，而不是 axios 的网络错误信息
+                } else if (response?.status) {
+                    errorMessage = `请求失败 (${response.status})`;
+                } else if (error.message) {
                     errorMessage = error.message;
                 }
 
-                // 避免为拦截器已处理的HTTP错误（403, 404, 500等）重复显示toast
-                if (response?.status !== 403 && response?.status !== 404 && response?.status !== 500) {
-                     uni.showToast({
-                        title: errorMessage,
-                        icon: 'none',
-                        duration: 3000
-                    });
-                }
+                uni.showToast({
+                    title: errorMessage,
+                    icon: 'none',
+                    duration: 3000
+                });
             }
 
             throw error;
@@ -279,16 +295,16 @@ export const request = (
  * 不显示loading的API请求函数
  */
 export const apiSilent = (url: string, data?: any) =>
-    request(url, data, { showLoading: false });
+    api(url, data, { showLoading: false });
 
 /**
  * 自定义loading文本的API请求函数
  */
 export const apiWithLoading = (url: string, data: any = undefined, loadingText: string) =>
-    request(url, data, { showLoading: true, loadingText });
+    api(url, data, { showLoading: true, loadingText });
 
 /**
  * 不显示错误提示的API请求函数
  */
 export const apiNoError = (url: string, data?: any) =>
-    request(url, data, { hideErrorToast: true });
+    api(url, data, { hideErrorToast: true });

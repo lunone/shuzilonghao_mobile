@@ -1,4 +1,4 @@
-import request from '@/utils/request';
+import { request } from '@/utils/request';
 import type { DateRangeQueryDTO } from '@/types/common';
 import type { DepartmenItem } from '@/api/user.api';
 
@@ -64,23 +64,16 @@ export interface DutyTodayResponse {
 }
 
 // 获取员工信息
-export const getStaff = async (data?: StaffListQueryDTO): Promise<StaffProfile[]> => {
-    return request({
-        url: '/user/staff',
-        data,
-    });
+export const getStaff = (data?: StaffListQueryDTO): Promise<StaffProfile[]> => {
+    return request('/user/staff', data);
 };
 
 // 获取部门列表
-export const getDepartments = async (): Promise<DepartmenItem[]> => {
-    return request({
-        url: '/department/list',
-    });
+export const getDepartments = (): Promise<DepartmenItem[]> => {
+    return request('/department/list');
 };
 
 // 获取今日值班信息
-export const getDutyToday = async (): Promise<DutyTodayResponse[]> => {
-    return request({
-        url: '/duty/today',
-    });
+export const getDutyToday = (): Promise<DutyTodayResponse[]> => {
+    return request('/duty/today');
 };

@@ -1,4 +1,4 @@
-import request from '@/utils/request';
+import { request } from '@/utils/request';
 import type { DateRangeQueryDTO } from '@/types/common';
 import type { CrewCrewMateStats, CrewFatigueStatsResponse } from '@/api/statistics.api';
 
@@ -111,50 +111,32 @@ export interface PilotMultiStats {
 
 // 获取飞行员列表
 export const getPilots = async (data?: PilotListQueryDTO): Promise<PilotListResponse> => {
-    return request({
-        url: '/pilot/list',
-        data,
-    });
+    return request('/pilot/list', data);
 };
 
 // 获取飞行员信息
 export const getPilotProfile = async (data: PilotProfileQueryDTO): Promise<PilotProfile> => {
-    return request({
-        url: '/pilot/profile',
-        data,
-    });
+    return request('/pilot/profile', data);
 };
 
 // 获取飞行员值班信息
 export const getPilotDuty = async (data: UserIdOrCodeAndDateRangeQueryDTO): Promise<PilotDutyResponse> => {
-    return request({
-        url: '/pilot/duty',
-        data,
-    });
+    return request('/pilot/duty', data);
 };
 
 // 获取飞行员缺勤信息
 export const getPilotAbsence = async (data: UserIdOrCodeAndDateRangeQueryDTO): Promise<any[]> => {
-    return request({
-        url: '/pilot/absence',
-        data,
-    });
+    return request('/pilot/absence', data);
 };
 
 // 获取飞行员培训信息
 export const getPilotTraining = async (data: UserIdOrCodeAndDateRangeQueryDTO): Promise<any[]> => {
-    return request({
-        url: '/pilot/training',
-        data,
-    });
+    return request('/pilot/training', data);
 };
 
 // 获取飞行员机搭子信息
 export const getPilotCrewMate = async (data: UserIdOrCodeAndDateRangeQueryDTO): Promise<CrewCrewMateStats[]> => {
-    return request({
-        url: '/stat/crew/mate',
-        data,
-    });
+    return request('/stat/crew/mate', data);
 };
 
 // 获取飞行员疲劳信息响应
@@ -169,8 +151,5 @@ export interface PilotFatigueResponse {
 
 // 获取飞行员疲劳信息
 export const getPilotFatigue = async (data: UserIdOrCodeAndDateRangeQueryDTO): Promise<PilotFatigueResponse> => {
-    return request({
-        url: '/stat/crew/fatigue',
-        data,
-    });
+    return request('/stat/crew/fatigue', data);
 };

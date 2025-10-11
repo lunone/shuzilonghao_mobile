@@ -1,4 +1,4 @@
-import request from '@/utils/request';
+import { request } from '@/utils/request';
 
 // 飞机相关接口定义 (从 aircraft.interface.ts 移动而来)
 
@@ -140,16 +140,11 @@ export interface MelItem {
 export type AircraftListResponse = string[];
 
 // 获取飞机列表
-export const getAircrafts = async (): Promise<AircraftListResponse> => {
-    return request({
-        url: '/aircraft/list',
-    });
+export const getAircrafts = (): Promise<AircraftListResponse> => {
+    return request('/aircraft/list');
 };
 
 // 获取MEL事件
-export const getMels = async (data: MelQueryDTO): Promise<MelItem[]> => {
-    return request({
-        url: '/me/mel',
-        data,
-    });
+export const getMels = (data: MelQueryDTO): Promise<MelItem[]> => {
+    return request('/me/mel', data);
 };
