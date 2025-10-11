@@ -25,6 +25,7 @@
     "@dcloudio/uni-quickapp-webview": "3.0.0-4070520250711001",
     "@dcloudio/uni-ui": "^1.5.10",
     "axios": "^1.7.9",
+    "caniuse-lite": "^1.0.30001749",
     "dayjs": "^1.11.13",
     "less": "^4.2.2",
     "less-loader": "^12.2.0",

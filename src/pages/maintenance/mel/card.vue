@@ -25,9 +25,8 @@
     </div>
 </template>
 <script setup lang="ts">
-import { api } from '@/utils/api'
+import { getMels } from '@/api/aircraft.api'
 import dayjs from 'dayjs'
-import { CONFIG } from '@/config';
 import { ref, computed, watch, onMounted, PropType, Ref, watchEffect } from 'vue'
 
 // 定义 loading 和 error 状态
@@ -42,7 +41,7 @@ const emits = defineEmits(['getMel'])
 // 获取 MEL 数据
 const fetchMels = async () => {
     try {
-        const res = await api(CONFIG.url.mels, { date: dayjs().format('YYYY-MM-DD') }) as any[];
+        const res = await getMels({ date: dayjs().format('YYYY-MM-DD') }) as any[];
         mels.value = res.reduce((acc, cur) => ({ ...acc, [cur.acReg]: [...(acc[cur.acReg] || []), cur] }), {});
     } catch (err) {
         error.value = '获取 MEL 数据失败';

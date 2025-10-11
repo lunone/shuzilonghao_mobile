@@ -88,8 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import { api } from '@/utils/api'
-import { CONFIG } from '@/config'
+import { getPilotCrewMate, getPilotFatigue } from '@/api/pilot.api'
 import { computed, onMounted, ref, watch } from 'vue'
 import PieChart from '@/components/ucharts/pie.vue'
 import BarChart from '@/components/ucharts/bar.vue'
@@ -134,8 +133,8 @@ watch([activeRange, () => props.pcode], async ([range]) => {
         console.log('时间范围切换为:', range, parms)
 
         await Promise.all([
-            api(CONFIG.url.crewMate, parms).then(res => mates.value = res),
-            api(CONFIG.url.crewFatigue, parms).then(res => {
+            getPilotCrewMate(parms).then(res => mates.value = res),
+            getPilotFatigue(parms).then(res => {
                 console.log('promise all res:', res);
                 airlines.value = res.airlines;
                 atds.value = res.atds;

@@ -14,9 +14,10 @@ import { computed, ref, watch } from 'vue';
 import _ from 'lodash';
 import { CONFIG } from '@/config';
 import dayjs from 'dayjs';
-import { api } from '@/utils/api';
+
 import { numberByWan } from '@/utils/tools';
 import { StatSingle } from '@/interface/flight.interface';
+import { getStatMonth } from '@/api/statistics.api';
 
 type StatMulti = StatSingle & {
     month?: string;
@@ -39,7 +40,7 @@ const tips = computed(() => selectYear.value ? '返回多年统计' : '点击下
 async function fetchData(startDate: Date, endDate: Date) {
     loading.value = true;
     try {
-        const res = await api(CONFIG.url.statMonth, { startDate, endDate }) as StatSingle[];
+        const res = await getStatMonth({ startDate, endDate });
         stats.value = stat(res);
     } catch (err) {
         error.value = '数据加载失败';

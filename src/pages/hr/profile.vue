@@ -49,8 +49,7 @@
 </template>
 <script setup lang="ts">
 import { computed, onMounted, Ref, ref, watch } from 'vue';
-import { CONFIG } from '@/config';
-import { api } from '@/utils/api';
+import { getUserProfile } from '@/api/user.api';
 import { UserItem } from '@/interface/user.interface';
 import { useUserStore } from '@/store/user.store';
 import { useDepartmentStore } from '@/store/department.store';
@@ -71,7 +70,7 @@ const props = defineProps({
 const employee: Ref<UserItem> = ref();
 
 const fetchEmployee = async () => {
-    employee.value = await api(CONFIG.url.userProfile, { userId: props.userId });
+    employee.value = await getUserProfile({ userId: props.userId });
 };
 
 

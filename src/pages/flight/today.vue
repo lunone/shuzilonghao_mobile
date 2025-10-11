@@ -22,8 +22,7 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, Ref } from 'vue';
-import { api } from '@/utils/api';
-import { CONFIG } from '@/config';
+import { getFlightsByDate } from '@/api/flight.api';
 import dayjs from 'dayjs';
 import { FlightItem } from '@/interface/flight.interface';
 
@@ -48,9 +47,8 @@ const flightStats = computed(() => {
 function showDetail(key) {
     // 这里弹出框
 }
-onMounted(() => {
-    api(CONFIG.url.flightsDate, { startDate: dayjs().startOf('day').toDate(), endDate: dayjs().endOf('day').toDate() })
-        .then(res => flights.value = res as FlightItem[]);
+onMounted(async () => {
+    flights.value = await getFlightsByDate({ startDate: dayjs().startOf('day').toDate(), endDate: dayjs().endOf('day').toDate() }) as FlightItem[];
 });
 </script>
 <style lang="less" scoped>

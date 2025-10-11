@@ -121,8 +121,7 @@
 import { ref, computed, onMounted } from 'vue'
 import type { FlightItem } from '@/interface/flight.interface'
 import FlightDetail from '@/pages/flight/flightDetail.vue'
-import { api } from '@/utils/api'
-import { CONFIG } from '@/config'
+import { getFlightsByDate } from '@/api/flight.api'
 import dayjs from 'dayjs'
 import { useAirportStore } from '@/store/airport.store'
 
@@ -257,9 +256,8 @@ const getTimeClass = (actual: string, planned: string) => {
     return 'ontime'
 }
 
-onMounted(() => {
-    api(CONFIG.url.flightsDate, { startDate: dayjs().startOf('day').toDate(), endDate: dayjs().endOf('day').toDate() })
-        .then(res => flights.value = res as FlightItem[]);
+onMounted(async () => {
+    flights.value = await getFlightsByDate({ startDate: dayjs().startOf('day').toDate(), endDate: dayjs().endOf('day').toDate() }) as FlightItem[];
     airportStore.fetchAirports();
 });
 </script>

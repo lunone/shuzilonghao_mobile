@@ -39,7 +39,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits } from 'vue'
 import type { Resource } from '@/interface/permission.interface'
 
 // 组件属性

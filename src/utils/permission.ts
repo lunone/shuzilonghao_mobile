@@ -1,6 +1,8 @@
 import { PERMISSION_CODES, ROLE_CODES, type UserPermission, type Permission, type Role, type Resource, type PermissionAction, type RolePermissionAssignment } from '@/interface/permission.interface';
-import { api, apiSilent, apiWithLoading, apiNoError } from './api';
-import { CONFIG } from '@/config';
+import * as permissionApi from '@/api/permission.api';
+import * as roleApi from '@/api/role.api';
+import * as resourceApi from '@/api/resource.api';
+import * as userApi from '@/api/user.api';
 
 /**
  * 权限检查工具类
@@ -308,11 +310,8 @@ export const permission = {
         path?: string;
         method?: string;
         enabled?: boolean;
-    }, options?: { showLoading?: boolean; loadingText?: string }): Promise<Permission> {
-        return api(CONFIG.url.permissionCreate, { data }, {
-            showLoading: options?.showLoading ?? false,
-            loadingText: options?.loadingText ?? '创建权限中...'
-        });
+    }): Promise<Permission> {
+        return permissionApi.createPermission(data);
     },
 
     // 更新权限
@@ -326,12 +325,12 @@ export const permission = {
         method?: string;
         enabled?: boolean;
     }): Promise<any> {
-        return api(CONFIG.url.permissionUpdate, { id, data });
+        return permissionApi.updatePermission({ id, ...data });
     },
 
     // 删除权限
     async deletePermission(id: number): Promise<any> {
-        return api(CONFIG.url.permissionDelete, { id });
+        return permissionApi.deletePermission({ id });
     },
 
     // 获取权限列表
@@ -342,16 +341,13 @@ export const permission = {
         enabled?: boolean;
         page?: number;
         pageSize?: number;
-    }, options?: { showLoading?: boolean; loadingText?: string }): Promise<{ list: Permission[]; total: number }> {
-        return api(CONFIG.url.permissionList, params, {
-            showLoading: options?.showLoading ?? false,
-            loadingText: options?.loadingText ?? '加载权限中...'
-        });
+    }): Promise<{ list: Permission[]; total: number }> {
+        return permissionApi.getPermissionList(params);
     },
 
     // 获取权限树
     async getPermissionTree(): Promise<Permission[]> {
-        return api(CONFIG.url.permissionTree);
+        return permissionApi.getPermissionTree();
     },
 
     // ==================== 角色管理API ====================
@@ -364,17 +360,17 @@ export const permission = {
         orderNum?: number;
         enabled?: boolean;
     }): Promise<Role> {
-        return api(CONFIG.url.roleCreate, { data });
+        return roleApi.createRole(data);
     },
 
     // 更新角色
     async updateRole(id: number, data: Partial<Role>): Promise<any> {
-        return api(CONFIG.url.roleUpdate, { id, data });
+        return roleApi.updateRole({ id, ...data });
     },
 
     // 删除角色
     async deleteRole(id: number): Promise<any> {
-        return api(CONFIG.url.roleDelete, { id });
+        return roleApi.deleteRole({ id });
     },
 
 
@@ -386,29 +382,23 @@ export const permission = {
         enabled?: boolean;
         page?: number;
         pageSize?: number;
-    }, options?: { showLoading?: boolean; loadingText?: string }): Promise<{ list: Role[]; total: number }> {
-        return api(CONFIG.url.roleList, params, {
-            showLoading: options?.showLoading ?? false,
-            loadingText: options?.loadingText ?? '加载角色中...'
-        });
+    }): Promise<{ list: Role[]; total: number }> {
+        return roleApi.getRoleList(params);
     },
 
     // 为角色分配权限
     async assignPermissionsToRole(roleId: number, permissionIds: number[]): Promise<any> {
-        return api(CONFIG.url.roleAssignPermissions, { roleId, permissionIds });
+        return roleApi.assignPermissions({ roleId, permissionIds });
     },
 
     // 获取角色的权限
     async getRolePermissions(roleId: number): Promise<Permission[]> {
-        return api(CONFIG.url.rolePermissions, { roleId });
+        return roleApi.getRolePermissions({ roleId });
     },
 
     // 获取角色的权限ID列表 (使用新API)
-    async getRolePermissionIds(roleId: number, options?: { showLoading?: boolean; loadingText?: string }): Promise<number[]> {
-        const permissions = await api(CONFIG.url.rolePermissions, { roleId }, {
-            showLoading: options?.showLoading ?? false,
-            loadingText: options?.loadingText ?? '加载角色已有权限...'
-        });
+    async getRolePermissionIds(roleId: number): Promise<number[]> {
+        const permissions = await roleApi.getRolePermissions({ roleId });
         return permissions.map((p: Permission) => p.id);
     },
 
@@ -416,36 +406,32 @@ export const permission = {
 
     // 为用户分配角色
     async assignRolesToUser(userId: string, roleIds: number[]): Promise<any> {
-        return api(CONFIG.url.userAssignRoles, { userId, roleIds });
+        return userApi.assignRolesToUser({ userId, roleIds });
     },
 
     // 获取用户的角色列表
-    async getUserRoles(userId: string, options?: { showLoading?: boolean; loadingText?: string }): Promise<Role[]> {
-        return api(CONFIG.url.userRoles, { userId }, {
-            showLoading: options?.showLoading ?? false,
-            loadingText: options?.loadingText ?? '加载用户角色...'
-        });
+    async getUserRoles(userId: string): Promise<Role[]> {
+        return userApi.getUserRoles({ userId });
     },
 
     // 获取用户的权限列表
     async getUserPermissionsById(userId: string): Promise<Permission[]> {
-        return api(CONFIG.url.userPermissions, { userId });
+        return userApi.getUserPermissions({ userId });
     },
 
     // 获取用户的权限编码列表
     async getUserPermissionCodes(userId: string): Promise<string[]> {
-        return api(CONFIG.url.userPermissionCodes, { userId });
+        return userApi.getUserPermissionCodes({ userId });
     },
 
     // 检查用户是否有指定权限
     async hasUserPermission(userId: string, permissionCode: string): Promise<{ hasPermission: boolean }> {
-        return api(CONFIG.url.userHasPermission, { userId, permissionCode });
+        return userApi.checkUserPermission({ userId, permissionCode });
     },
 
     // 检查用户是否有指定角色 (使用新API)
     async hasUserRole(userId: string, roleCode: string): Promise<{ hasRole: boolean }> {
-        const userRoles = await api(CONFIG.url.userRoles, { userId });
-        return { hasRole: userRoles.some((role: Role) => role.code === roleCode) };
+        return userApi.checkUserRole({ userId, roleCode });
     },
 
     // ==================== 权限操作管理API (新增) ====================
@@ -456,27 +442,27 @@ export const permission = {
         actionCode: string;
         description?: string;
     }): Promise<PermissionAction> {
-        return api(CONFIG.url.permissionActionCreate, { data });
+        return permissionApi.createPermissionAction(data);
     },
 
     // 更新权限操作
     async updatePermissionAction(id: number, data: Partial<PermissionAction>): Promise<any> {
-        return api(CONFIG.url.permissionActionUpdate, { id, data });
+        return permissionApi.updatePermissionAction({ id, ...data });
     },
 
     // 删除权限操作
     async deletePermissionAction(id: number): Promise<any> {
-        return api(CONFIG.url.permissionActionDelete, { id });
+        return permissionApi.deletePermissionAction({ id });
     },
 
     // 获取权限操作详情
     async getPermissionActionDetail(id: number): Promise<PermissionAction> {
-        return api(CONFIG.url.permissionActionDetail, { id });
+        return permissionApi.getPermissionActionDetail({ id });
     },
 
     // 获取权限操作列表
     async getPermissionActionList(): Promise<PermissionAction[]> {
-        return api(CONFIG.url.permissionActionList, {});
+        return permissionApi.getPermissionActionList();
     },
 
     // ==================== 资源管理API (新增) ====================
@@ -493,32 +479,32 @@ export const permission = {
         orderNum?: number;
         enabled?: boolean;
     }): Promise<Resource> {
-        return api(CONFIG.url.resourceCreate, { data });
+        return resourceApi.createResource(data);
     },
 
     // 更新资源
     async updateResource(id: number, data: Partial<Resource>): Promise<any> {
-        return api(CONFIG.url.resourceUpdate, { id, data });
+        return resourceApi.updateResource({ id, ...data });
     },
 
     // 删除资源
     async deleteResource(id: number): Promise<any> {
-        return api(CONFIG.url.resourceDelete, { id });
+        return resourceApi.deleteResource({ id });
     },
 
     // 获取资源详情
     async getResourceDetail(id: number): Promise<Resource> {
-        return api(CONFIG.url.resourceDetail, { id });
+        return resourceApi.getResourceDetail({ id });
     },
 
     // 获取资源列表
     async getResourceList(): Promise<Resource[]> {
-        return api(CONFIG.url.resourceList, {});
+        return resourceApi.getResourceList();
     },
 
     // 获取资源树
     async getResourceTree(): Promise<Resource[]> {
-        return api(CONFIG.url.resourceTree, {});
+        return resourceApi.getResourceTree();
     },
 
     // 批量创建资源
@@ -533,7 +519,7 @@ export const permission = {
         orderNum?: number;
         enabled?: boolean;
     }>): Promise<any> {
-        return api(CONFIG.url.resourceBatchCreate, { data });
+        return resourceApi.batchCreateResource(data);
     },
 
     // 批量更新资源
@@ -541,12 +527,12 @@ export const permission = {
         id: number;
         data: Partial<Resource>;
     }>): Promise<any> {
-        return api(CONFIG.url.resourceBatchUpdate, { data });
+        return resourceApi.batchUpdateResource(data);
     },
 
     // 批量删除资源
     async batchDeleteResources(ids: number[]): Promise<any> {
-        return api(CONFIG.url.resourceBatchDelete, { ids });
+        return resourceApi.batchDeleteResource({ ids });
     },
 
 
@@ -555,17 +541,17 @@ export const permission = {
 
     // 为资源分配权限
     async assignPermissionsToResource(resourceId: number, permissionIds: number[]): Promise<any> {
-        return api(CONFIG.url.resourceAssignPermissions, { resourceId, permissionIds });
+        return resourceApi.assignResourcePermissions({ resourceId, permissionIds });
     },
 
     // 获取资源的权限
     async getResourcePermissions(resourceId: number): Promise<any> {
-        return api(CONFIG.url.resourcePermissions, { resourceId });
+        return resourceApi.getResourcePermissions({ resourceId });
     },
 
     // 获取资源的权限ID列表
     async getResourcePermissionIds(resourceId: number): Promise<number[]> {
-        return api(CONFIG.url.resourcePermissionIds, { resourceId });
+        return resourceApi.getResourcePermissionIds({ resourceId });
     },
 };
 

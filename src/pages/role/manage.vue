@@ -324,7 +324,7 @@
 import { ref, onMounted, computed, onUnmounted } from 'vue'
 import permission from '@/utils/permission'
 import { useUserStore } from '@/store/user.store'
-import { loading } from '@/utils/api'
+
 import type { Role, Permission, Resource, PermissionAction, RolePermissionAssignment } from '@/interface/permission.interface'
 import UserRoleManager from './manage/UserRoleManager.vue'
 import RolePermissionManager from './manage/RolePermissionManager.vue'
@@ -397,16 +397,16 @@ const loadingText = ref('加载中...')
 const userStore = useUserStore()
 
 // 注册页面loading回调
-const unregisterPageLoading = loading.registerPageLoading((isLoading: boolean, text?: string) => {
-    pageLoading.value = isLoading
-    if (text) {
-        loadingText.value = text
-    }
-})
+// const unregisterPageLoading = loading.registerPageLoading((isLoading: boolean, text?: string) => {
+//     pageLoading.value = isLoading
+//     if (text) {
+//         loadingText.value = text
+//     }
+// })
 
 // 页面卸载时取消注册
 onUnmounted(() => {
-    unregisterPageLoading()
+    // unregisterPageLoading()
 })
 
 // 计算属性：检测权限是否有变更
@@ -444,7 +444,7 @@ onMounted(async () => {
 // 加载所有角色
 const loadAllRoles = async () => {
     try {
-        const result = await permission.getRoleList({ enabled: true }, { showLoading: true, loadingText: '加载角色中...' })
+        const result = await permission.getRoleList({ enabled: true })
         allRoles.value = result.list
     } catch (error) {
         uni.showToast({ title: '加载角色失败', icon: 'none' })
@@ -501,7 +501,7 @@ const loadUserRoles = async () => {
     if (!selectedUser.value) return
 
     try {
-        userRoles.value = await permission.getUserRoles(selectedUser.value.id, { showLoading: true, loadingText: '加载用户角色...' })
+        userRoles.value = await permission.getUserRoles(selectedUser.value.id)
     } catch (error) {
         uni.showToast({ title: '加载用户角色失败', icon: 'none' })
         console.error('加载用户角色失败:', error)
@@ -518,7 +518,7 @@ const loadUserPermissions = async () => {
         // 同时加载用户权限和完整权限列表
         const [userPerms, allPerms] = await Promise.all([
             permission.getUserPermissionsById(selectedUser.value.id),
-            permission.getPermissionList({}, { showLoading: true, loadingText: '加载权限列表...' })
+            permission.getPermissionList({})
         ])
 
         console.log('用户权限列表:', userPerms)
@@ -625,8 +625,8 @@ const loadRolePermissions = async () => {
     try {
         // 并行加载权限列表和角色已有权限，保持loading状态
         const [result, rolePermissions] = await Promise.all([
-            permission.getPermissionList({}, { showLoading: true, loadingText: '加载角色权限...' }),
-            permission.getRolePermissionIds(selectedRole.value.id, { showLoading: true, loadingText: '加载角色已有权限...' })
+            permission.getPermissionList({}),
+            permission.getRolePermissionIds(selectedRole.value.id)
         ])
 
         allPermissions.value = result.list
@@ -929,7 +929,7 @@ const createPermission = async () => {
             path: newPermission.value.path,
             method: newPermission.value.method,
             enabled: newPermission.value.enabled
-        }, { showLoading: true, loadingText: '创建权限中...' })
+        })
         uni.showToast({ title: '创建权限成功', icon: 'success' })
         showCreatePermissionDialog.value = false
         // 重置表单

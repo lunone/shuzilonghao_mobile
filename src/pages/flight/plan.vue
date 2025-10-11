@@ -7,10 +7,8 @@
 <script setup lang="ts">
 import { ref, onMounted, Ref, computed } from 'vue';
 import dayjs from 'dayjs';
-import { api } from '@/utils/api';
-import { FlightItem } from '@/interface/flight.interface';
+import { getFlightPlan } from '@/api/flight.api';
 import ucharts from '@/components/ucharts/ucharts.vue';
-import { CONFIG } from '@/config';
 import _ from 'lodash-es';
 
 const dayLenth = 22;
@@ -20,7 +18,7 @@ const fetchFlishgts = async () => {
     const startDate = dayjs().add(0, 'day').toDate();
     const endDate = dayjs().add(dayLenth, 'day').toDate();
     try {
-        const res = await api(CONFIG.url.flightPlan, { startDate, endDate });
+        const res = await getFlightPlan({ startDate, endDate });
         flights.value = res;
         option.value = setOption(res);
     } catch (error) {
