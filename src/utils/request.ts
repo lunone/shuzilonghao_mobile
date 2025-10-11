@@ -232,7 +232,7 @@ export const request = (
                 loadingManager.hide();
             }
             // 检查业务逻辑错误 (假设成功的 code 是 0 或 200)
-            if (response.data.code !== 0 && response.data.code !== 200) {
+            if (response.data.code) {
                 const errorMessage = response.data.message || '业务处理失败';
                 if (!hideErrorToast) {
                     uni.showToast({
@@ -263,7 +263,7 @@ export const request = (
 
                 // 避免为拦截器已处理的HTTP错误（403, 404, 500等）重复显示toast
                 if (response?.status !== 403 && response?.status !== 404 && response?.status !== 500) {
-                     uni.showToast({
+                    uni.showToast({
                         title: errorMessage,
                         icon: 'none',
                         duration: 3000
