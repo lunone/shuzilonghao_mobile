@@ -107,7 +107,7 @@ export const useDepartmentStore = defineStore('department', () => {
         isLoading.department = true; // 标记为正在加载
         if (!departments.value.length) {
             const response = await getDepartments();
-            const res = response.data as DepartmenItem[];
+            const res = response as DepartmenItem[];
             departments.value = res.length ? res : []; // 更新部门列表
         }
 

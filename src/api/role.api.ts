@@ -1,48 +1,57 @@
 import request from '@/utils/request';
+import type { IdDTO, BaseEntity } from '@/interface/common.interface';
+
+interface Role extends BaseEntity {
+  code: string;
+  name: string;
+  description?: string;
+  status: number;
+}
+
 // 创建角色
-export const createRole = (data: any) => {
+export const createRole = async (data: Partial<Role>): Promise<Role> => {
     return request({
         url: '/system/role/create',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 更新角色
-export const updateRole = (data: any) => {
+export const updateRole = async (data: { id: number; data: Partial<Role> }): Promise<Role> => {
     return request({
         url: '/system/role/update',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 删除角色
-export const deleteRole = (data: any) => {
+export const deleteRole = async (data: IdDTO): Promise<void> => {
     return request({
         url: '/system/role/delete',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 获取角色列表
-export const getRoleList = (data: any) => {
+export const getRoleList = async (data?: any): Promise<Role[]> => {
     return request({
         url: '/system/role/list',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 分配权限
-export const assignPermissions = (data: any) => {
+export const assignPermissions = async (data: { roleId: number; permissionIds: number[] }): Promise<void> => {
     return request({
         url: '/system/role/assign-permissions',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 获取角色权限
-export const getRolePermissions = (data: any) => {
+export const getRolePermissions = async (data: IdDTO): Promise<any[]> => {
     return request({
         url: '/system/role/permissions',
         data,
-    }).then(res => res.data);
+    });
 };

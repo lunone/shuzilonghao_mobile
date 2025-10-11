@@ -1,102 +1,115 @@
 import request from '@/utils/request';
+import type { IdDTO, BaseEntity } from '@/interface/common.interface';
+
+interface Resource extends BaseEntity {
+  code: string;
+  name: string;
+  description?: string;
+  parentId?: number;
+  type: string;
+  url?: string;
+  sort?: number;
+}
+
+export type { Resource };
 // 创建资源
-export const createResource = (data: any) => {
+export const createResource = async (data: Partial<Resource>): Promise<Resource> => {
     return request({
         url: '/system/resource/create',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 更新资源
-export const updateResource = (data: any) => {
+export const updateResource = async (data: { id: number; data: Partial<Resource> }): Promise<Resource> => {
     return request({
         url: '/system/resource/update',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 删除资源
-export const deleteResource = (data: any) => {
+export const deleteResource = async (data: IdDTO): Promise<void> => {
     return request({
         url: '/system/resource/delete',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 获取资源详情
-export const getResourceDetail = (data: any) => {
+export const getResourceDetail = async (data: IdDTO): Promise<Resource> => {
     return request({
         url: '/system/resource/detail',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 获取资源列表
-export const getResourceList = () => {
+export const getResourceList = async (): Promise<Resource[]> => {
     return request({
         url: '/system/resource/list',
-    }).then(res => res.data);
+    });
 };
 
 // 获取资源树
-export const getResourceTree = () => {
+export const getResourceTree = async (): Promise<any[]> => {
     return request({
         url: '/system/resource/tree',
-    }).then(res => res.data);
+    });
 };
 
 // 批量创建资源
-export const batchCreateResource = (data: any) => {
+export const batchCreateResource = async (data: Partial<Resource>[]): Promise<Resource[]> => {
     return request({
         url: '/system/resource/batchCreate',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 批量更新资源
-export const batchUpdateResource = (data: any) => {
+export const batchUpdateResource = async (data: { id: number; data: Partial<Resource> }[]): Promise<Resource[]> => {
     return request({
         url: '/system/resource/batchUpdate',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 批量删除资源
-export const batchDeleteResource = (data: any) => {
+export const batchDeleteResource = async (data: IdDTO[]): Promise<void> => {
     return request({
         url: '/system/resource/batchDelete',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 分配资源权限
-export const assignResourcePermissions = (data: any) => {
+export const assignResourcePermissions = async (data: { resourceId: number; permissionIds: number[] }): Promise<void> => {
     return request({
         url: '/system/resource/assignPermissions',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 获取资源权限
-export const getResourcePermissions = (data: any) => {
+export const getResourcePermissions = async (data: IdDTO): Promise<any[]> => {
     return request({
         url: '/system/resource/resourcePermissions',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 获取资源权限ID
-export const getResourcePermissionIds = (data: any) => {
+export const getResourcePermissionIds = async (data: IdDTO): Promise<number[]> => {
     return request({
         url: '/system/resource/resourcePermissionIds',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 获取拥有某个权限的资源列表
-export const getPermissionResources = (data: any) => {
+export const getPermissionResources = async (data: IdDTO): Promise<Resource[]> => {
     return request({
         url: '/system/permission/resources',
         data,
-    }).then(res => res.data);
+    });
 };

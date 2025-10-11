@@ -95,17 +95,26 @@ function showDetail(date: { day: Date, index: string, name: string, className: s
     }
 }
 
-watch(() => props.pcode, () => {
+async function fetchData() {
     if (!props.pcode) return;
     const data = { userId: props.pcode, idType: 'pcode', startDate: props.startDate, endDate: props.endDate }
-    Promise.allSettled([
-        airportStore.fetchAirports(),
-        getPilotTraining(data).then(res => trainings.value = res.data.data || []),
-        getPilotDuty(data).then(res => duties.value = res.data.data || []),
-        getPilotAbsence(data).then(res => absences.value = res.data.data || []),
-    ]).then((arr) => console.log('获取信息train,duty,absence', arr))
-        .catch(err => console.warn('错误', err));
-}, { immediate: true, deep: true })
+    try {
+        const [trainingResult, dutyResult, absenceResult] = await Promise.allSettled([
+            airportStore.fetchAirports(),
+            getPilotTraining(data),
+            getPilotDuty(data),
+            getPilotAbsence(data),
+        ]);
+        trainings.value = trainingResult.status === 'fulfilled' ? trainingResult.value : [];
+        duties.value = dutyResult.status === 'fulfilled' ? dutyResult.value : [];
+        absences.value = absenceResult.status === 'fulfilled' ? absenceResult.value : [];
+        console.log('获取信息train,duty,absence', [trainingResult, dutyResult, absenceResult]);
+    } catch (err) {
+        console.warn('错误', err);
+    }
+}
+
+watch(() => props.pcode, fetchData, { immediate: true, deep: true })
 
 </script>
 <style lang="less" scoped>

@@ -54,7 +54,7 @@ const fetchData = async (currentPage: number = 1) => {
         const resVoluntary = await getSmsVoluntarys({ startDate, endDate });
         console.log(`resVoluntary`, resVoluntary)
 
-        voluntarys.value = voluntarys.value.concat(resVoluntary.data.data);
+        voluntarys.value = voluntarys.value.concat(resVoluntary);
     } catch (err) {
         console.error('获取事件列表失败', err);
     } finally {

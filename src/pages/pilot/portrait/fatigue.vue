@@ -132,16 +132,16 @@ watch([activeRange, () => props.pcode], async ([range]) => {
         const parms = { endDate, startDate, pcode: props.pcode }
         console.log('时间范围切换为:', range, parms)
 
-        await Promise.all([
-            getPilotCrewMate(parms).then(res => mates.value = res),
-            getPilotFatigue(parms).then(res => {
-                console.log('promise all res:', res);
-                airlines.value = res.airlines;
-                atds.value = res.atds;
-                flightHours.value = res.flightHours;
-                sum.value = { count: res.totalCount, flightHours: res.totalFlightHours, days: res.totalDays }
-            }),
-        ])
+        const [crewMateData, fatigueData] = await Promise.all([
+            getPilotCrewMate(parms),
+            getPilotFatigue(parms)
+        ]);
+        mates.value = crewMateData;
+        console.log('promise all res:', fatigueData);
+        airlines.value = fatigueData.airlines;
+        atds.value = fatigueData.atds;
+        flightHours.value = fatigueData.flightHours;
+        sum.value = { count: fatigueData.totalCount, flightHours: fatigueData.totalFlightHours, days: fatigueData.totalDays }
     } catch (e) {
         error.value = true;
         uni.showToast({

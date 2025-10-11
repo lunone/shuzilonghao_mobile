@@ -25,9 +25,8 @@ const fetchData = async (currentPage: number) => {
     // page.value++;
     try {
         const [startDate, endDate] = props.range;
-        const resEvents = await getSmsEvents({ startDate, endDate });
-        console.log(`resEvents---------`, resEvents);
-        const eventData = resEvents.data.data;
+        const eventData = await getSmsEvents({ startDate, endDate });
+        console.log(`resEvents---------`, eventData);
         for (let event of eventData) {
             const { dep, arr, acReg } = event;
             const crews = (event.crews || '').split(/[,\s;、。\.]+/);

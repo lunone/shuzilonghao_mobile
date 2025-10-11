@@ -63,16 +63,27 @@ const sections = computed(() => [
     }), {} as Record<keyof StatSingle, string>),
 ]);
 
-onMounted(() => {
+async function loadData() {
     const lastRange = props.range == 'year' ? { startDate: dates.firstDayOfLastYear, endDate: dates.dayBeforeOneYear } : { startDate: dates.theDayBeforeYesterday, endDate: dates.yesterday };
     const currentRange = props.range == 'year' ? { startDate: dates.firstDayOfYear, endDate: dates.now } : { startDate: dates.yesterday, endDate: dates.today };
-    Promise.allSettled([
-        getStatPeriod(currentRange).then(res => currentRes.value = res.data.data as StatSingle),
-        getStatPeriod(lastRange).then(res => lastRes.value = res.data.data as StatSingle),
-    ])
-        // .then((arr) => console.log('获取信息', arr, thisYearRes.value, lastYearRes.value))
-        .catch(err => console.warn('错误', err));
-});
+    try {
+        const [currentResult, lastResult] = await Promise.allSettled([
+            getStatPeriod(currentRange),
+            getStatPeriod(lastRange)
+        ]);
+        if (currentResult.status === 'fulfilled') {
+            currentRes.value = currentResult.value as StatSingle;
+        }
+        if (lastResult.status === 'fulfilled') {
+            lastRes.value = lastResult.value as StatSingle;
+        }
+        // console.log('获取信息', [currentResult, lastResult], currentRes.value, lastRes.value);
+    } catch (err) {
+        console.warn('错误', err);
+    }
+}
+
+onMounted(loadData);
 
 </script>
 <style lang="less" scoped>

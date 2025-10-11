@@ -86,8 +86,8 @@ provide("showProfile", (userName: string, type = 'name') => {
         selectUserId.value = userId;
     }
 })
-const getOption = (res) => {
-    months.value = Object.keys(res);
+const getOption = (data) => {
+    months.value = Object.keys(data);
     const events2 = [];
     const voluntarys2 = [];
     let last = { events: 0, voluntarys: 0 };
@@ -95,7 +95,7 @@ const getOption = (res) => {
     // 提取原始数据并保留副本
     const voluntarysOriginal = [];
     for (let month of months.value) {
-        const val = res[month];
+        const val = data[month];
         events2.push(val.events);
         voluntarys2.push(val.voluntarys);
         voluntarysOriginal.push(val.voluntarys); // 存储原始值
@@ -170,9 +170,9 @@ const fetchData = async () => {
     loading.value = true;
     error.value = '';
     try {
-        const res = await getSmsStat({ startDate, endDate });
-        stats.value = res.data.data;
-        pieOption.value = getOption(res);
+        const data = await getSmsStat({ startDate, endDate });
+        stats.value = data;
+        pieOption.value = getOption(data);
     } catch (err) {
         error.value = '获取事件列表失败';
     } finally {

@@ -48,7 +48,7 @@ export const useUserStore = defineStore('user', () => {
 
     const myself = async (refresh = false) => {
         const response = await initUser();
-        const mySelf = response.data as UserItem;
+        const mySelf = (response as any).user as UserItem;
 
         if (mySelf?.id) {
             self.value = mySelf;
@@ -63,8 +63,8 @@ export const useUserStore = defineStore('user', () => {
 
                 // 设置权限数据
                 const permissions: UserPermission = {
-                    roles: userRolesResponse.data || [],
-                    permissions: userPermissionCodesResponse.data || []
+                    roles: userRolesResponse || [],
+                    permissions: userPermissionCodesResponse || []
                 };
                 setPermissions(permissions);
 
@@ -82,7 +82,7 @@ export const useUserStore = defineStore('user', () => {
         // 检查 self.value 是否已有数据
         if (!self.value || !self.value.id) {
             const response = await initUser();
-            const mySelf = response.data as UserItem;
+            const mySelf = (response as any).user as UserItem;
 
             if (mySelf?.id) {
                 self.value = mySelf;
@@ -115,7 +115,7 @@ export const useUserStore = defineStore('user', () => {
         isLoading.staff = true;
         if (!Object.keys(staff.value).length) {
             const response = await getStaffList();
-            const res = response.data as UserItem[];
+            const res = response as UserItem[];
             const obj: Record<string, UserItem> = {};
             if (res.length) {
                 for (let user of res) {

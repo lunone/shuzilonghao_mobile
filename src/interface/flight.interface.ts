@@ -37,9 +37,7 @@ export type FlightItem = {
     netWeightCargo?: number,
 }
 
-
 type multi = { total: number, avg?: number, max?: number, min?: number };
-
 
 export type StatSingle = {
     name?: string,
@@ -55,3 +53,16 @@ export type StatMulti = {
     counter: multi,
     netWeightCargo: multi,
 };
+
+// 航班日期查询类型
+export type FlightDateKey = "date" | "std" | "etd" | "atd" | "htd" | "sta" | "eta" | "ata" | "hta";
+
+// 航班查询DTO
+export interface FlightQueryDTO {
+  dateKey?: FlightDateKey;
+  startDate: Date | string;
+  endDate: Date | string;
+}
+
+// 航班计划统计响应 (按日期和机型号分组的统计)
+export type FlightPlanStats = Record<string, Record<string, number>>;

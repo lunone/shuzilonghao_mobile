@@ -36,7 +36,7 @@ export const useAirportStore = defineStore('airport', () => {
         isLoading.airport = true;
         if (!airportsCode4.value['ZHCC']) {
             const response = await getAirports();
-            const res = response.data as Record<string, AirportItem>;
+            const res = response as Record<string, AirportItem>;
             airportsCode4.value = res;
         }
         isLoading.airport = false;

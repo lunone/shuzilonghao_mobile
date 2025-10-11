@@ -144,9 +144,9 @@ watch(() => dateRange, async () => {
         uni.showToast({ title: '加载中...', icon: 'loading', mask: true, duration: 33000 })
         const startDate = dayjs(dateRange.value.join('-') + '-01').toDate();
         const endDate = dayjs(startDate).endOf('month').toDate();
-        const res = await getStatCrewFh({ startDate, endDate });
+        const stat = await getStatCrewFh({ startDate, endDate });
         uni.hideToast();
-        const stat = res.data.data.map((pilot: any) => ({
+        const processedStat = stat.map((pilot: any) => ({
             rank: -1,
             userId: pilot.userId,
             name: pilot.name,

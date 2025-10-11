@@ -70,10 +70,9 @@ const fetchData = async (startDate: Date, endDate: Date) => {
     loading.value = true;
     error.value = '';
     try {
-        const res = await getStatByAirline({ startDate, endDate });
-        // airports.value = await
-        console.log('统计', res.data);
-        airlineStats.value = res.data;
+        const data = await getStatByAirline({ startDate, endDate });
+        console.log('统计', data);
+        airlineStats.value = data;
         stationClick(stations.value[0]);
     } catch (err) {
         console.log(err)

@@ -110,3 +110,27 @@ export type AircraftItem = {
     efbGroundoil: number; // EFB接口列，飞机在地面每小时标准油耗
     eighteenItem19: string; // 补充情报第19项编组
 };
+
+// MEL查询DTO （日期+机号可选）
+export interface MelQueryDTO {
+  startDate: Date | string;
+  endDate: Date | string;
+  acReg?: string; // 机号可选
+}
+
+// MEL事件项
+export interface MelItem {
+  id?: number;
+  acReg: string; // 机号
+  melCode: string; // MEL代码
+  description: string; // 描述
+  category: string; // 分类
+  deferralClass: string; // 延期等级
+  rectificationDate?: Date | string; // 修复日期
+  status: string; // 状态
+  createdAt: Date | string; // 创建时间
+  updatedAt?: Date | string; // 更新时间
+}
+
+// 飞机列表响应
+export type AircraftListResponse = string[];

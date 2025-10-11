@@ -1,78 +1,89 @@
 import request from '@/utils/request';
+import type { IdDTO, BaseEntity, DateRangeQueryDTO } from '@/interface/common.interface';
+
+interface Permission extends BaseEntity {
+  code: string;
+  name: string;
+  description?: string;
+  parentId?: number;
+  type: string;
+  sort?: number;
+}
+
 // 创建权限
-export const createPermission = (data: any) => {
+export const createPermission = async (data: Partial<Permission>): Promise<Permission> => {
     return request({
         url: '/system/permission/create',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 更新权限
-export const updatePermission = (data: any) => {
+export const updatePermission = async (data: { id: number; data: Partial<Permission> }): Promise<Permission> => {
     return request({
         url: '/system/permission/update',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 删除权限
-export const deletePermission = (data: any) => {
+export const deletePermission = async (data: IdDTO): Promise<void> => {
     return request({
         url: '/system/permission/delete',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 获取权限列表
-export const getPermissionList = (data: any) => {
+export const getPermissionList = async (data?: any): Promise<Permission[]> => {
     return request({
         url: '/system/permission/list',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 获取权限树
-export const getPermissionTree = () => {
+export const getPermissionTree = async (): Promise<any[]> => {
     return request({
         url: '/system/permission/tree',
-    }).then(res => res.data);
+    });
 };
 
 // 创建权限操作
-export const createPermissionAction = (data: any) => {
+export const createPermissionAction = async (data: any): Promise<any> => {
     return request({
         url: '/system/permission-action/create',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 更新权限操作
-export const updatePermissionAction = (data: any) => {
+export const updatePermissionAction = async (data: any): Promise<any> => {
     return request({
         url: '/system/permission-action/update',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 删除权限操作
-export const deletePermissionAction = (data: any) => {
+export const deletePermissionAction = async (data: any): Promise<any> => {
     return request({
         url: '/system/permission-action/delete',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 获取权限操作详情
-export const getPermissionActionDetail = (data: any) => {
+export const getPermissionActionDetail = async (data: any): Promise<any> => {
     return request({
         url: '/system/permission-action/detail',
         data,
-    }).then(res => res.data);
+    });
 };
 
 // 获取权限操作列表
-export const getPermissionActionList = () => {
+export const getPermissionActionList = async (): Promise<any[]> => {
     return request({
         url: '/system/permission-action/list',
-    }).then(res => res.data);
+    });
 };

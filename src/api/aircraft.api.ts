@@ -1,17 +1,17 @@
 import request from '@/utils/request';
+import type { AircraftListResponse, MelQueryDTO, MelItem } from '@/interface/aircraft.interface';
+
 // 获取飞机列表
-export const getAircrafts = async () => {
-    const res = await request({
+export const getAircrafts = async (): Promise<AircraftListResponse> => {
+    return request({
         url: '/aircraft/list',
     });
-    return res.data.data;
 };
 
 // 获取MEL事件
-export const getMels = async (data: any) => {
-    const res = await request({
+export const getMels = async (data: MelQueryDTO): Promise<MelItem[]> => {
+    return request({
         url: '/me/mel',
         data,
     });
-    return res.data.data;
 };

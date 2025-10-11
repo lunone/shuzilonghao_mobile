@@ -13,7 +13,6 @@ export type CrewItem = {
     level?: string,
 }
 
-
 export type DepartmenItem = {
     id: number,
     name: string,

@@ -36,7 +36,7 @@ export const usePilotStore = defineStore('pilot', () => {
         isLoading.pilot = true;
         if (!pilots.value.length) {
             const response = await getPilots();
-            const res = response.data as PilotItem[];
+            const res = (response as any).list as PilotItem[];
             pilots.value = res.length ? res : [];
         }
         isLoading.pilot = false;

@@ -41,13 +41,20 @@ const starList = computed(() => {
     };
     return src;
 }) as Ref<StatSingle>;
-onMounted(() => {
+async function loadData() {
     const data = { station: 'ZHCC', startDate: props.startDate, endDate: props.endDate }
-    Promise.all([
-        fetchAirports(),
-        getStatByStation(data).then(res => starSrc.value = res.data || {})
-    ])
-})
+    try {
+        const [airportsResult, statResult] = await Promise.all([
+            fetchAirports(),
+            getStatByStation(data)
+        ]);
+        starSrc.value = statResult || {};
+    } catch (err) {
+        console.error('加载数据失败', err);
+    }
+}
+
+onMounted(loadData)
 </script>
 <style lang="less" scoped>
 @import '@/css/base.less';

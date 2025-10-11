@@ -43,7 +43,7 @@ const formatDate = (date: string) => date ? dayjs(date).format('YYYY-MM-DD') : '
 const tabCurrent = ref(0);
 const onClickItem = e => tabCurrent.value = tabCurrent != e.currentIndex ? e.currentIndex : tabCurrent.value;
 
-onLoad(e => {
+async function loadData(e) {
     console.log('onLoad', e)
     if (!e.pcode) return;
     pcode.value = e.pcode;
@@ -51,12 +51,21 @@ onLoad(e => {
     if (pilot2?.userId) {
         pilot.value = { userId: pilot2.userId, name: pilot2.name, }
     }
-    Promise.allSettled([
-        fetchPilots(), getPilotProfile({ userId: e.pcode, idType: 'pcode' }).then(res => pilot.value = res.data.data || {}),
-    ])
-        .then(res => { console.log('allSettled:', res) })
-        .catch(err => console.log('error', err));
-});
+    try {
+        const [pilotsResult, profileResult] = await Promise.allSettled([
+            fetchPilots(),
+            getPilotProfile({ userId: e.pcode, idType: 'pcode' })
+        ]);
+        if (profileResult.status === 'fulfilled') {
+            pilot.value = profileResult.value || {};
+        }
+        console.log('allSettled:', [pilotsResult, profileResult]);
+    } catch (err) {
+        console.log('error', err);
+    }
+}
+
+onLoad(loadData);
 </script>
 <style lang="less" scoped>
 @import '@/css/base.less';

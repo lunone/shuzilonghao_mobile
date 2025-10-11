@@ -20,15 +20,10 @@ export const useAircraftStore = defineStore('aircraft', () => {
         if (isLoading.aircraft) return;
         isLoading.aircraft = true;
         if (!aircraftsArr.value.length) {
-            const response = await getAircrafts();
-            const res = response.data as AircraftItem[];
-
-            res.forEach(aircraft => {
-                aircraft.startDate = dayjs(aircraft.startDate).toDate();
-                aircraft.endDate = aircraft.endDate ? dayjs(aircraft.endDate).toDate() : undefined;
-                aircraft.acTypeLong = acTypeShortTranslate[aircraft.acTypeLong] ?? aircraft.acType;
-            });
-            aircraftsArr.value = res;
+            // 目前API只返回飞机注册号列表，暂时注释获取详细数据的逻辑
+            // const response = await getAircrafts();
+            // const res = response as AircraftItem[];
+            // TODO: 需要调用获取飞机详细信息的API
         }
         isLoading.aircraft = false;
     };
