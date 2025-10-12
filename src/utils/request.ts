@@ -1,9 +1,8 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { CONFIG } from '@/config';
 
-let isRefreshing = false; // 是否正在刷新的flag
+let refreshTokenPromise: Promise<any> | null = null; // 管理Token刷新的Promise
 let isShowNetworkErrorModal = false; // 确保对话框弹出一个的标志
-let notLoginQweue: (() => void)[] = []; // 401请求队列
 let networkErrorQueue: Record<string, any> = {}; // 网络错误请求队列
 
 const option: AxiosRequestConfig = {
@@ -48,92 +47,125 @@ instance.interceptors.request.use(beforeRequest)
 // 404服务器不存在但是可能因为网关原因存在,500以上都是服务器错误
 // 再有内部错误都以code来处理,
 
-// 新增的响应拦截器，处理服务器导致的错误:404反代失效造成,500服务器未启动等.正常的内部错误使用200
+// 统一响应拦截器
 instance.interceptors.response.use(
     (response: AxiosResponse) => {
-        const requestId = response.config.url + JSON.stringify(response.config.data); // 生成唯一的请求ID
+        // 任何成功的响应都可能携带新token，在此更新
+        const { token } = response?.data || {};
+        if (token) {
+            uni.setStorageSync(CONFIG.key.token, token);
+        }
+        // 如果请求在网络错误队列中，成功后将其移除
+        const requestId = response.config.url + JSON.stringify(response.config.data);
         delete networkErrorQueue[requestId];
-        return response
+        return response;
     },
-    (error: AxiosError) => {
+    async (error: AxiosError) => {
         const response = error.response;
-        if (!response) {
+        const originalRequest = error.config as any;
+
+        // 如果没有response或config，直接抛出错误
+        if (!response || !originalRequest) {
             return Promise.reject(error);
         }
-        const requestId = response.config.url + JSON.stringify(response.config.data); // 生成唯一的请求ID
-        if (![404, 500].includes(response.status)) {// 非404,500进入下一段拦截器
-            delete networkErrorQueue[requestId];
-            return Promise.reject(error);// 抛出错误,后面处理
-        }
-        return new Promise((resolve) => {
-            if (!networkErrorQueue[requestId]) {// 请求不在队列里面,将请求存入队列
-                networkErrorQueue[requestId] = () => resolve(instance(response.config));
-            }
-        })
-    }
-)
 
-// 响应-处理401的token竞争问题
-instance.interceptors.response.use(response => {
-    return response
-}, (error: AxiosError) => {
-    const response = error.response;
-    if (response?.status == 200) {// * 401重试队列也会走这里,不走正常?
-        return response;
-    } else if (response?.status !== 401) {
-        return Promise.reject(error);// 抛出错误,后面处理
-    }
-    // 刷新token时,将resolve放进队列，用一个函数形式来保存，等token刷新后直接执行
-    if (isRefreshing) {
-        return new Promise(resolve => notLoginQweue.push(() => resolve(instance(response.config))))
-    }
-    isRefreshing = true// 第一次要登录一下
-    return new Promise((resolve) => uni.login({ provider: 'weixin', success: res => resolve(res.code) }))// 登录微信
-        .then(code => instance({ url: CONFIG.url.login, data: { code } }))// 重试token
-        .then(_ => instance(response.config)) // 重试本次需求
-})
-
-// 响应-处理内容部分,判断code问题,判断token问题.
-instance.interceptors.response.use((response: AxiosResponse) => {
-    const { token } = response?.data || {};
-    if (token) {// 返回如过携带了token,就是要更新token了.
-        uni.setStorageSync(CONFIG.key.token, token);
-        notLoginQweue.forEach(f => f());// 新token重试积压请求
-        notLoginQweue = []; // 清空队列
-        isRefreshing = false;
-    }
-    return response;
-});
-
-// 最后-错误处理,默认的void返回也会触发之前pending的Promise,就不会继续进行.
-instance.interceptors.response.use(response => response, error => {
-    const response = error.response;
-    if (!response?.status) {
-        // 前面终止继续的到这里,防止报错
-    } else if (response.status == 402) {
-        notLoginQweue = [];// 非注册用户就不可能再401重试了,清空401队列了
-        uni.reLaunch({ url: `${CONFIG.page.index}?error=402` })
-    } else if (response.status == 403) {// 权限问题,弹出
-        uni.showToast({ title: '权限不足', duration: 3e3, icon: 'none' });
-    } else if ([404, 500].indexOf(response.status) != -1) {
-        if (!isShowNetworkErrorModal) {// 只弹出一次对话框
-            isShowNetworkErrorModal = true;
-            uni.showModal({
-                title: '提示', confirmText: '重试', showCancel: false, confirmColor: '#f55850',
-                content: `网络出错(${response.status})，请检查网络连接`,
-                success: (res) => {
-                    if (res.confirm) {
-                        isShowNetworkErrorModal = false;
-                        for (let id in networkErrorQueue) {// 重试队列中的所有请求
-                            networkErrorQueue[id]();
-                        }
-                    }
+        // --- 处理 401: Token 无效或过期 ---
+        if (response.status === 401) {
+            // 如果正在刷新token，则等待刷新完成后重试
+            if (refreshTokenPromise) {
+                try {
+                    await refreshTokenPromise;
+                    return instance(originalRequest);
+                } catch (refreshError) {
+                    return Promise.reject(refreshError);
                 }
-            })
+            }
+
+            // 发起第一次刷新token的请求
+            refreshTokenPromise = new Promise(async (resolve, reject) => {
+                try {
+                    // 1. 调用 uni.login 获取 code
+                    const loginRes = await uni.login({ provider: 'weixin' });
+                    const code = (loginRes as any).code;
+
+                    // 2. 用 code 请求新 token
+                    const tokenResponse = await instance({ url: CONFIG.url.login, data: { code } });
+
+                    // 3. 从响应中获取新 token 并更新
+                    const newToken = tokenResponse?.data?.token;
+                    if (newToken) {
+                        uni.setStorageSync(CONFIG.key.token, newToken);
+                        resolve(newToken);
+                    } else {
+                        throw new Error('刷新token失败');
+                    }
+                } catch (e) {
+                    uni.removeStorageSync(CONFIG.key.token); // 清空token
+                    uni.reLaunch({ url: `${CONFIG.page.index}?error=401` });
+                    reject(e);
+                } finally {
+                    // 无论成功或失败，重置promise，以便下次401能重新触发刷新
+                    refreshTokenPromise = null;
+                }
+            });
+
+            try {
+                await refreshTokenPromise;
+                // 刷新成功后，重试原始请求
+                return instance(originalRequest);
+            } catch (refreshError) {
+                // 刷新失败，原始请求也失败
+                return Promise.reject(refreshError);
+            }
         }
+
+        // --- 处理 402: 需要注册 ---
+        if (response.status === 402) {
+            uni.removeStorageSync(CONFIG.key.token); // 清空token
+            uni.reLaunch({ url: `${CONFIG.page.index}?error=402` });
+            return Promise.reject(error);
+        }
+
+        // --- 处理 403: 权限不足 ---
+        if (response.status === 403) {
+            uni.showToast({ title: '权限不足', duration: 3e3, icon: 'none' });
+            return Promise.reject(error);
+        }
+
+        // --- 处理 404, 500 等网络或服务器错误 ---
+        if ([404, 500].includes(response.status)) {
+            const requestId = originalRequest.url + JSON.stringify(originalRequest.data);
+            return new Promise((resolve) => {
+                // 将重试函数放入队列
+                if (!networkErrorQueue[requestId]) {
+                    networkErrorQueue[requestId] = () => resolve(instance(originalRequest));
+                }
+                // 只弹出一个重试对话框
+                if (!isShowNetworkErrorModal) {
+                    isShowNetworkErrorModal = true;
+                    uni.showModal({
+                        title: '提示',
+                        content: `网络出错(${response.status})，请检查网络连接`,
+                        confirmText: '重试',
+                        showCancel: false,
+                        confirmColor: '#f55850',
+                        success: (res) => {
+                            isShowNetworkErrorModal = false;
+                            if (res.confirm) {
+                                // 执行所有待重试的请求
+                                Object.values(networkErrorQueue).forEach(retry => (retry as Function)());
+                                networkErrorQueue = {}; // 清空队列
+                            }
+                        },
+                    });
+                }
+            });
+        }
+
+        // --- 其他未处理错误 ---
+        return Promise.reject(error);
     }
-    return Promise.reject(error);
-});
+);
 
 
 // Loading状态管理
@@ -196,14 +228,10 @@ export const loading = {
  * @param options.loadingText loading文本，默认'加载中...'
  * @param options.hideErrorToast 是否隐藏错误提示，默认false
  */
-export const request = (
+export const request = async (
     url: string,
     data: any = undefined,
-    options: {
-        showLoading?: boolean;
-        loadingText?: string;
-        hideErrorToast?: boolean;
-    } = {}
+    options: { showLoading?: boolean; loadingText?: string; hideErrorToast?: boolean; } = {}
 ): Promise<any> => {
     const {
         showLoading = false,
@@ -211,73 +239,62 @@ export const request = (
         hideErrorToast = false
     } = options;
 
-    if (showLoading) {
-        loadingManager.show(loadingText);
-    }
+    showLoading && loadingManager.show(loadingText);
 
-    return instance({ url, data })
-        .then(response => {
-            if (showLoading) {
-                loadingManager.hide();
-            }
-            // 检查业务逻辑错误 (假设成功的 code 是 0 或 200)
-            if (response.data.code) {
-                const errorMessage = response.data.message || '业务处理失败';
-                if (!hideErrorToast) {
-                    uni.showToast({
-                        title: errorMessage,
-                        icon: 'none',
-                        duration: 3000
-                    });
-                }
-                return Promise.reject(new Error(errorMessage));
-            }
-            return response?.data?.data;
-        })
-        .catch(error => {
-            if (showLoading) {
-                loadingManager.hide();
-            }
+    try {
+        const response = await instance({ url, data });
 
+        // 检查业务逻辑错误
+        if (response.data.code) {
+            const errorMessage = response.data.message || '业务处理失败';
             if (!hideErrorToast) {
-                const response = error.response;
-                let errorMessage = '请求失败';
+                uni.showToast({ title: errorMessage, icon: 'none', duration: 3000 });
+            }
+            throw new Error(errorMessage);
+        }
+        return response?.data?.data;
 
-                if (response?.data?.message) {
-                    errorMessage = response.data.message;
-                } else if (error.message && !(error.config)) {
-                    // 只显示我们自己 reject 的业务错误，而不是 axios 的网络错误信息
-                    errorMessage = error.message;
-                }
+    } catch (error: any) {
+        if (!hideErrorToast) {
+            const response = error.response;
+            let errorMessage = '请求失败';
 
-                // 避免为拦截器已处理的HTTP错误（403, 404, 500等）重复显示toast
-                if (response?.status !== 403 && response?.status !== 404 && response?.status !== 500) {
-                    uni.showToast({
-                        title: errorMessage,
-                        icon: 'none',
-                        duration: 3000
-                    });
-                }
+            if (response?.data?.message) {
+                errorMessage = response.data.message;
+            } else if (error.message && !error.config) {
+                errorMessage = error.message;
             }
 
-            throw error;
-        });
+            // 避免为拦截器已处理的HTTP错误（403, 404, 500等）重复显示toast
+            if (response?.status !== 403 && response?.status !== 404 && response?.status !== 500) {
+                uni.showToast({ title: errorMessage, icon: 'none', duration: 3000 });
+            }
+        }
+        // 重新抛出错误，以便调用方可以捕获它
+        throw error;
+
+    } finally {
+        // 无论成功还是失败，最后都隐藏 loading
+        if (showLoading) {
+            loadingManager.hide();
+        }
+    }
 };
 
 /**
  * 不显示loading的API请求函数
  */
-export const apiSilent = (url: string, data?: any) =>
+export const requestSilent = (url: string, data?: any) =>
     request(url, data, { showLoading: false });
 
 /**
  * 自定义loading文本的API请求函数
  */
-export const apiWithLoading = (url: string, data: any = undefined, loadingText: string) =>
+export const requestWithLoading = (url: string, data: any = undefined, loadingText: string) =>
     request(url, data, { showLoading: true, loadingText });
 
 /**
  * 不显示错误提示的API请求函数
  */
-export const apiNoError = (url: string, data?: any) =>
+export const requestNoError = (url: string, data?: any) =>
     request(url, data, { hideErrorToast: true });
