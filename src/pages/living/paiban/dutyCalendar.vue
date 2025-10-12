@@ -89,7 +89,7 @@ watch(() => [userStore.staffObj, props.dutyData], async () => {
 // const staffList = ref<UserItem[]>([]);
 // todo:网络请求可排班人员
 onMounted(async () => {
-    userStore.fetchSelf()
+    userStore.fetchMe()
     userStore.fetchStaff()
     departmentStore.fetchDepartments()
 })

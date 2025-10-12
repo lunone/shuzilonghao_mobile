@@ -43,7 +43,7 @@ onLoad(async (e) => {
         }
     } else {
         // e.activate是激活成功后需要强制刷新个人信息
-        const res = await store.fetchSelf(e.activate);
+        const res = await store.fetchMe(e.activate);
         console.log('获取到的user', res);
         // 如果激活成功,显示readme
         if (e.activate) {

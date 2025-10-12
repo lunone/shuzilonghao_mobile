@@ -205,10 +205,10 @@ function generateDuty() {
 }
 
 // 监听用户和部门数据变化
-watch(() => [userStore.selfObj, userStore.staffObj, departmentStore.list],
+watch(() => [userStore.me, userStore.staffObj, departmentStore.list],
     () => {
         // 没有用户就返回空数组
-        const currentUser = userStore.selfObj;
+        const currentUser = userStore.me;
         if (!currentUser || !currentUser.department ||
             !Object.keys(userStore.staffObj).length || !departmentStore.list) {
             userOptions.value = [];

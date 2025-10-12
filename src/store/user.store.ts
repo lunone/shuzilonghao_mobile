@@ -10,8 +10,8 @@ export const useUserStore = defineStore('user', () => {
     // --- STATE ---
     const isLoading = { staff: false, self: false };
     const staff = ref<Record<string, UserItem>>({});
-    const self = ref({}) as Ref<UserItem>;
-    const token = ref(uni.getStorageSync(CONFIG.key.token) || '');
+    const me = ref({}) as Ref<UserItem>;
+    // const token = ref(uni.getStorageSync(CONFIG.key.token) || '');
     const userPermissions = ref<UserPermission | null>(null);
 
     // --- GETTERS ---
@@ -37,21 +37,16 @@ export const useUserStore = defineStore('user', () => {
     };
 
     const setToken = (newToken?: string) => {
-        token.value = newToken || '';
-        if (newToken) {
-            uni.setStorageSync(CONFIG.key.token, newToken);
-        } else {
-            uni.removeStorageSync(CONFIG.key.token);
-        }
+        newToken ? uni.setStorageSync(CONFIG.key.token, newToken) : uni.removeStorageSync(CONFIG.key.token);
     };
 
     /**
      * 获取当前用户信息和权限，内置防止并发请求的逻辑
      */
-    const fetchSelf = async (forceRefresh = false) => {
+    const fetchMe = async (forceRefresh = false) => {
         // 如果已存在用户信息且不强制刷新，则直接返回
-        if (self.value?.id && !forceRefresh) {
-            return self.value;
+        if (me.value?.id && !forceRefresh) {
+            return me.value;
         }
         // 如果正在请求中，则直接返回
         if (isLoading.self) {
@@ -64,7 +59,7 @@ export const useUserStore = defineStore('user', () => {
             const { user, permissionTree } = response;
 
             if (user?.id) {
-                self.value = user;
+                me.value = user;
 
                 // 处理权限
                 const flattenedPermissions = flattenPermissionTree(permissionTree);
@@ -76,12 +71,12 @@ export const useUserStore = defineStore('user', () => {
         } catch (error) {
             console.error('获取用户信息失败:', error);
             // 清理状态
-            self.value = {} as UserItem;
+            me.value = {} as UserItem;
             userPermissions.value = null;
         } finally {
             isLoading.self = false;
         }
-        return self.value;
+        return me.value;
     };
 
     const fetchStaff = async () => {
@@ -149,15 +144,15 @@ export const useUserStore = defineStore('user', () => {
         // State & Getters
         staffObj,
         // token: computed(() => token.value),
-        selfObj: computed(() => self.value),
+        me: computed(() => me.value),
         staff: computed(() => Object.values(staff.value)),
         staffRaw: staff,
         permissions,
 
         // Actions
-        fetchSelf,
+        fetchMe,
         fetchStaff,
-        setToken,
+        // setToken,
 
         // Permission Checkers
         hasPermission,

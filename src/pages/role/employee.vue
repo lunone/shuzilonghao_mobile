@@ -63,7 +63,7 @@ const goToPermissionManage = () => {
 // 输出当前用户权限信息到控制台
 onMounted(async () => {
     // 等待用户信息加载完
-    await userStore.fetchSelf()
+    await userStore.fetchMe()
     console.log('=== 当前用户权限信息 ===')
     console.log('用户角色:', userStore.permissions?.roles || [])
     console.log('用户权限列表:', userStore.permissions?.permissions || [])

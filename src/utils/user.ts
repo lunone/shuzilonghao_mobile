@@ -9,18 +9,18 @@ const getMateUsers = async (): Promise<UserItem[]> => {
 
     // 确保数据加载
     await Promise.all([
-        userStore.fetchSelf(),
+        userStore.fetchMe(),
         userStore.fetchStaff(),
         departmentStore.fetchDepartments()
     ]);
 
-    if (!userStore.selfObj?.id || !userStore.selfObj?.department || !departmentStore.list.length || !userStore.staff.length) {
+    if (!userStore.me?.id || !userStore.me?.department || !departmentStore.list.length || !userStore.staff.length) {
         // console.log('尚缺条件', userStore.selfObj, departmentStore.list.length, userStore.staff)
         return []
     }
 
     // 获取部门相关信息并筛选用户
-    const ancestorIds = departmentStore.getAncestor(userStore.selfObj.department + '');
+    const ancestorIds = departmentStore.getAncestor(userStore.me.department + '');
     if (!ancestorIds.length) {
         return [];
     }

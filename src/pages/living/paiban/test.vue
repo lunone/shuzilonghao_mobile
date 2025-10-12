@@ -8,7 +8,7 @@ import { useUserStore } from '@/store/user.store';
 import { onMounted } from 'vue';
 const userStore = useUserStore();
 onMounted(() => {
-    userStore.fetchSelf();
+    userStore.fetchMe();
 })
 </script>
 <style lang="less" scoped></style>

@@ -117,7 +117,7 @@ export const useUserStore = defineStore('user', () => {
     /**
      * 获取当前用户信息和权限，内置防止并发请求的逻辑
      */
-    const fetchSelf = async (forceRefresh = false) => {
+    const fetchMe = async (forceRefresh = false) => {
         // 如果已存在用户信息且不强制刷新，则直接返回
         if (self.value?.id && !forceRefresh) {
             return self.value;
@@ -197,7 +197,7 @@ export const useUserStore = defineStore('user', () => {
         permissions,
 
         // Actions
-        fetchSelf,
+        fetchMe,
         fetchStaff,
         setToken,
 
@@ -250,5 +250,5 @@ export const useUserStore = defineStore('user', () => {
 -------
         const res = await store.selfObj;
 =======
-        const res = await store.fetchSelf();
+        const res = await store.fetchMe();
 >>>>>>> REPLACE
