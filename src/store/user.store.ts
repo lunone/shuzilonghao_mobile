@@ -4,13 +4,14 @@ import { initUser, getStaffList } from '@/api/user.api';
 import type { UserItem } from '@/api/user.api';
 import type { UserPermission, PermissionTree } from '@/api/permission.api';
 import { ROLE_CODES } from '@/api/permission.api';
+import { CONFIG } from '@/config';
 
 export const useUserStore = defineStore('user', () => {
     // --- STATE ---
     const isLoading = { staff: false, self: false };
     const staff = ref<Record<string, UserItem>>({});
     const self = ref({}) as Ref<UserItem>;
-    const token = ref('');
+    const token = ref(uni.getStorageSync(CONFIG.key.token) || '');
     const userPermissions = ref<UserPermission | null>(null);
 
     // --- GETTERS ---
@@ -36,8 +37,11 @@ export const useUserStore = defineStore('user', () => {
     };
 
     const setToken = (newToken?: string) => {
+        token.value = newToken || '';
         if (newToken) {
-            token.value = newToken;
+            uni.setStorageSync(CONFIG.key.token, newToken);
+        } else {
+            uni.removeStorageSync(CONFIG.key.token);
         }
     };
 
@@ -144,7 +148,7 @@ export const useUserStore = defineStore('user', () => {
     return {
         // State & Getters
         staffObj,
-        token: computed(() => token.value),
+        // token: computed(() => token.value),
         selfObj: computed(() => self.value),
         staff: computed(() => Object.values(staff.value)),
         staffRaw: staff,
