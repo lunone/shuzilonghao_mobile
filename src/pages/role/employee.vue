@@ -3,7 +3,7 @@
 
 
         <!-- 使用 v-if 和 hasPermission 控制显示 -->
-        <div v-if="hasPermission('jingying:yuedu')" class="section overview">
+        <div v-if="userStore.hasPermission('jingying:yuedu')" class="section overview">
             <StatVue class="day" :range="`day`" />
             <StatVue class="year" />
             <!-- 权限管理入口 -->
@@ -22,10 +22,10 @@
             <!-- </div> -->
         </div>
         <!-- <DutyAct /> -->
-        <div v-if="hasPermission('hr:read')" class="section duty">
+        <div v-if="userStore.hasPermission('hr:read')" class="section duty">
             <Duty />
         </div>
-        <div v-if="hasPermission('flight:read')" class="section">
+        <div v-if="userStore.hasPermission('flight:read')" class="section">
             <Flight />
         </div>
     </div>
@@ -41,13 +41,12 @@ import Flight from '../flight/flight.vue';
 import DutyAct from '@/pages/living/dutyAct.vue'
 import manage from './manage.vue';
 import Manage from './manage.vue';
-import { usePermission } from '@/utils/directives';
+
 
 // 使用 userStore
 const userStore = useUserStore()
 
 // 权限检查
-const { hasPermission } = usePermission();
 const canManageSystem = computed(() => userStore.isAdmin())
 
 
@@ -157,11 +156,11 @@ onMounted(async () => {
                     font-size: 18px;
                 }
 
-                p {
-                    margin: 0;
-                    color: #666;
-                    font-size: 14px;
-                }
+                // p {
+                //     margin: 0;
+                //     color: #666;
+                //     font-size: 14px;
+                // }
             }
 
             .permission-arrow {
