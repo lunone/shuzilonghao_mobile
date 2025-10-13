@@ -126,41 +126,7 @@ instance.interceptors.response.use(
             return Promise.reject(error);
         }
 
-        // --- 处理 403: 权限不足 ---
-        if (response.status === 403) {
-            uni.showToast({ title: '权限不足', duration: 3e3, icon: 'none' });
-            return Promise.reject(error);
-        }
-
-        // --- 处理 404, 500 等网络或服务器错误 ---
-        if ([404, 500].includes(response.status)) {
-            const requestId = originalRequest.url + JSON.stringify(originalRequest.data);
-            return new Promise((resolve) => {
-                // 将重试函数放入队列
-                if (!networkErrorQueue[requestId]) {
-                    networkErrorQueue[requestId] = () => resolve(instance(originalRequest));
-                }
-                // 只弹出一个重试对话框
-                if (!isShowNetworkErrorModal) {
-                    isShowNetworkErrorModal = true;
-                    uni.showModal({
-                        title: '提示',
-                        content: `网络出错(${response.status})，请检查网络连接`,
-                        confirmText: '重试',
-                        showCancel: false,
-                        confirmColor: '#f55850',
-                        success: (res) => {
-                            isShowNetworkErrorModal = false;
-                            if (res.confirm) {
-                                // 执行所有待重试的请求
-                                Object.values(networkErrorQueue).forEach(retry => (retry as Function)());
-                                networkErrorQueue = {}; // 清空队列
-                            }
-                        },
-                    });
-                }
-            });
-        }
+        // 对于403, 404, 500等统一让最后的catch处理,这里只透传
 
         // --- 其他未处理错误 ---
         return Promise.reject(error);
@@ -219,30 +185,43 @@ export const loading = {
     registerPageLoading: (callback: (isLoading: boolean, text?: string) => void) => loadingManager.registerPageLoading(callback)
 };
 
+export type RequestParams<T = any> = {
+    url: string;
+    data?: any;
+    showLoading?: boolean;
+    loadingText?: string;
+    hideErrorToast?: boolean;
+    defaultValue?: T;
+};
+
 /**
  * 通用的API请求函数，自动处理loading
- * @param url 请求URL
- * @param data 请求数据
- * @param options 配置选项
- * @param options.showLoading 是否显示loading，默认false
- * @param options.loadingText loading文本，默认'加载中...'
- * @param options.hideErrorToast 是否隐藏错误提示，默认false
+ * @param params 请求参数对象
+ * @param params.url 请求URL
+ * @param params.data 请求数据
+ * @param params.showLoading 是否显示loading，默认false
+ * @param params.loadingText loading文本，默认'加载中...'
+ * @param params.hideErrorToast 是否隐藏错误提示，默认false
+ * @param params.defaultValue 失败时返回的默认值
  */
-export const request = async (
-    url: string,
-    data: any = undefined,
-    options: { showLoading?: boolean; loadingText?: string; hideErrorToast?: boolean; } = {}
-): Promise<any> => {
+export const request = async <T = any>(
+    params: RequestParams<T>
+): Promise<T | undefined> => {
     const {
+        url,
+        data,
         showLoading = false,
         loadingText = '加载中...',
-        hideErrorToast = false
-    } = options;
+        hideErrorToast = false,
+        defaultValue,
+    } = params;
+
+    const hasDefaultValue = defaultValue !== undefined;
 
     showLoading && loadingManager.show(loadingText);
 
     try {
-        const response = await instance({ url, data });
+        const response = await instance({ url, data:data });
 
         // 检查业务逻辑错误
         if (response.data.code) {
@@ -259,42 +238,39 @@ export const request = async (
             const response = error.response;
             let errorMessage = '请求失败';
 
-            if (response?.data?.message) {
-                errorMessage = response.data.message;
+            if (response) {
+                switch (response.status) {
+                    case 403:
+                        errorMessage = '权限不足';
+                        break;
+                    case 404:
+                        errorMessage = `接口地址不存在`;
+                        break;
+                    case 500:
+                        errorMessage = '服务器内部错误';
+                        break;
+                    default:
+                        errorMessage = response.data?.message || '未知错误';
+                }
             } else if (error.message && !error.config) {
                 errorMessage = error.message;
             }
 
-            // 避免为拦截器已处理的HTTP错误（403, 404, 500等）重复显示toast
-            if (response?.status !== 403 && response?.status !== 404 && response?.status !== 500) {
-                uni.showToast({ title: errorMessage, icon: 'none', duration: 3000 });
-            }
+            uni.showToast({ title: errorMessage, icon: 'none', duration: 3000 });
         }
-        // 重新抛出错误，以便调用方可以捕获它
-        throw error;
+
+        // 根据是否存在defaultValue决定是抛出异常还是返回默认值
+        if (hasDefaultValue) {
+            return defaultValue;
+        } else {
+            throw error;
+        }
 
     } finally {
-        // 无论成功还是失败，最后都隐藏 loading
         if (showLoading) {
             loadingManager.hide();
         }
     }
 };
 
-/**
- * 不显示loading的API请求函数
- */
-export const requestSilent = (url: string, data?: any) =>
-    request(url, data, { showLoading: false });
 
-/**
- * 自定义loading文本的API请求函数
- */
-export const requestWithLoading = (url: string, data: any = undefined, loadingText: string) =>
-    request(url, data, { showLoading: true, loadingText });
-
-/**
- * 不显示错误提示的API请求函数
- */
-export const requestNoError = (url: string, data?: any) =>
-    request(url, data, { hideErrorToast: true });

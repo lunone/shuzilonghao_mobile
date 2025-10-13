@@ -65,15 +65,15 @@ export interface DutyTodayResponse {
 
 // 获取员工信息
 export const getStaff = (data?: StaffListQueryDTO): Promise<StaffProfile[]> => {
-    return request('/user/staff', data);
+    return request({ url: '/user/staff', data });
 };
 
 // 获取部门列表
 export const getDepartments = (): Promise<DepartmenItem[]> => {
-    return request('/department/list');
+    return request({ url: '/department/list' });
 };
 
 // 获取今日值班信息
 export const getDutyToday = (): Promise<DutyTodayResponse[]> => {
-    return request('/duty/today');
+    return request({ url: '/duty/today' });
 };

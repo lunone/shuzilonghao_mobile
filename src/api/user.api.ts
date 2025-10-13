@@ -69,55 +69,66 @@ interface UserInitResponse {
 
 // 初始化用户信息
 export const initUser = (): Promise<UserInitResponse> => {
-    return request('/user/init');
+    // 关键操作，失败时应抛出异常
+    return request({ url: '/user/init' });
 };
 
 // 登录
 export const login = (code: string): Promise<{ token: string }> => {
-    return request('/login/wx', { code });
+    // 关键操作，失败时应抛出异常
+    return request({ url: '/login/wx', data: { code } });
 };
 
 // 激活
 export const activate = (data: WxActivateDTO): Promise<{ token: string }> => {
-    return request('/login/activate', data);
+    // 关键操作，失败时应抛出异常
+    return request({ url: '/login/activate', data });
 };
 
 // 获取用户档案
 export const getUserProfile = (data: UserIdDTO): Promise<any> => {
-    return request('/user/profile', data);
+    // 获取数据，失败时返回null
+    return request({ url: '/user/profile', data, defaultValue: null });
 };
 
 // 获取员工列表
 export const getStaffList = (): Promise<UserItem[]> => {
-    return request('/user/staff');
+    // 获取列表，失败时返回空数组
+    return request({ url: '/user/staff', defaultValue: [] });
 };
 
 // 获取用户角色列表
 export const getUserRoles = (data: UserIdDTO): Promise<string[]> => {
-    return request('/user/userRoles', data);
+    // 获取列表，失败时返回空数组
+    return request({ url: '/user/userRoles', data, defaultValue: [] });
 };
 
 // 获取用户权限代码列表
 export const getUserPermissionCodes = (data: UserIdDTO): Promise<string[]> => {
-    return request('/user/userPermissionCodes', data);
+    // 获取列表，失败时返回空数组
+    return request({ url: '/user/userPermissionCodes', data, defaultValue: [] });
 };
 
 // 检查用户权限
 export const checkUserPermission = (data: { userId: string; permissionCode: string }): Promise<boolean> => {
-    return request('/user/hasPermission', data);
+    // 检查权限，失败时应返回false
+    return request({ url: '/user/hasPermission', data, defaultValue: false });
 };
 
 // 检查用户角色
 export const checkUserRole = (data: { userId: string; roleCode: string }): Promise<boolean> => {
-    return request('/user/hasRole', data);
+    // 检查角色，失败时应返回false
+    return request({ url: '/user/hasRole', data, defaultValue: false });
 };
 
 // 为用户分配角色
 export const assignRolesToUser = (data: { userId: string; roleIds: number[] }): Promise<void> => {
-    return request('/user/assignRoles', data);
+    // 关键操作，失败时应抛出异常
+    return request({ url: '/user/assignRoles', data });
 };
 
 // 获取用户权限列表
 export const getUserPermissions = (data: UserIdDTO): Promise<any[]> => {
-    return request('/user/userPermissions', data);
+    // 获取列表，失败时返回空数组
+    return request({ url: '/user/userPermissions', data, defaultValue: [] });
 };

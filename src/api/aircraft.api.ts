@@ -141,10 +141,10 @@ export type AircraftListResponse = string[];
 
 // 获取飞机列表
 export const getAircrafts = (): Promise<AircraftListResponse> => {
-    return request('/aircraft/list');
+    return request({ url: '/aircraft/list' });
 };
 
 // 获取MEL事件
 export const getMels = (data: MelQueryDTO): Promise<MelItem[]> => {
-    return request('/me/mel', data);
+    return request({ url: '/me/mel', data });
 };

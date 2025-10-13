@@ -43,15 +43,15 @@ export type SmsStatResponse = Record<string, SmsMonthlyStat>;
 
 // 获取SMS统计
 export const getSmsStat = async (data: DateRangeQueryDTO): Promise<SmsStatResponse> => {
-    return request('/sms/stat', data);
+    return request({ url: '/sms/stat', data });
 };
 
 // 获取SMS事件列表
 export const getSmsEvents = async (data: DateRangeQueryDTO): Promise<SmsEventItem[]> => {
-    return request('/sms/event/list', data);
+    return request({ url: '/sms/event/list', data });
 };
 
 // 获取SMS自愿报告列表
 export const getSmsVoluntarys = async (data: DateRangeQueryDTO): Promise<SmsVoluntaryItem[]> => {
-    return request('/sms/voluntary/list', data);
+    return request({ url: '/sms/voluntary/list', data });
 };

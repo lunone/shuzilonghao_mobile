@@ -28,5 +28,5 @@ export type AirportCode4Response = Record<string, AirportInfo>;
 
 // 获取机场列表
 export const getAirports = async (): Promise<AirportCode4Response> => {
-    return request('/airport/code4');
+    return request({ url: '/airport/code4' });
 };

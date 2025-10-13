@@ -74,15 +74,15 @@ export type FlightPlanStats = Record<string, Record<string, number>>;
 
 // 根据日期获取航班
 export const getFlightsByDate = async (data: DateRangeQueryDTO & { userId?: string, idType?: string }): Promise<FlightItem[]> => {
-    return request('/flight/date', data);
+    return request({ url: '/flight/date', data });
 };
 
 // 根据ATD获取航班
 export const getFlightsByATD = async (data: DateRangeQueryDTO): Promise<FlightItem[]> => {
-    return request('/flight/atd', data);
+    return request({ url: '/flight/atd', data });
 };
 
 // 获取航班计划
 export const getFlightPlan = async (data: DateRangeQueryDTO): Promise<FlightPlanStats> => {
-    return request('/flight/plan', data);
+    return request({ url: '/flight/plan', data });
 };
