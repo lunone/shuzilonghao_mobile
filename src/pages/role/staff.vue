@@ -3,7 +3,7 @@
 
 
         <!-- 使用 v-if 和 hasPermission 控制显示 -->
-        <div v-if="userStore.hasPermission('jingying:yuedu')" class="section overview">
+        <div v-if="userStore.hasPermission('page:system')" class="section overview">
             <StatVue class="day" :range="`day`" />
             <StatVue class="year" />
             <!-- 权限管理入口 -->
@@ -60,16 +60,6 @@ const goToPermissionManage = () => {
 onMounted(async () => {
     // 等待用户信息加载完
     await userStore.fetchMe()
-    // console.log('=== 当前用户权限信息 ===')
-    // console.log('用户角色:', userStore.permissions || [])
-    console.log('用户权限列表:', userStore.permissions || [])
-
-    // 检查具体权限
-    console.log('jingying:yuedu 权限:', userStore.hasPermission('jingying:yuedu'))
-    console.log('hr:read 权限:', userStore.hasPermission('hr:read'))
-    console.log('flight:read 权限:', userStore.hasPermission('flight:read'))
-    console.log('system:manage 权限:', userStore.isAdmin())
-    console.log('========================')
 })
 
 </script>

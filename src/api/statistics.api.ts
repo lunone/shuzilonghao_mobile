@@ -13,10 +13,10 @@ export interface CrewHourStats {
 
 // 周期统计和
 export interface PeriodStats {
-  totalFlights: number;
-  totalHours: number;
-  totalNetWeightCargo: number;
-  averageLoadFactor: number;
+  counter: number;
+  hour: number;
+  netWeightCargo: number;
+  averageLoadFactor?: number;
 }
 
 // 月度统计
