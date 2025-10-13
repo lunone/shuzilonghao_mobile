@@ -52,7 +52,6 @@ import { Ref, ref, watch } from 'vue';
 import ProfileVue from './profile.vue';
 import { UserItem } from '@/api/user.api';
 
-// import router from '@/router';
 import UserCardVue from './userCard.vue';
 const show = ref(false);
 // 定义数据结构
@@ -121,7 +120,6 @@ watch(users, () => {
 // });
 const jump = (url: string) => {
     console.log('jump', url);
-    // router.push(url);
     show.value = true;
 }
 </script>

@@ -34,7 +34,6 @@
 <script lang="ts" setup>
 
 import { computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user.store'
 import StatVue from '@/pages/staff/stat.vue';
 import Duty from '../staff/duty.vue';
@@ -51,8 +50,6 @@ const userStore = useUserStore()
 const { hasPermission } = usePermission();
 const canManageSystem = computed(() => userStore.isAdmin())
 
-// 路由跳转
-const router = useRouter()
 
 const goToPermissionManage = () => {
     uni.navigateTo({
