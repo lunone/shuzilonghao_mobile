@@ -130,17 +130,17 @@
             }
         },
         {
-            "path": "pages/role/employee",
+            "path": "pages/role/staff",
             "style": {
-                "navigationBarTitleText": "员工界面"
+                "navigationBarTitleText": "内部人员"
             }
         },
-        {
-            "path": "pages/role/leader",
-            "style": {
-                "navigationBarTitleText": "领导界面"
-            }
-        },
+        // {
+        //     "path": "pages/role/leader",
+        //     "style": {
+        //         "navigationBarTitleText": "领导界面"
+        //     }
+        // },
         {
             "path": "pages/role/agent",
             "style": {
@@ -163,108 +163,267 @@
     "permissionConfig": {
         // 页面权限配置
         "pages/analysis/analysis": {
-            "permissions": ["analysis:read"],
-            "roles": ["admin", "manager", "staff"]
+            "permissions": [
+                "analysis:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "staff"
+            ]
         },
         "pages/analysis/year": {
-            "permissions": ["analysis:read"],
-            "roles": ["admin", "manager", "staff"]
+            "permissions": [
+                "analysis:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "staff"
+            ]
         },
         "pages/analysis/airlines": {
-            "permissions": ["analysis:read"],
-            "roles": ["admin", "manager", "staff"]
+            "permissions": [
+                "analysis:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "staff"
+            ]
         },
         "pages/analysis/overview": {
-            "permissions": ["analysis:read"],
-            "roles": ["admin", "manager", "staff"]
+            "permissions": [
+                "analysis:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "staff"
+            ]
         },
         "pages/airplane/airplane": {
-            "permissions": ["aircraft:read"],
-            "roles": ["admin", "manager", "pilot", "staff"]
+            "permissions": [
+                "aircraft:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "pilot",
+                "staff"
+            ]
         },
         "pages/sms/sms": {
-            "permissions": ["sms:read"],
-            "roles": ["admin", "manager", "staff"]
+            "permissions": [
+                "sms:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "staff"
+            ]
         },
         "pages/pilot/pilot": {
-            "permissions": ["hr:read"],
-            "roles": ["admin", "manager", "pilot"]
+            "permissions": [
+                "hr:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "pilot"
+            ]
         },
         "pages/pilot/rank": {
-            "permissions": ["hr:read"],
-            "roles": ["admin", "manager", "pilot"]
+            "permissions": [
+                "hr:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "pilot"
+            ]
         },
         "pages/pilot/fatigue": {
-            "permissions": ["hr:read"],
-            "roles": ["admin", "manager", "pilot"]
+            "permissions": [
+                "hr:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "pilot"
+            ]
         },
         "pages/pilot/technical": {
-            "permissions": ["hr:read"],
-            "roles": ["admin", "manager", "pilot"]
+            "permissions": [
+                "hr:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "pilot"
+            ]
         },
         "pages/pilot/portrait": {
-            "permissions": ["hr:read"],
-            "roles": ["admin", "manager", "pilot"]
+            "permissions": [
+                "hr:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "pilot"
+            ]
         },
         "pages/pilot/analysis": {
-            "permissions": ["hr:read"],
-            "roles": ["admin", "manager", "pilot"]
+            "permissions": [
+                "hr:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "pilot"
+            ]
         },
         "pages/hr/hr": {
-            "permissions": ["hr:read"],
-            "roles": ["admin", "manager", "staff"]
+            "permissions": [
+                "hr:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "staff"
+            ]
         },
         "pages/guanli/dutyAct": {
-            "permissions": ["hr:manage"],
-            "roles": ["admin", "manager"]
+            "permissions": [
+                "hr:manage"
+            ],
+            "roles": [
+                "admin",
+                "manager"
+            ]
         },
         "pages/role/employee": {
-            "permissions": ["user:read"],
-            "roles": ["admin", "manager", "staff"]
+            "permissions": [
+                "user:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "staff"
+            ]
         },
         "pages/role/leader": {
-            "permissions": ["user:read"],
-            "roles": ["admin", "manager"]
+            "permissions": [
+                "user:read"
+            ],
+            "roles": [
+                "admin",
+                "manager"
+            ]
         },
         "pages/role/agent": {
-            "permissions": ["user:read"],
-            "roles": ["admin", "manager", "agent"]
+            "permissions": [
+                "user:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "agent"
+            ]
         },
         "pages/flight/flight": {
-            "permissions": ["flight:read"],
-            "roles": ["admin", "manager", "pilot", "staff"]
+            "permissions": [
+                "flight:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "pilot",
+                "staff"
+            ]
         },
         "pages/flight/flightDetail": {
-            "permissions": ["flight:read"],
-            "roles": ["admin", "manager", "pilot", "staff"]
+            "permissions": [
+                "flight:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "pilot",
+                "staff"
+            ]
         },
         "pages/flight/flightList": {
-            "permissions": ["flight:read"],
-            "roles": ["admin", "manager", "pilot", "staff"]
+            "permissions": [
+                "flight:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "pilot",
+                "staff"
+            ]
         },
         "pages/flight/flightSummary": {
-            "permissions": ["flight:read"],
-            "roles": ["admin", "manager", "pilot", "staff"]
+            "permissions": [
+                "flight:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "pilot",
+                "staff"
+            ]
         },
         "pages/flight/plan": {
-            "permissions": ["flight:read"],
-            "roles": ["admin", "manager", "pilot", "staff"]
+            "permissions": [
+                "flight:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "pilot",
+                "staff"
+            ]
         },
         "pages/flight/today": {
-            "permissions": ["flight:read"],
-            "roles": ["admin", "manager", "pilot", "staff"]
+            "permissions": [
+                "flight:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "pilot",
+                "staff"
+            ]
         },
         "pages/maintenance/maintenance": {
-            "permissions": ["maintenance:read"],
-            "roles": ["admin", "manager", "staff"]
+            "permissions": [
+                "maintenance:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "staff"
+            ]
         },
         "pages/sale/sale": {
-            "permissions": ["sale:read"],
-            "roles": ["admin", "manager", "staff"]
+            "permissions": [
+                "sale:read"
+            ],
+            "roles": [
+                "admin",
+                "manager",
+                "staff"
+            ]
         },
         "pages/role/manage": {
-            "permissions": ["system:manage"],
-            "roles": ["admin"]
+            "permissions": [
+                "system:manage"
+            ],
+            "roles": [
+                "admin"
+            ]
         }
     },
     "uniIdRouter": {},

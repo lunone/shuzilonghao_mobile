@@ -94,10 +94,10 @@ export interface ResourcePermission {
     createdAt?: string;
 }
 
-export interface UserPermission {
-    roles: string[]; // 角色ID数组
-    permissions: string[]; // 权限代码数组（扁平化，用于快速检查）
-}
+// export interface UserPermission {
+//     roles: string[]; // 角色ID数组
+//     permissions: string[]; // 权限代码数组（扁平化，用于快速检查）
+// }
 
 // 权限资源类型枚举
 export enum PermissionResource {

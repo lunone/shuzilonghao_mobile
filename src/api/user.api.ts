@@ -40,26 +40,17 @@ export type WatchUser = {
 //
 export type UserItem = {
     id: string,
-    userId: string,
     name?: string,
     avatar?: string,
     gender?: number,
     position: string,
     department: number,
-    // departmentName?: string,
-    // topDepartmentId?: number,
-    // topDepartmentName?: string,
-    hireDate?: string,
-    mobile?: string,
-    contract?: string,
-    contractMobile?: string,
-    idCard?: string,
-    district?: string,
-    address?: string,
+    type: string,
+    relatedId?: string,
+    email?: string,
     status: number,
-    // 角色和权限相关字段
-    roles?: string[], // 角色代码数组
-    permissions?: string[] // 权限代码数组
+    lastLogin?: Date,
+    regTime?: Date,
 }
 
 interface UserInitResponse {

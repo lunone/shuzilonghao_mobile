@@ -60,9 +60,9 @@ const goToPermissionManage = () => {
 onMounted(async () => {
     // 等待用户信息加载完
     await userStore.fetchMe()
-    console.log('=== 当前用户权限信息 ===')
-    console.log('用户角色:', userStore.permissions?.roles || [])
-    console.log('用户权限列表:', userStore.permissions?.permissions || [])
+    // console.log('=== 当前用户权限信息 ===')
+    // console.log('用户角色:', userStore.permissions || [])
+    console.log('用户权限列表:', userStore.permissions || [])
 
     // 检查具体权限
     console.log('jingying:yuedu 权限:', userStore.hasPermission('jingying:yuedu'))

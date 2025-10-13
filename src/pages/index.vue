@@ -1,9 +1,7 @@
 <template>
     <div class="main-container">
-        <!-- 临时测试公开页面屏蔽 -->
         <splashVue v-if="userType == 'init'" />
-        <leaderVue v-else-if="userType == 'leader'" />
-        <employeeVue v-else-if="userType == 'employee'" />
+        <staffVue v-else-if="userType == 'staff'" />
         <agentVue v-else-if="userType == 'agent'" />
 
         <publicVue v-else />
@@ -20,45 +18,35 @@
 import { onLoad } from '@dcloudio/uni-app';
 import { ref } from 'vue';
 import { CONFIG } from '@/config';
+import { useUserStore } from '@/store/user.store';
 import activateVue from '@/pages/public/activate.vue';
-import errorVue from '@/pages/public/error.vue';
 import splashVue from '@/pages/public/splash.vue';
 import publicVue from '@/pages/public/public.vue';
-import leaderVue from '@/pages/role/leader.vue';
-import employeeVue from '@/pages/role/employee.vue';
+import staffVue from '@/pages/role/staff.vue';
 import agentVue from '@/pages/agent/agent.vue';
-import { useUserStore } from '@/store/user.store';
 import ReadmeVue from './staff/readme.vue';
 
 const store = useUserStore();
 const userType = ref('init');
-const error = ref('');
 const showReadme = ref(false);
 
 onLoad(async (e) => {
+    let user = { type: 'public' };
     if (e.error) {
         console.log('main里面的error', e, e.error);
-        if (e.error == 402) {
-            userType.value = 'public';
-        }
+        // if (e.error == 402) {
+        //     userType.value = 'public';
+        // }
     } else {
-        // e.activate是激活成功后需要强制刷新个人信息
-        const res = await store.fetchMe(e.activate);
-        console.log('获取到的user', res);
+        user = await store.fetchMe(e.activate);// e.activate是激活成功后需要强制刷新个人信息
+        console.log('获取到的user', user);
         // 如果激活成功,显示readme
         if (e.activate) {
             showReadme.value = true;
-        }
-        // 因为现在本页面已经成了入口级别页面了.所以不一定要初始化了
-        // 如果是初始化就要加载封面页,如果不是就立即跳转了
-        const duration = CONFIG.css.splash.duration;
-
-        setTimeout(() => {
-            // 测试员工页面暂时屏蔽
-            // userType.value = res['type'] || 'public';
-            userType.value = 'employee'
-        }, duration);
+        };
     }
+    // 开屏页展示结束后跳转
+    setTimeout(() => userType.value = user.type || 'public', CONFIG.css.splash.duration)
 })
 
 </script>

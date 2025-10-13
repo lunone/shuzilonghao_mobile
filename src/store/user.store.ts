@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed, Ref } from 'vue';
 import { initUser, getStaffList } from '@/api/user.api';
 import type { UserItem } from '@/api/user.api';
-import type { UserPermission, PermissionTree } from '@/api/permission.api';
+import type { PermissionTree } from '@/api/permission.api';
 import { ROLE_CODES } from '@/api/permission.api';
 import { CONFIG } from '@/config';
 
@@ -12,11 +12,11 @@ export const useUserStore = defineStore('user', () => {
     const staff = ref<Record<string, UserItem>>({});
     const me = ref({}) as Ref<UserItem>;
     // const token = ref(uni.getStorageSync(CONFIG.key.token) || '');
-    const userPermissions = ref<UserPermission | null>(null);
+    const userPermissionCodes = ref<string[]>(null);
 
     // --- GETTERS ---
     const staffObj = computed(() => staff.value);
-    const permissions = computed(() => userPermissions.value);
+    const permissions = computed(() => userPermissionCodes.value);
 
     // --- ACTIONS ---
 
@@ -62,17 +62,18 @@ export const useUserStore = defineStore('user', () => {
                 me.value = user;
 
                 // 处理权限
-                const flattenedPermissions = flattenPermissionTree(permissionTree);
-                userPermissions.value = {
-                    roles: user.roles || [],
-                    permissions: flattenedPermissions,
-                };
+                // const flattenedPermissions = 
+                userPermissionCodes.value = flattenPermissionTree(permissionTree);
+                // {
+                //     roles: user.roles || [],
+                //     permissions: flattenedPermissions,
+                // };
             }
         } catch (error) {
             console.error('获取用户信息失败:', error);
             // 清理状态
             me.value = {} as UserItem;
-            userPermissions.value = null;
+            userPermissionCodes.value = null;
         } finally {
             isLoading.self = false;
         }
@@ -99,13 +100,13 @@ export const useUserStore = defineStore('user', () => {
     // --- PERMISSION CHECKERS ---
 
     const hasPermission = (permissionCode: string): boolean => {
-        if (!userPermissions.value) return false;
-        return userPermissions.value.permissions.includes(permissionCode);
+        if (!userPermissionCodes.value) return false;
+        return userPermissionCodes.value.includes(permissionCode);
     };
 
     const hasRole = (roleCode: string): boolean => {
-        if (!userPermissions.value) return false;
-        return userPermissions.value.roles.includes(roleCode);
+        if (!userPermissionCodes.value) return false;
+        return userPermissionCodes.value.includes(roleCode);
     };
 
     const isAdmin = (): boolean => {
@@ -113,18 +114,18 @@ export const useUserStore = defineStore('user', () => {
     };
 
     const hasAnyPermission = (permissionCodes: string[]): boolean => {
-        if (!userPermissions.value) return false;
-        return permissionCodes.some(code => userPermissions.value!.permissions.includes(code));
+        if (!userPermissionCodes.value) return false;
+        return permissionCodes.some(code => userPermissionCodes.value.includes(code));
     };
 
     const hasAllPermissions = (permissionCodes: string[]): boolean => {
-        if (!userPermissions.value) return false;
-        return permissionCodes.every(code => userPermissions.value!.permissions.includes(code));
+        if (!userPermissionCodes.value) return false;
+        return permissionCodes.every(code => userPermissionCodes.value.includes(code));
     };
 
     const hasAnyRole = (roleCodes: string[]): boolean => {
-        if (!userPermissions.value) return false;
-        return roleCodes.some(code => userPermissions.value!.roles.includes(code));
+        if (!userPermissionCodes.value) return false;
+        return roleCodes.some(code => userPermissionCodes.value.includes(code));
     };
 
     // --- LEGACY COMPATIBILITY ---
