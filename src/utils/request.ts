@@ -221,7 +221,7 @@ export const request = async <T = any>(
     showLoading && loadingManager.show(loadingText);
 
     try {
-        const response = await instance({ url, data:data });
+        const response = await instance({ url, data });
 
         // 检查业务逻辑错误
         if (response.data.code) {
@@ -241,7 +241,7 @@ export const request = async <T = any>(
             if (response) {
                 switch (response.status) {
                     case 403:
-                        errorMessage = '权限不足';
+                        errorMessage = response.data?.message || '权限不足';
                         break;
                     case 404:
                         errorMessage = `接口地址不存在`;
