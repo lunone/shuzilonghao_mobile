@@ -89,7 +89,7 @@ export const useUserStore = defineStore('user', () => {
             const obj: Record<string, UserItem> = {};
             if (res.length) {
                 for (let user of res) {
-                    obj[user.userId] = user;
+                    obj[user.id] = user;
                 }
             }
             staff.value = obj;

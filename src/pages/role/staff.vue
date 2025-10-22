@@ -3,29 +3,16 @@
 
 
         <!-- 使用 v-if 和 hasPermission 控制显示 -->
-        <div v-if="userStore.hasPermission('page:system')" class="section overview">
+        <div v-if="userStore.hasPermission('page:stat:comp')" class="section overview">
             <StatVue class="day" :range="`day`" />
             <StatVue class="year" />
             <!-- 权限管理入口 -->
         </div>
-        <!-- <Manage />   -->
-        <div class="section permission-section">
-            <!-- <div class="" v-if="canManageSystem"> -->
-            <div class="permission-card" @click="goToPermissionManage">
-                <div class="permission-icon">🔐</div>
-                <div class="permission-content">
-                    <h3 class="permission-title">权限管理</h3>
-                    <p>管理系统用户权限和角色分配。</p>
-                </div>
-                <div class="permission-arrow">→</div>
-            </div>
-            <!-- </div> -->
-        </div>
         <!-- <DutyAct /> -->
-        <div v-if="userStore.hasPermission('hr:read')" class="section duty">
+        <div v-if="userStore.hasPermission('page:duty:list')" class="section duty">
             <Duty />
         </div>
-        <div v-if="userStore.hasPermission('flight:read')" class="section">
+        <div v-if="userStore.hasPermission('page:flight:list')" class="section">
             <Flight />
         </div>
     </div>

@@ -76,7 +76,6 @@ async function loadData() {
         if (lastResult.status === 'fulfilled') {
             lastRes.value = lastResult.value;
         }
-        console.log('获取信息', [currentResult, lastResult], currentRes.value, lastRes.value);
     } catch (err) {
         console.warn('错误', err);
     }
