@@ -1,7 +1,6 @@
 <template>
     <div class="main-container">
         <splashVue v-if="userType == 'init'" />
-        <staffVue v-else-if="userType == 'staff'" />
         <agentVue v-else-if="userType == 'agent'" />
 
         <publicVue v-else />
@@ -22,7 +21,6 @@ import { useUserStore } from '@/store/user.store';
 import activateVue from '@/pages/public/activate.vue';
 import splashVue from '@/pages/public/splash.vue';
 import publicVue from '@/pages/public/public.vue';
-import staffVue from '@/pages/role/staff.vue';
 import agentVue from '@/pages/agent/agent.vue';
 import ReadmeVue from './staff/readme.vue';
 
@@ -46,7 +44,17 @@ onLoad(async (e) => {
         };
     }
     // 开屏页展示结束后跳转
-    setTimeout(() => userType.value = user.type || 'public', CONFIG.css.splash.duration)
+    setTimeout(() => {
+        const userTypeValue = user.type || 'public';
+        if (userTypeValue === 'staff') {
+            // staff用户直接跳转到staff主页
+            uni.switchTab({
+                url: '/pages/staff/home'
+            });
+        } else {
+            userType.value = userTypeValue;
+        }
+    }, CONFIG.css.splash.duration)
 })
 
 </script>

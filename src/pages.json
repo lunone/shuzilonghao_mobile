@@ -129,12 +129,6 @@
                 "navigationBarTitleText": "排班"
             }
         },
-        {
-            "path": "pages/role/staff",
-            "style": {
-                "navigationBarTitleText": "内部人员"
-            }
-        },
         // {
         //     "path": "pages/role/leader",
         //     "style": {
@@ -152,8 +146,57 @@
             "style": {
                 "navigationBarTitleText": "权限管理"
             }
+        },
+        {
+            "path": "pages/staff/home",
+            "style": {
+                "navigationBarTitleText": "主页"
+            }
+        },
+        {
+            "path": "pages/staff/workspace",
+            "style": {
+                "navigationBarTitleText": "工作台"
+            }
+        },
+        {
+            "path": "pages/staff/office",
+            "style": {
+                "navigationBarTitleText": "办公"
+            }
+        },
+        {
+            "path": "pages/staff/profile",
+            "style": {
+                "navigationBarTitleText": "我"
+            }
         }
     ],
+    "tabBar": {
+        "custom": true,
+        "color": "#7A7E83",
+        "selectedColor": "#3cc51f",
+        "borderStyle": "black",
+        "backgroundColor": "#ffffff",
+        "list": [
+            {
+                "pagePath": "pages/staff/home",
+                "text": "主页"
+            },
+            {
+                "pagePath": "pages/staff/workspace",
+                "text": "工作台"
+            },
+            {
+                "pagePath": "pages/staff/office",
+                "text": "办公"
+            },
+            {
+                "pagePath": "pages/staff/profile",
+                "text": "我"
+            }
+        ]
+    },
     "globalStyle": {
         "navigationBarTextStyle": "black",
         "navigationBarTitleText": "数字龙浩",
