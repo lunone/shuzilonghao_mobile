@@ -15,7 +15,8 @@ export default defineConfig({
         API_BASE_URL: JSON.stringify(
             process.env.NODE_ENV === 'production'
                 ? 'https://app.airlonghao.com/sz'
-                : 'http://127.0.0.1:7004'
+                // : 'http://127.0.0.1:7004'
+                : 'http://home.zhilun.ltd:1988'
         )
     },
     css: {

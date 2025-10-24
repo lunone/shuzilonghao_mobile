@@ -50,6 +50,7 @@ instance.interceptors.request.use(beforeRequest)
 // 统一响应拦截器
 instance.interceptors.response.use(
     (response: AxiosResponse) => {
+        console.log('响应拦截器:----', response);
         // 任何成功的响应都可能携带新token，在此更新
         const { token } = response?.data || {};
         if (token) {
@@ -71,6 +72,7 @@ instance.interceptors.response.use(
 
         // --- 处理 401: Token 无效或过期 ---
         if (response.status === 401) {
+            console.log('401 --：Token 无效或过期');
             // 如果正在刷新token，则等待刷新完成后重试
             if (refreshTokenPromise) {
                 try {

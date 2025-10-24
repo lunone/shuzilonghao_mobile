@@ -24,7 +24,7 @@ import Duty from '@/pages/staff/duty.vue';
 
 import Flight from '@/pages/flight/flight.vue';
 // 引入 custom-tab-bar 组件
-import CustomTabBar from '@/custom-tab-bar/index.vue';
+import CustomTabBar from '@/components/custom-tab-bar/index.vue';
 // 使用 userStore
 const userStore = useUserStore()
 const links = [
