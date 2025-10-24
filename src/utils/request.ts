@@ -21,12 +21,17 @@ const option: AxiosRequestConfig = {
         uni.request({
             ...uniConfig,
             success(res) {
-                // 兼容axios的错误处理,
-                const params = { ...res, status: res.statusCode, statusText: res.errMsg, config, request: null }
-                res.statusCode >= 200 && res.statusCode < 300 ? resolve(params) : reject({ response: params });
+                const response = { ...res, status: res.statusCode, statusText: res.errMsg, config, request: null, data: res.data, headers: res.header };
+                if (res.statusCode >= 200 && res.statusCode < 300) {
+                    resolve(response);
+                } else {
+                    const error = new AxiosError(res.errMsg, String(res.statusCode), config, null, response);
+                    reject(error);
+                }
             },
-            fail(res) {
-                reject({ ...res, status: res.statusCode, statusText: res.errMsg, config, request: null });
+            fail(err) {
+                const error = new AxiosError(err.errMsg, 'NETWORK_ERROR', config);
+                reject(error);
             },
         })
     }) as any, // 指定uniapp适配器
@@ -50,7 +55,6 @@ instance.interceptors.request.use(beforeRequest)
 // 统一响应拦截器
 instance.interceptors.response.use(
     (response: AxiosResponse) => {
-        console.log('响应拦截器:----', response);
         // 任何成功的响应都可能携带新token，在此更新
         const { token } = response?.data || {};
         if (token) {
@@ -72,7 +76,6 @@ instance.interceptors.response.use(
 
         // --- 处理 401: Token 无效或过期 ---
         if (response.status === 401) {
-            console.log('401 --：Token 无效或过期');
             // 如果正在刷新token，则等待刷新完成后重试
             if (refreshTokenPromise) {
                 try {
@@ -274,5 +277,3 @@ export const request = async <T = any>(
         }
     }
 };
-
-
