@@ -1,5 +1,12 @@
 <template>
     <view class="flight-monitor">
+        <!-- 日期切换 -->
+        <view class="date-switcher">
+            <text class="date-option">昨天</text>
+            <text class="date-option active">今天 ({{ dayjs().format('MM-DD') }})</text>
+            <text class="date-option">明天</text>
+        </view>
+
         <!-- 头部统计和筛选 -->
         <view v-if="showStats || showFilters" class="header-section">
             <view v-if="showStats" class="stats-row">
@@ -58,58 +65,8 @@
 
         <!-- 航班列表 -->
         <scroll-view v-if="showList" class="flight-list" scroll-y="true">
-            <view v-for="flight in filteredFlights" :key="flight.id" class="flight-card" @click="selectFlight(flight)">
-                <view class="flight-header">
-                    <view class="flight-info">
-                        <text class="flight-no">{{ flight.flightNo }}</text>
-                        <text class="aircraft">{{ flight.acReg }}</text>
-                        <text class="detail-item">机型: {{ flight.acType }}</text>
-                        <text class="detail-item" v-if="flight.flightKind">性质: {{ flight.flightKind }}</text>
-                    </view>
-                    <view class="status-badge" :class="getStatusClass(flight)">
-                        {{ getStatusText(flight) }}
-                    </view>
-                </view>
-
-                <view class="route-info">
-                    <view class="airport">
-                        <text class="airport-code">{{ getCityName(flight.dep) }}</text>
-                        <text class="airport-name">{{ flight.dep }}</text>
-                    </view>
-                    <view class="plane-icon">✈</view>
-                    <view class="airport">
-                        <text class="airport-code">{{ getCityName(flight.arr) }}</text>
-                        <text class="airport-name">{{ flight.arr }}</text>
-                    </view>
-                </view>
-
-                <view class="time-info">
-                    <view class="time-group">
-                        <text class="time-label">计划起飞</text>
-                        <text class="time-value">{{ formatTime(flight.std) }}</text>
-                    </view>
-                    <view class="time-group">
-                        <text class="time-label">实际起飞</text>
-                        <text class="time-value" :class="getTimeClass(flight.atd, flight.std)">
-                            {{ flight.atd ? formatTime(flight.atd) : '--' }}
-                        </text>
-                    </view>
-                    <view class="time-group">
-                        <text class="time-label">计划到达</text>
-                        <text class="time-value">{{ formatTime(flight.sta) }}</text>
-                    </view>
-                    <view class="time-group">
-                        <text class="time-label">实际到达</text>
-                        <text class="time-value" :class="getTimeClass(flight.ata, flight.sta)">
-                            {{ flight.ata ? formatTime(flight.ata) : '--' }}
-                        </text>
-                    </view>
-                </view>
-
-                <view class="flight-details">
-
-                </view>
-            </view>
+            <flight-card v-for="flight in filteredFlights" :key="flight.id" :flight="flight"
+                @click="selectFlight(flight)" />
         </scroll-view>
 
         <!-- 航班详情组件 -->
@@ -121,6 +78,7 @@
 import { ref, computed, onMounted } from 'vue'
 import type { FlightItem } from '@/api/flight.api'
 import FlightDetail from '@/pages/flight/flightDetail.vue'
+import FlightCard from '@/pages/flight/flightCard.vue'
 import { getFlightsByDate } from '@/api/flight.api'
 import dayjs from 'dayjs'
 import { useAirportStore } from '@/store/airport.store'
@@ -212,50 +170,6 @@ const closeDetail = () => {
     detailVisible.value = false
 }
 
-const formatTime = (time: string | Date) => {
-    if (!time) return '--'
-    return dayjs(time).format('HH:mm')
-}
-
-const getCityName = (code: string) => {
-    return airportStore.getCity(code, 'city')
-}
-
-const getStatusText = (flight: FlightItem) => {
-    if (flight.isCancle) return '取消'
-    if (flight.ata) return '到达'
-    if (flight.atd) return '起飞'
-    if (flight.isDelay) return '延误'
-    return '计划'
-}
-
-const getStatusClass = (flight: FlightItem) => {
-    if (flight.isCancle) return 'cancelled'
-    if (flight.ata) return 'arrived'
-    if (flight.atd) return 'departed'
-    if (flight.isDelay) return 'delayed'
-    return 'planned'
-}
-
-const getTimeClass = (actual: string, planned: string) => {
-    if (!actual || !planned) return ''
-
-    // 使用iOS兼容的日期格式
-    const actualTime = new Date(`2024/01/01 ${actual}`)
-    const plannedTime = new Date(`2024/01/01 ${planned}`)
-
-    // 检查日期是否有效
-    if (isNaN(actualTime.getTime()) || isNaN(plannedTime.getTime())) {
-        return ''
-    }
-
-    const diff = (actualTime.getTime() - plannedTime.getTime()) / (1000 * 60) // 分钟差
-
-    if (diff > 15) return 'delayed'
-    if (diff < -5) return 'early'
-    return 'ontime'
-}
-
 onMounted(async () => {
     flights.value = await getFlightsByDate({ startDate: dayjs().startOf('day').toDate(), endDate: dayjs().endOf('day').toDate() }) as FlightItem[];
     airportStore.fetchAirports();
@@ -264,24 +178,44 @@ onMounted(async () => {
 
 <style lang="less" scoped>
 .flight-monitor {
-    //   padding: 20px;
-    //   background: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.date-switcher {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+
+    .date-option {
+        padding: 4px 12px;
+        color: #666;
+        font-size: 14px;
+
+        &.active {
+            font-weight: bold;
+            color: #333;
+        }
+    }
 }
 
 .header-section {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding: 15px;
+    margin-bottom: 10px;
+    padding: 10px;
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
     .stats-row {
         display: flex;
-        gap: 15px;
+        gap: 10px;
         flex: 1;
+        flex-wrap: wrap;
 
         .stat-item {
             display: flex;
@@ -291,11 +225,10 @@ onMounted(async () => {
             .stat-label {
                 font-size: 12px;
                 color: #666;
-                font-weight: 500;
             }
 
             .stat-value {
-                font-size: 16px;
+                font-size: 14px;
                 font-weight: bold;
                 color: #333;
 
@@ -312,17 +245,17 @@ onMounted(async () => {
         .filter-trigger {
             background: #f8f9fa;
             border: 1px solid #ddd;
-            padding: 8px;
-            border-radius: 6px;
+            padding: 6px;
+            border-radius: 4px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 36px;
-            height: 36px;
+            width: 30px;
+            height: 30px;
 
             .filter-icon {
-                font-size: 14px;
+                font-size: 12px;
                 line-height: 1;
             }
         }
@@ -336,11 +269,11 @@ onMounted(async () => {
             border-radius: 6px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
             z-index: 100;
-            min-width: 140px;
-            margin-top: 5px;
+            min-width: 120px;
+            margin-top: 4px;
 
             .filter-section {
-                padding: 12px;
+                padding: 8px;
                 border-bottom: 1px solid #eee;
 
                 &:last-child {
@@ -351,7 +284,7 @@ onMounted(async () => {
                     font-size: 12px;
                     font-weight: bold;
                     color: #333;
-                    margin-bottom: 8px;
+                    margin-bottom: 6px;
                 }
 
                 .filter-options {
@@ -360,7 +293,7 @@ onMounted(async () => {
                     gap: 4px;
 
                     .filter-option {
-                        padding: 6px 10px;
+                        padding: 5px 8px;
                         border: 1px solid #ddd;
                         background: white;
                         border-radius: 4px;
@@ -460,156 +393,10 @@ onMounted(async () => {
 }
 
 .flight-list {
-    height: calc(100vh - 250px);
-
-    .flight-card {
-        background: white;
-        margin-bottom: 15px;
-        padding: 15px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        cursor: pointer;
-        transition: transform 0.2s;
-
-        &:hover {
-            transform: translateY(-2px);
-        }
-
-        .flight-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-
-            .flight-info {
-                .flight-no {
-                    font-size: 18px;
-                    font-weight: bold;
-                    color: #333;
-                    margin-right: 10px;
-                }
-
-                .aircraft {
-                    font-size: 14px;
-                    color: #666;
-                }
-            }
-
-            .status-badge {
-                padding: 4px 8px;
-                border-radius: 4px;
-                font-size: 12px;
-                font-weight: bold;
-
-                &.planned {
-                    background: #e9ecef;
-                    color: #495057;
-                }
-
-                &.departed {
-                    background: #d1ecf1;
-                    color: #0c5460;
-                }
-
-                &.arrived {
-                    background: #d4edda;
-                    color: #155724;
-                }
-
-                &.delayed {
-                    background: #fff3cd;
-                    color: #856404;
-                }
-
-                &.cancelled {
-                    background: #f8d7da;
-                    color: #721c24;
-                }
-            }
-        }
-
-        .route-info {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 15px;
-
-            .airport {
-                flex: 1;
-                text-align: center;
-
-                .airport-code {
-                    display: block;
-                    font-size: 16px;
-                    font-weight: bold;
-                    color: #333;
-                }
-
-                .airport-name {
-                    display: block;
-                    font-size: 12px;
-                    color: #666;
-                }
-            }
-
-            .plane-icon {
-                font-size: 20px;
-                color: #007bff;
-                margin: 0 10px;
-            }
-        }
-
-        .time-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-
-            .time-group {
-                flex: 1;
-                text-align: center;
-
-                .time-label {
-                    display: block;
-                    font-size: 12px;
-                    color: #666;
-                    margin-bottom: 2px;
-                }
-
-                .time-value {
-                    display: block;
-                    font-size: 14px;
-                    font-weight: bold;
-
-                    &.ontime {
-                        color: #28a745;
-                    }
-
-                    &.delayed {
-                        color: #dc3545;
-                    }
-
-                    &.early {
-                        color: #17a2b8;
-                    }
-                }
-            }
-        }
-
-        .flight-details {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: #666;
-
-            .detail-item {
-                margin-right: 15px;
-
-                &:last-child {
-                    margin-right: 0;
-                }
-            }
-        }
-    }
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 10px;
+    background-color: #f7f7f7;
 }
 
 .detail-panel {

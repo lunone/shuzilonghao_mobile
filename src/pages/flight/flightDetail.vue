@@ -1,36 +1,11 @@
 <template>
   <view v-if="visible" class="flight-detail-overlay" @click="closeDetail">
     <view class="flight-detail-panel" @click.stop>
-      <view class="detail-header">
-        <text class="detail-title">航班详情</text>
-        <button class="close-btn" @click="closeDetail">✕</button>
-      </view>
-
       <view v-if="loading" class="loading">
         <text>加载中...</text>
       </view>
 
       <view v-else-if="flightDetail" class="detail-content">
-        <view class="detail-section">
-          <text class="section-title">基本信息</text>
-          <view class="detail-row">
-            <text class="detail-label">航班号:</text>
-            <text class="detail-value">{{ flightDetail.flightNo }}</text>
-          </view>
-          <view class="detail-row">
-            <text class="detail-label">飞机编号:</text>
-            <text class="detail-value">{{ flightDetail.acReg }}</text>
-          </view>
-          <view class="detail-row">
-            <text class="detail-label">机型:</text>
-            <text class="detail-value">{{ flightDetail.acType }}</text>
-          </view>
-          <view class="detail-row">
-            <text class="detail-label">航司:</text>
-            <text class="detail-value">{{ flightDetail.carrier }}</text>
-          </view>
-        </view>
-
         <view class="detail-section">
           <text class="section-title">时间信息</text>
           <view class="detail-row">
@@ -60,49 +35,17 @@
         </view>
 
         <view class="detail-section">
-          <text class="section-title">状态信息</text>
+          <text class="section-title">其他信息</text>
           <view class="detail-row">
             <text class="detail-label">航班性质:</text>
             <text class="detail-value">{{ flightDetail.flightKind || '正班' }}</text>
           </view>
           <view class="detail-row">
-            <text class="detail-label">国际/国内:</text>
-            <text class="detail-value">{{ flightDetail.abroad ? '国际' : '国内' }}</text>
-          </view>
-          <view class="detail-row" v-if="flightDetail.isDelay">
-            <text class="detail-label">延误:</text>
-            <text class="detail-value abnormal">是</text>
-          </view>
-          <view class="detail-row" v-if="flightDetail.isCancle">
-            <text class="detail-label">取消:</text>
-            <text class="detail-value abnormal">是</text>
-          </view>
-          <view class="detail-row" v-if="flightDetail.isAltn">
-            <text class="detail-label">备降:</text>
-            <text class="detail-value warning">是</text>
-          </view>
-          <view class="detail-row" v-if="flightDetail.cancleType">
-            <text class="detail-label">取消类型:</text>
-            <text class="detail-value">{{ flightDetail.cancleType }}</text>
-          </view>
-        </view>
-
-        <view class="detail-section">
-          <text class="section-title">其他信息</text>
-          <view class="detail-row">
-            <text class="detail-label">起飞机场:</text>
-            <text class="detail-value">{{ flightDetail.depName }} ({{ flightDetail.dep }})</text>
-          </view>
-          <view class="detail-row">
-            <text class="detail-label">目的机场:</text>
-            <text class="detail-value">{{ flightDetail.arrName }} ({{ flightDetail.arr }})</text>
-          </view>
-          <view class="detail-row">
-            <text class="detail-label">机位:</text>
+            <text class="detail-label">到达机位:</text>
             <text class="detail-value">{{ flightDetail.bay }}</text>
           </view>
           <view class="detail-row">
-            <text class="detail-label">载重:</text>
+            <text class="detail-label">载重信息:</text>
             <text class="detail-value">{{ flightDetail.netWeightCargo }}kg</text>
           </view>
         </view>
@@ -244,34 +187,6 @@ const formatTime = (time: string) => {
   max-height: 80vh;
   overflow-y: auto;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-
-  .detail-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid #eee;
-
-    .detail-title {
-      font-size: 18px;
-      font-weight: bold;
-      color: #333;
-    }
-
-    .close-btn {
-      background: none;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      color: #666;
-      padding: 0;
-      width: 30px;
-      height: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-  }
 
   .loading, .error {
     padding: 40px 20px;

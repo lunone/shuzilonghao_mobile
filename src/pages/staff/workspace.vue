@@ -35,12 +35,12 @@ onMounted(async () => {
   padding-bottom: 120rpx; // 为tabbar留出空间
 
   &>.section {
-    padding: @padding-page;
-    border-radius: @radius-base;
+    // padding: @padding-page;
+    // border-radius: @radius-base;
     background-color: @color-block;
     margin: 5px @margin-page;
     box-sizing: border-box;
-    box-shadow: @shadow-base;
+    // box-shadow: @shadow-base;
   }
 }
 </style>
