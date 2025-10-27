@@ -174,7 +174,7 @@
     ],
     "tabBar": {
         "custom": true,
-        "component": "components/custom-tab-bar/index",
+        "component": "components/zl/tabbar",
         "color": "#7A7E83",
         "selectedColor": "#3cc51f",
         "borderStyle": "black",

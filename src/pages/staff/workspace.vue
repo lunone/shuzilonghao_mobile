@@ -13,7 +13,7 @@ import { onMounted } from 'vue'
 import { useUserStore } from '@/store/user.store'
 import Flight from '@/pages/flight/flight.vue';
 // 引入 custom-tab-bar 组件
-import CustomTabBar from '@/components/custom-tab-bar/index.vue';
+import CustomTabBar from '@/components/zl/tabbar.vue';
 
 // 使用 userStore
 const userStore = useUserStore()

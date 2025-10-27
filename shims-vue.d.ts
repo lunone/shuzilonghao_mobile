@@ -4,7 +4,7 @@ declare module '*.vue' {
   export default component
 }
 
-// declare module '*/custom-tab-bar/index.vue' {
+// declare module '*/tabbar.vue' {
 //   import { DefineComponent } from 'vue'
 //   const component: DefineComponent<{}, {}, any>
 //   export default component
