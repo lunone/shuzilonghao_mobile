@@ -1,9 +1,9 @@
 <template>
   <div class="main-container">
     <div class="placeholder">
-      <div class="placeholder-icon">🏢</div>
+      <!-- <div class="placeholder-icon">🏢</div>
       <div class="placeholder-text">办公功能</div>
-      <div class="placeholder-desc">此功能正在开发中，敬请期待</div>
+      <div class="placeholder-desc">此功能正在开发中，敬请期待</div> -->
     </div>
   </div>
   <!-- 引入 custom-tab-bar 组件 -->

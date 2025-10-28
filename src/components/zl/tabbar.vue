@@ -32,18 +32,18 @@ const tabList = ref(props.tabList || [
         text: "主页",
         icon: "zl-icon-user"
     },
-    // {
-    //     path: "pages/staff/workspace",
-    //     text: "航班",
-    //     icon: "zl-icon-airplane"
-    // },
     {
-        path: "pages/staff/office",
-        text: "办公",
+        path: "pages/index/workspace",
+        text: "航班",
+        icon: "zl-icon-airplane"
+    },
+    {
+        path: "pages/index/module",
+        text: "功能",
         icon: "zl-icon-duty"
     },
     {
-        path: "pages/staff/profile",
+        path: "pages/index/profile",
         text: "我",
         icon: "zl-icon-person"
     }

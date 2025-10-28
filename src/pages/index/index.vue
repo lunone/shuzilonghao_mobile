@@ -22,7 +22,7 @@ import activateVue from '@/pages/public/activate.vue';
 import splashVue from '@/pages/public/splash.vue';
 import publicVue from '@/pages/public/public.vue';
 import agentVue from '@/pages/agent/agent.vue';
-import ReadmeVue from './staff/readme.vue';
+import ReadmeVue from '@/pages/staff/readme.vue';
 
 const store = useUserStore();
 const userType = ref('init');

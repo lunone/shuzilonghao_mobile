@@ -1,7 +1,7 @@
 {
     "pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
         {
-            "path": "pages/index",
+            "path": "pages/index/index",
             "style": {
                 "navigationBarTitleText": "数字龙浩",
                 "navigationBarBackgroundColor": "#ffffff"
@@ -129,12 +129,6 @@
                 "navigationBarTitleText": "排班"
             }
         },
-        // {
-        //     "path": "pages/role/leader",
-        //     "style": {
-        //         "navigationBarTitleText": "领导界面"
-        //     }
-        // },
         {
             "path": "pages/role/agent",
             "style": {
@@ -154,25 +148,19 @@
             }
         },
         {
-            "path": "pages/staff/workspace",
+            "path": "pages/index/workspace",
             "style": {
                 "navigationBarTitleText": "工作台"
             }
         },
         {
-            "path": "pages/staff/office",
+            "path": "pages/index/module",
             "style": {
-                "navigationBarTitleText": "办公"
+                "navigationBarTitleText": "功能列表"
             }
         },
         {
-            "path": "pages/staff/readme",
-            "style": {
-                "navigationBarTitleText": "测试"
-            }
-        },
-        {
-            "path": "pages/staff/profile",
+            "path": "pages/index/profile",
             "style": {
                 "navigationBarTitleText": "我"
             }
@@ -192,19 +180,15 @@
                 "text": "主页"
             },
             {
-                "pagePath": "pages/staff/workspace",
+                "pagePath": "pages/index/workspace",
                 "text": "工作台"
             },
             {
-                "pagePath": "pages/staff/office",
-                "text": "办公"
+                "pagePath": "pages/index/module",
+                "text": "更多"
             },
             {
-                "pagePath": "pages/staff/readme",
-                "text": "测试"
-            },
-            {
-                "pagePath": "pages/staff/profile",
+                "pagePath": "pages/index/profile",
                 "text": "我"
             }
         ]
@@ -215,272 +199,7 @@
         "navigationBarBackgroundColor": "#F8F8F8",
         "backgroundColor": "#F8F8F8"
     },
-    "permissionConfig": {
-        // 页面权限配置
-        "pages/analysis/analysis": {
-            "permissions": [
-                "analysis:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "staff"
-            ]
-        },
-        "pages/analysis/year": {
-            "permissions": [
-                "analysis:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "staff"
-            ]
-        },
-        "pages/analysis/airlines": {
-            "permissions": [
-                "analysis:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "staff"
-            ]
-        },
-        "pages/analysis/overview": {
-            "permissions": [
-                "analysis:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "staff"
-            ]
-        },
-        "pages/airplane/airplane": {
-            "permissions": [
-                "aircraft:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "pilot",
-                "staff"
-            ]
-        },
-        "pages/sms/sms": {
-            "permissions": [
-                "sms:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "staff"
-            ]
-        },
-        "pages/pilot/pilot": {
-            "permissions": [
-                "hr:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "pilot"
-            ]
-        },
-        "pages/pilot/rank": {
-            "permissions": [
-                "hr:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "pilot"
-            ]
-        },
-        "pages/pilot/fatigue": {
-            "permissions": [
-                "hr:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "pilot"
-            ]
-        },
-        "pages/pilot/technical": {
-            "permissions": [
-                "hr:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "pilot"
-            ]
-        },
-        "pages/pilot/portrait": {
-            "permissions": [
-                "hr:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "pilot"
-            ]
-        },
-        "pages/pilot/analysis": {
-            "permissions": [
-                "hr:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "pilot"
-            ]
-        },
-        "pages/hr/hr": {
-            "permissions": [
-                "hr:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "staff"
-            ]
-        },
-        "pages/guanli/dutyAct": {
-            "permissions": [
-                "hr:manage"
-            ],
-            "roles": [
-                "admin",
-                "manager"
-            ]
-        },
-        "pages/role/employee": {
-            "permissions": [
-                "user:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "staff"
-            ]
-        },
-        "pages/role/leader": {
-            "permissions": [
-                "user:read"
-            ],
-            "roles": [
-                "admin",
-                "manager"
-            ]
-        },
-        "pages/role/agent": {
-            "permissions": [
-                "user:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "agent"
-            ]
-        },
-        "pages/flight/flight": {
-            "permissions": [
-                "flight:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "pilot",
-                "staff"
-            ]
-        },
-        "pages/flight/flightDetail": {
-            "permissions": [
-                "flight:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "pilot",
-                "staff"
-            ]
-        },
-        "pages/flight/flightList": {
-            "permissions": [
-                "flight:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "pilot",
-                "staff"
-            ]
-        },
-        "pages/flight/flightSummary": {
-            "permissions": [
-                "flight:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "pilot",
-                "staff"
-            ]
-        },
-        "pages/flight/plan": {
-            "permissions": [
-                "flight:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "pilot",
-                "staff"
-            ]
-        },
-        "pages/flight/today": {
-            "permissions": [
-                "flight:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "pilot",
-                "staff"
-            ]
-        },
-        "pages/maintenance/maintenance": {
-            "permissions": [
-                "maintenance:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "staff"
-            ]
-        },
-        "pages/sale/sale": {
-            "permissions": [
-                "sale:read"
-            ],
-            "roles": [
-                "admin",
-                "manager",
-                "staff"
-            ]
-        },
-        "pages/role/manage": {
-            "permissions": [
-                "system:manage"
-            ],
-            "roles": [
-                "admin"
-            ]
-        }
-    },
+
     "uniIdRouter": {},
     "easycom": {
         "autoscan": true,
