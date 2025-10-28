@@ -171,8 +171,8 @@ const closeDetail = () => {
 }
 
 onMounted(async () => {
+    await airportStore.fetchAirports();
     flights.value = await getFlightsByDate({ startDate: dayjs().startOf('day').toDate(), endDate: dayjs().endOf('day').toDate() }) as FlightItem[];
-    airportStore.fetchAirports();
 });
 </script>
 
@@ -395,8 +395,9 @@ onMounted(async () => {
 .flight-list {
     flex: 1;
     overflow-y: auto;
-    padding: 0 10px;
-    background-color: #f7f7f7;
+    padding: 0 4px;
+    box-sizing: border-box;
+    // background-color: #f7f7f7;
 }
 
 .detail-panel {

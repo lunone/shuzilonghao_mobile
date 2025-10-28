@@ -30,7 +30,7 @@ const tabList = ref(props.tabList || [
     },
     {
         path: "pages/staff/workspace",
-        text: "工作台",
+        text: "航班",
         icon: "zl-icon-airplane"
     },
     {

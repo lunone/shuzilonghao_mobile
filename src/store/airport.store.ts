@@ -27,7 +27,14 @@ export const useAirportStore = defineStore('airport', () => {
     const getCity = computed(() => {
         return (code: string, type: string = 'city'): string => {
             const src = code?.length === 4 ? airportsCode4.value : code3.value;
-            return src[code]?.[type] || code;
+            const airport = src[code];
+            if (!airport) return code;
+
+            if (type === 'city') {
+                return airport.city || airport.name || code;
+            }
+
+            return airport[type] || code;
         };
     });
 

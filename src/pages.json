@@ -166,6 +166,12 @@
             }
         },
         {
+            "path": "pages/staff/readme",
+            "style": {
+                "navigationBarTitleText": "测试"
+            }
+        },
+        {
             "path": "pages/staff/profile",
             "style": {
                 "navigationBarTitleText": "我"
@@ -191,6 +197,10 @@
             {
                 "pagePath": "pages/staff/office",
                 "text": "办公"
+            },
+            {
+                "pagePath": "pages/staff/readme",
+                "text": "测试"
             },
             {
                 "pagePath": "pages/staff/profile",

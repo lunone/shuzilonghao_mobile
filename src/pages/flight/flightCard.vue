@@ -4,11 +4,11 @@
         <view class="flight-card" :class="flightStatusClasses">
             <view class="flight-row-1">
                 <text class="airport">
-                    <text class="city">{{ getCityName(flight.dep) }}</text><text class="code">({{ flight.dep }})</text>
+                    <text class="city">{{ getCityName(flight.dep) }}</text><text class="code">{{ flight.dep }}</text>
                 </text>
                 <text class="flight-no">{{ flight.flightNo }}</text>
                 <text class="airport">
-                    <text class="city">{{ getCityName(flight.arr) }}</text><text class="code">({{ flight.arr }})</text>
+                    <text class="code">{{ flight.arr }}</text><text class="city">{{ getCityName(flight.arr) }}</text>
                 </text>
             </view>
             <view class="flight-row-2">
@@ -32,6 +32,12 @@ import { useAirportStore } from '@/store/airport.store';
 import dayjs from 'dayjs';
 import { computed, ref } from 'vue';
 
+const timePrefixMap: { [key: string]: string } = {
+    A: '实',
+    E: '预',
+    S: '计',
+};
+
 // Touch slide state
 const startX = ref(0);
 const currentX = ref(0);
@@ -47,7 +53,7 @@ const props = defineProps<Props>();
 const airportStore = useAirportStore();
 
 const getCityName = (code: string) => {
-    return airportStore.getCity(code, 'cityName') || code;
+    return airportStore.getCity(code, 'city') || code;
 };
 
 const getAirportCode = (code: string) => {
@@ -61,16 +67,16 @@ const formatTime = (time: string | Date) => {
 
 const departureTimeInfo = computed(() => {
     const f = props.flight;
-    if (f.atd) return { time: formatTime(f.atd), class: 'time-atd', prefix: 'A' };
-    if (f.etd) return { time: formatTime(f.etd), class: 'time-etd', prefix: 'E' };
-    return { time: formatTime(f.std), class: 'time-std', prefix: 'S' };
+    if (f.atd) return { time: formatTime(f.atd), class: 'time-atd', prefix: timePrefixMap['A'] };
+    if (f.etd) return { time: formatTime(f.etd), class: 'time-etd', prefix: timePrefixMap['E'] };
+    return { time: formatTime(f.std), class: 'time-std', prefix: timePrefixMap['S'] };
 });
 
 const arrivalTimeInfo = computed(() => {
     const f = props.flight;
-    if (f.ata) return { time: formatTime(f.ata), class: 'time-ata', prefix: 'A' };
-    if (f.eta) return { time: formatTime(f.eta), class: 'time-eta', prefix: 'E' };
-    return { time: formatTime(f.sta), class: 'time-sta', prefix: 'S' };
+    if (f.ata) return { time: formatTime(f.ata), class: 'time-ata', prefix: timePrefixMap['A'] };
+    if (f.eta) return { time: formatTime(f.eta), class: 'time-eta', prefix: timePrefixMap['E'] };
+    return { time: formatTime(f.sta), class: 'time-sta', prefix: timePrefixMap['S'] };
 });
 
 const flightStatusClasses = computed(() => {
@@ -165,10 +171,12 @@ const getTimeClass = (actual: string, planned: string) => {
 }
 
 .flight-card {
+    box-sizing: border-box;
     background: #fff;
     border-radius: 6px;
     padding: 8px 12px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    border: 1rpx solid #e6e6e6;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     transition: all 0.2s ease-in-out;
 
@@ -196,24 +204,37 @@ const getTimeClass = (actual: string, planned: string) => {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        width: 100%;
     }
 
     .flight-row-1 {
         margin-bottom: 8px;
 
         .airport {
-            font-size: 18px;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 16px;
             font-weight: bold;
             color: #333;
 
+            &:first-child {
+                text-align: left;
+            }
+
+            &:last-child {
+                text-align: right;
+            }
+
             .city {
-                font-size: 18px;
+                font-size: 16px;
                 font-weight: bold;
                 color: #333;
             }
 
             .code {
-                font-size: 16px;
+                font-size: 14px;
                 color: #999;
             }
         }
@@ -224,18 +245,36 @@ const getTimeClass = (actual: string, planned: string) => {
             background-color: #f0f0f0;
             padding: 2px 6px;
             border-radius: 4px;
+            flex-shrink: 0;
+            margin: 0 8px;
+            text-align: center;
         }
     }
 
     .flight-row-2 {
         .time-group {
+            flex: 1;
             display: flex;
             align-items: center;
+            overflow: hidden;
+            white-space: nowrap;
+
+            &:first-child {
+                justify-content: flex-start;
+            }
+
+            &:last-child {
+                justify-content: flex-end;
+            }
 
             .time-prefix {
-                font-size: 14px;
+                font-size: 12rpx;
                 font-weight: bold;
-                color: #000;
+                color: #f5f5f5;
+                background-color: rgb(220, 220, 220);
+                padding: 1px 4px;
+                border-radius: 3px;
+                // margin-right: 4px;
             }
 
             .time {
@@ -244,22 +283,37 @@ const getTimeClass = (actual: string, planned: string) => {
                 margin-left: 2px;
             }
 
-            .departure-time {
-                &.time-atd { color: #c9302c; }
-                &.time-etd { color: #d9534f; }
-                &.time-std { color: #e67e7a; }
-            }
+           .departure-time {
+               &.time-atd { color: #c9302c; }
+               &.time-etd { color: #d9534f; }
+               &.time-std { color: #e67e7a; }
+           }
 
-            .arrival-time {
-                &.time-ata { color: #4cae4c; }
-                &.time-eta { color: #5cb85c; }
-                &.time-sta { color: #82c982; }
-            }
+           .arrival-time {
+               &.time-ata { color: #4cae4c; }
+               &.time-eta { color: #5cb85c; }
+               &.time-sta { color: #82c982; }
+           }
+
+           &.departure-time-group {
+               .time-atd + .time-prefix { background-color: #c9302c; }
+               .time-etd + .time-prefix { background-color: #d9534f; }
+               .time-std + .time-prefix { background-color: #e67e7a; }
+           }
+
+           &.arrival-time-group {
+               .time-ata + .time-prefix { background-color: #4cae4c; }
+               .time-eta + .time-prefix { background-color: #5cb85c; }
+               .time-sta + .time-prefix { background-color: #82c982; }
+           }
         }
 
         .aircraft-info {
+            flex-shrink: 0;
+            margin: 0 8px;
             font-size: 12px;
             color: #888;
+            text-align: center;
         }
     }
 }

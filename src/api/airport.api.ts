@@ -7,7 +7,7 @@ export interface AirportInfo {
   code4: string; // 4位代码
   code3?: string; // 3位代码
   name: string; // 机场名称
-  city?: string; // 城市
+  city: string; // 城市
   province?: string; // 省份
   country?: string; // 国家
   latitude?: number; // 纬度
