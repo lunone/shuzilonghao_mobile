@@ -11,7 +11,11 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
-
+/**
+ * 本页面显示自定义 tabbar 组件，原生的tabBar被隐藏，然显示了本组件
+ * 本组件下下面的tabList的存在项目必须是在pages.json中配置的tabBar.list中的项目.
+ * 对于原生的tabBar,是由本组件的CSS被盖住了。
+ */
 // 接受传参的 tabList，默认使用现有数据
 const props = defineProps<{
     tabList?: Array<{
@@ -28,11 +32,11 @@ const tabList = ref(props.tabList || [
         text: "主页",
         icon: "zl-icon-user"
     },
-    {
-        path: "pages/staff/workspace",
-        text: "航班",
-        icon: "zl-icon-airplane"
-    },
+    // {
+    //     path: "pages/staff/workspace",
+    //     text: "航班",
+    //     icon: "zl-icon-airplane"
+    // },
     {
         path: "pages/staff/office",
         text: "办公",
@@ -95,6 +99,7 @@ onShow(() => {
 @import '@/css/icon.less';
 
 .tab-bar {
+    // 这是自定义tabbar的样式，原生的tabBar被隐藏，然显示了本组件
     position: fixed;
     bottom: 0;
     left: 0;

@@ -178,12 +178,13 @@
             }
         }
     ],
-    "tabBar": {
+    "tabBar": { // 这里并没有被渲染，存在价值，第一引入了tabBar机制，第二list传入了tab白名单。
         "custom": true,
-        "component": "components/zl/tabbar",
-        "color": "#7A7E83",
-        "selectedColor": "#3cc51f",
-        "borderStyle": "black",
+        // "component": "components/zl/tabbar",
+        // 原生的tabBar显示了，被自定义tabbar组件盖住了。所以这里定义的颜色什么的试图在极端情况下失效了也不被暴露，要不要意义不大
+        "color": "#ffffff",
+        "selectedColor": "#ffffff",
+        "borderStyle": "white",
         "backgroundColor": "#ffffff",
         "list": [
             {
