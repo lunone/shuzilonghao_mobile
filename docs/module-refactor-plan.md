@@ -252,7 +252,7 @@ const useModuleFilter = () => {
       color: @color-text;
       margin-bottom: 20rpx;
       padding-left: 20rpx;
-      border-left: 4rpx solid @primary-color;
+      border-left: 4rpx solid @color-primary;
     }
     
     .module-grid {
@@ -277,7 +277,7 @@ const useModuleFilter = () => {
         .module-icon {
           font-size: 48rpx;
           margin-bottom: 16rpx;
-          color: @primary-color;
+          color: @color-primary;
         }
         
         .module-text {
@@ -499,7 +499,7 @@ onMounted(async () => {
       color: @color-text;
       margin-bottom: 20rpx;
       padding-left: 20rpx;
-      border-left: 4rpx solid @primary-color;
+      border-left: 4rpx solid @color-primary;
     }
     
     .module-grid {
@@ -524,7 +524,7 @@ onMounted(async () => {
         .module-icon {
           font-size: 48rpx;
           margin-bottom: 16rpx;
-          color: @primary-color;
+          color: @color-primary;
           
           &.zl-icon-analysis { color: #1890ff; }
           &.zl-icon-forbidden { color: #f5222d; }

@@ -48,7 +48,7 @@ function error(message = '激活失败') {
 }
 </script>
 <style lang="less" scoped>
-@primary-color: #fea23e;
+@color-primary: #fea23e;
 @background-color: #f8f8f8;
 @text-color: #333;
 
@@ -73,13 +73,13 @@ function error(message = '激活失败') {
         .code {
             padding: 10px;
             font-size: 18px;
-            border: 1px solid @primary-color;
+            border: 1px solid @color-primary;
             border-radius: 5px;
             margin: 10px;
         }
 
         .button {
-            background-color: @primary-color;
+            background-color: @color-primary;
             color: white;
             margin: 0 10px;
             padding: 2px 25px;
@@ -89,7 +89,7 @@ function error(message = '激活失败') {
             font-size: 18px;
 
             &:disabled {
-                background-color: darken(@primary-color, 20%);
+                background-color: darken(@color-primary, 20%);
                 cursor: not-allowed;
             }
         }

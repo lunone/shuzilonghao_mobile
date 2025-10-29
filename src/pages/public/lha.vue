@@ -23,7 +23,7 @@ import { onLoad } from '@dcloudio/uni-app';
 </script>
 
 <style lang="less" scoped>
-@primary-color: #007bff; // 蓝色
+@color-primary: #007bff; // 蓝色
 @secondary-color: #6c757d; // 灰色
 @background-color: #f8f9fa;
 @text-color: #495057;
@@ -42,7 +42,7 @@ import { onLoad } from '@dcloudio/uni-app';
 
     .title {
         font-size: 22px;
-        color: @primary-color;
+        color: @color-primary;
         margin: 0 20px;
 
     }

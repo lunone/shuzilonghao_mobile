@@ -163,7 +163,7 @@ const barOption = computed(() => {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
     .title {
-        color: @primary-color;
+        color: @color-primary;
         font-size: 20px;
         font-weight: normal;
         margin-bottom: 10px;
