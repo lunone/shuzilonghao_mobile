@@ -48,6 +48,7 @@ export type UserItem = {
     type: string,
     relatedId?: string,
     email?: string,
+    mobile?: string,
     status: number,
     lastLogin?: Date,
     regTime?: Date,

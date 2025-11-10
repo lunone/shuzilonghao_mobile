@@ -130,11 +130,9 @@ export const useUserStore = defineStore('user', () => {
 
     // --- LEGACY COMPATIBILITY ---
 
-    const getStaff = {
-        value: (userId: string): UserItem => {
-            return staff.value[userId] || {} as UserItem;
-        }
-    };
+    const getStaff = (userId: string): UserItem => staff.value[userId] || {} as UserItem;
+
+
 
     function getStaffByName(name: string): UserItem | undefined {
         return Object.values(staff.value).find(user => user.name === name);

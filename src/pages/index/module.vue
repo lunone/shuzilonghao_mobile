@@ -198,16 +198,16 @@ onMounted(async () => {
     
     .module-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20rpx;
-      padding: 0 10rpx;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16rpx;
+      padding: 0 8rpx;
       
       .module-item {
         background: #ffffff;
-        border-radius: 16rpx;
-        padding: 30rpx 20rpx;
+        border-radius: 12rpx;
+        padding: 20rpx 12rpx;
         text-align: center;
-        box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.08);
         transition: all 0.3s ease;
         
         &:active {
@@ -216,8 +216,8 @@ onMounted(async () => {
         }
         
         .module-icon {
-          font-size: 48rpx;
-          margin-bottom: 16rpx;
+          font-size: 36rpx;
+          margin-bottom: 12rpx;
           color: @color-primary;
           
           &.zl-icon-analysis { color: #1890ff; }
@@ -232,9 +232,9 @@ onMounted(async () => {
         }
         
         .module-text {
-          font-size: 26rpx;
+          font-size: 22rpx;
           color: @color-text;
-          line-height: 1.4;
+          line-height: 1.3;
           font-weight: 500;
         }
       }

@@ -34,12 +34,12 @@ const tabList = ref(props.tabList || [
     },
     {
         path: "pages/index/workspace",
-        text: "航班",
+        text: "工作台",
         icon: "zl-icon-airplane"
     },
     {
         path: "pages/index/module",
-        text: "功能",
+        text: "更多",
         icon: "zl-icon-duty"
     },
     {

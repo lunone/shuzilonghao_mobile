@@ -17,7 +17,6 @@
 import { ref, onMounted, computed } from 'vue';
 import { useDepartmentStore } from '@/store/department.store';
 import { useUserStore } from '@/store/user.store';
-import { getDutyToday } from '@/api/staff.api';
 import { DutyResponse } from '@/types/duty';
 import { call } from '@/utils/tools';
 
@@ -32,7 +31,7 @@ const dutyData = ref<DutyResponse[]>([]);
 const processedData = computed(() => {
     return dutyData.value.map((duty, index) => {
         const dept = departmentStore.list.find(d => d.id.toString() === duty.departmentId);
-        const user = userStore.getStaff.value(duty.userId);
+        const user = userStore.getStaff(duty.userId);
         return {
             id: index + 1,
             name: user?.name || '未知',
@@ -44,7 +43,7 @@ const processedData = computed(() => {
 
 // 拨打电话函数
 const callUser = (userId: string) => {
-    const user = userStore.getStaff.value(userId);
+    const user = userStore.getStaff(userId);
     if (user?.mobile) {
         call(user.mobile);
     } else {

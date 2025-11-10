@@ -6,11 +6,14 @@
             <StatVue class="year" />
         </div>
 
-        <zl-shortcut class="shortcut" :links="links" />
+        <!-- <zl-shortcut class="shortcut" :links="links" /> -->
+        
         <div v-if="userStore.hasPermission('page:duty:list')" class="section duty">
             <Duty />
         </div>
-        <!-- <Flight /> -->
+        今日食堂
+
+        <Flight />
     </div>
     <!-- 引入 custom-tab-bar 组件 -->
     <CustomTabBar />
