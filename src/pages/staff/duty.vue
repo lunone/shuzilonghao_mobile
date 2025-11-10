@@ -2,7 +2,10 @@
     <div class="duty-container">
         <div class="user-list">
             <div v-for="item in processedData" :key="item.id" class="user-item" @click="callUser(item.userId)">
-                <i class="avatar-icon zl-icon-user"></i>
+                <div class="avatar-container">
+                    <i class="avatar-icon zl-icon-user"></i>
+                    <div class="name-overlay">{{ item.name }}</div>
+                </div>
                 <div class="dep-name">{{ item.depAbbr }}</div>
             </div>
         </div>
@@ -74,6 +77,9 @@ const fetchDutyData = async () => {
         { departmentId: '5', userId: '5' },
         { departmentId: '6', userId: '6' },
         { departmentId: '7', userId: '7' },
+        { departmentId: '8', userId: '8' },
+        { departmentId: '9', userId: '9' },
+        { departmentId: '10', userId: '10' },
     ];
 };
 
@@ -128,12 +134,34 @@ onMounted(async () => {
     border-radius: 50%;
     background-color: #f0f0f0;
     border: 1px solid #e0e0e0;
-    margin-bottom: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 28px; /* 图标大小 */
     color: #b0b0b0; /* 图标颜色 */
+}
+
+.avatar-container {
+    position: relative;
+    margin-bottom: 8px;
+}
+
+.name-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 10px;
+    padding: 2px 4px;
+    text-align: center;
+    border-radius: 0 0 25px 25px;
+    line-height: 1.2;
+    max-width: 50px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .dep-name {
