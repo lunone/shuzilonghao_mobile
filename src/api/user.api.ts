@@ -124,3 +124,11 @@ export const getUserPermissions = (data: UserIdDTO): Promise<any[]> => {
     // 获取列表，失败时返回空数组
     return request({ url: '/user/userPermissions', data, defaultValue: [] });
 };
+
+/**
+ * @description 确认扫码登录
+ * @param ticketId 扫码获取的ticketId
+ */
+export const confirmQrLogin = (ticketId: string): Promise<any> => {
+    return request({ url: '/login/qr/confirm', data: { ticketId } });
+};
