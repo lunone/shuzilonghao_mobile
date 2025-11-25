@@ -130,6 +130,12 @@
             }
         },
         {
+            "path": "pages/living/mealDetail",
+            "style": {
+                "navigationBarTitleText": "餐食详情"
+            }
+        },
+        {
             "path": "pages/role/agent",
             "style": {
                 "navigationBarTitleText": "供应商界面"
