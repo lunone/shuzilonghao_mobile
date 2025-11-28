@@ -1,8 +1,5 @@
 <template>
     <div class="main-container">
-        <!-- #ifdef H5 || MP-WEIXIN -->
-        <button v-if="isDev" @click="goToQrTest">手动扫码(dev)</button>
-        <!-- #endif -->
         <!-- 使用 v-if 和 hasPermission 控制显示 -->
         <div v-if="userStore.hasPermission('page:stat:comp')" class="section overview">
             <StatVue class="day" :range="`day`" />
@@ -34,13 +31,6 @@ import Flight from '@/pages/flight/flight.vue';
 import CustomTabBar from '@/components/zl/tabbar.vue';
 // 使用 userStore
 const userStore = useUserStore()
-const isDev = computed(() => process.env.NODE_ENV === 'development');
-
-const goToQrTest = () => {
-    uni.navigateTo({
-        url: '/pages/public/qr_test'
-    });
-};
 const links = [
     [
         { size: 12, link: '/pages/analysis/analysis', class: 'analysis', text: '运行分析' },

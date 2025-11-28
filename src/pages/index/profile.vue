@@ -16,6 +16,12 @@
         <div class="menu-text">个人资料</div>
         <div class="menu-arrow">></div>
       </div>
+
+      <div class="menu-item" @click="handleScanCode">
+        <div class="menu-icon">📷</div>
+        <div class="menu-text">扫一扫</div>
+        <div class="menu-arrow">></div>
+      </div>
       
       <div class="menu-item" @click="goToSettings">
         <div class="menu-icon">⚙️</div>
@@ -72,6 +78,47 @@ const getRoleText = () => {
   
   return roles.map(role => roleMap[role] || role).join('、')
 }
+
+// 扫码
+const handleScanCode = () => {
+  uni.scanCode({
+    onlyFromCamera: true,
+    success: (res) => {
+      console.log('扫码成功：', res);
+      // 微信小程序码, res.path 是解码后的地址, e.g., pages/auth/scan?scene=xxx
+      // 普通二维码, res.result 是二维码内容, e.g., https://example.com?scene=xxx
+      const scanResult = res.path || res.result;
+      let ticketId = null;
+
+      if (scanResult) {
+        const sceneReg = /[?&]scene=([^&]+)/;
+        const match = scanResult.match(sceneReg);
+        if (match) {
+          ticketId = match;
+        }
+      }
+
+      if (ticketId) {
+        uni.navigateTo({
+          url: `/pages/auth/scan?scene=${encodeURIComponent(ticketId)}`,
+        });
+      } else {
+        console.error('二维码内容解析失败: 未找到scene参数');
+        uni.showToast({
+          title: '无效的二维码',
+          icon: 'none',
+        });
+      }
+    },
+    fail: (err) => {
+      console.error('扫码失败：', err);
+      uni.showToast({
+        title: '扫码失败',
+        icon: 'none',
+      });
+    },
+  });
+};
 
 // 跳转到个人资料
 const goToProfile = () => {

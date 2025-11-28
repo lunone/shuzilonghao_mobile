@@ -38,12 +38,6 @@
             }
         },
         {
-            "path": "pages/public/qr_test",
-            "style": {
-                "navigationBarTitleText": "扫码测试"
-            }
-        },
-        {
             "path": "pages/auth/scan",
             "style": {
                 "navigationBarTitleText": "扫码授权"
