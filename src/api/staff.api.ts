@@ -65,7 +65,7 @@ export interface DutyTodayResponse {
 
 // 获取员工信息
 export const getStaff = (data?: StaffListQueryDTO): Promise<StaffProfile[]> => {
-    return request({ url: '/user/staff', data });
+    return request({ url: '/staff/list', data });
 };
 
 // 获取部门列表

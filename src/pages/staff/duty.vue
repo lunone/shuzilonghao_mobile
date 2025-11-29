@@ -1,44 +1,51 @@
 <template>
     <div class="duty-container">
+        <div class="header">
+            <h3 class="title">今日值班</h3>
+            <div class="more-button" @click="navigateToDutyWatch">更多</div>
+        </div>
         <div class="user-list">
-            <div v-for="item in processedData" :key="item.id" class="user-item" @click="callUser(item.userId)">
+            <div v-for="item in processedData" :key="item.userId" class="user-item" @click="callUser(item.userId)">
                 <div class="avatar-container">
                     <i class="avatar-icon zl-icon-user"></i>
                     <div class="name-overlay">{{ item.name }}</div>
                 </div>
-                <div class="dep-name">{{ item.depAbbr }}</div>
+                <div class="dep-name">{{ item.groupAbbr }}</div>
             </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
-import { useDepartmentStore } from '@/store/department.store';
+import { onMounted, computed } from 'vue';
 import { useUserStore } from '@/store/user.store';
-import { DutyResponse } from '@/types/duty';
+import { useDutyStore } from '@/store/duty.store';
 import { call } from '@/utils/tools';
-// import { getDutyToday } from '@/api/staff.api';
+import dayjs from 'dayjs';
 
 // 初始化 store
-const departmentStore = useDepartmentStore();
 const userStore = useUserStore();
+const dutyStore = useDutyStore();
 
-// 响应式数据
-const dutyData = ref<DutyResponse[]>([]);
-
-// 计算属性：处理数据，结合部门和用户名称
+// 计算属性：处理今日值班数据
 const processedData = computed(() => {
-    return dutyData.value.map((duty, index) => {
-        const dept = departmentStore.list.find(d => d.id.toString() === duty.departmentId);
+    // 确保 userStore.staff 和 dutyStore.dutyGroups 已经被访问，建立响应式依赖
+    const staffLoaded = Object.keys(userStore.staffObj).length > 0;
+    const groupsLoaded = Object.keys(dutyStore.dutyGroups).length > 0;
+    if (!staffLoaded || !groupsLoaded) {
+        return [];
+    }
+
+    const today = dayjs().format('YYYY-MM-DD');
+    const todayDuty = dutyStore.dutySchedule[today] || [];
+    
+    return todayDuty.map(duty => {
         const user = userStore.getStaff(duty.userId);
-        // 获取部门名称的前两个字作为缩写
-        const depAbbr = dept?.name.slice(0, 2) || '未知';
+        const group = dutyStore.dutyGroups[duty.groupId];
         return {
-            id: index + 1,
-            name: user?.name || '未知',
-            depAbbr: depAbbr,
             userId: duty.userId,
+            name: user?.name || '未知',
+            groupAbbr: group?.abbr || '未知',
         };
     });
 });
@@ -56,41 +63,20 @@ const callUser = (userId: string) => {
     }
 };
 
-// 获取当日值班数据
-const fetchDutyData = async () => {
-    // try {
-    //     const res = await getDutyToday();
-    //     dutyData.value = res || [];
-    // } catch (error) {
-    //     console.error('获取值班数据失败:', error);
-    //     uni.showToast({
-    //         title: '加载值班数据失败',
-    //         icon: 'none'
-    //     });
-    // }
-    // 使用模拟数据
-    dutyData.value = [
-        { departmentId: '1', userId: '1' },
-        { departmentId: '2', userId: '2' },
-        { departmentId: '3', userId: '3' },
-        { departmentId: '4', userId: '4' },
-        { departmentId: '5', userId: '5' },
-        { departmentId: '6', userId: '6' },
-        { departmentId: '7', userId: '7' },
-        { departmentId: '8', userId: '8' },
-        { departmentId: '9', userId: '9' },
-        { departmentId: '10', userId: '10' },
-    ];
+// 跳转到值班总览页面
+const navigateToDutyWatch = () => {
+    uni.navigateTo({ url: '/pages/staff/dutyWatch' });
 };
 
 // 页面加载时初始化
 onMounted(async () => {
-    // 初始化部门和员工数据
-    await departmentStore.fetchDepartments();
-    await userStore.fetchStaff();
-
-    // 获取值班数据
-    await fetchDutyData();
+    const today = new Date();
+    // 并行获取所有依赖数据，确保全部完成后再渲染
+    await Promise.all([
+        userStore.fetchStaff(),
+        dutyStore.fetchDutyGroups(),
+        dutyStore.fetchDutySchedule(today, today)
+    ]);
 });
 </script>
 
@@ -98,15 +84,35 @@ onMounted(async () => {
 @import "@/css/icon.less";
 
 .duty-container {
-    padding: 16px 0;
+    padding: 16px 16px;
     background-color: #fff;
+    border-radius: 8px;
+    margin: 0 16px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+.more-button {
+    font-size: 14px;
+    color: #999;
+    cursor: pointer;
 }
 
 .user-list {
     display: flex;
     flex-direction: row;
     overflow-x: auto;
-    padding: 0 16px;
     -ms-overflow-style: none;
     scrollbar-width: none;
 

@@ -176,6 +176,18 @@
             "style": {
                 "navigationBarTitleText": "我"
             }
+        },
+        {
+            "path": "pages/staff/dutyWatch",
+            "style": {
+                "navigationBarTitleText": "值班总览"
+            }
+        },
+        {
+            "path": "pages/staff/dutyUser",
+            "style": {
+                "navigationBarTitleText": "交接日志"
+            }
         }
     ],
     "tabBar": { // 这里并没有被渲染，存在价值，第一引入了tabBar机制，第二list传入了tab白名单。

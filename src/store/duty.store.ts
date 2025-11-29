@@ -1,0 +1,148 @@
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+import { getDutyAll, getDutyGroups, getDutyNotes, getUserPermittedDutyGroups, getMyDutyNotes } from '@/api/duty.api';
+import type { DutyAllResponse, DutyGroup, DutyNote, UserDutyGroup } from '@/types/duty';
+import dayjs from 'dayjs';
+
+export const useDutyStore = defineStore('duty', () => {
+    // --- STATE ---
+    const dutyGroups = ref<Record<string, DutyGroup>>({});
+    const dutySchedule = ref<DutyAllResponse>({});
+    const dutyNotes = ref<DutyNote[]>([]);
+    const userDutyGroups = ref<UserDutyGroup[]>([]);
+    const isLoading = ref({
+        groups: false,
+        schedule: false,
+        notes: false,
+        userGroups: false,
+    });
+
+    // --- GETTERS ---
+    const dutyGroupsList = computed(() => Object.values(dutyGroups.value));
+
+    // --- ACTIONS ---
+
+    /**
+     * @description 获取所有值班组信息
+     */
+    const fetchDutyGroups = async (forceRefresh = false) => {
+        if (isLoading.value.groups) return;
+        if (!forceRefresh && Object.keys(dutyGroups.value).length > 0) return;
+
+        isLoading.value.groups = true;
+        try {
+            const response = await getDutyGroups({ pageSize: 100 });
+            const groups: Record<string, DutyGroup> = {};
+            if (response) {
+                response.forEach(group => {
+                    groups[group.id] = group;
+                });
+            }
+            dutyGroups.value = groups;
+        } catch (error) {
+            console.error('Failed to fetch duty groups:', error);
+        } finally {
+            isLoading.value.groups = false;
+        }
+    };
+
+    /**
+     * @description 获取指定日期范围的排班数据
+     * @param {Date} startDate
+     * @param {Date} endDate
+     */
+    const fetchDutySchedule = async (startDate: Date, endDate: Date) => {
+        if (isLoading.value.schedule) return;
+        isLoading.value.schedule = true;
+        try {
+            const response = await getDutyAll({
+                startDate: dayjs(startDate).toISOString(),
+                endDate: dayjs(endDate).toISOString(),
+            });
+            dutySchedule.value = response;
+        } catch (error) {
+            console.error('Failed to fetch duty schedule:', error);
+        } finally {
+            isLoading.value.schedule = false;
+        }
+    };
+
+    /**
+     * @description 获取指定组和日期范围的交接日志
+     */
+    const fetchDutyNotes = async (groupId: number, startDate: Date, endDate: Date) => {
+        if (isLoading.value.notes) return;
+        isLoading.value.notes = true;
+        try {
+            const response = await getDutyNotes({
+                groupId,
+                startDate: dayjs(startDate).toISOString(),
+                endDate: dayjs(endDate).toISOString(),
+            });
+            dutyNotes.value = response;
+        } catch (error) {
+            console.error('Failed to fetch duty notes:', error);
+            dutyNotes.value = [];
+        } finally {
+            isLoading.value.notes = false;
+        }
+    };
+
+    /**
+     * @description 获取当前用户在指定日期范围内的交接日志
+     */
+    const fetchMyDutyNotes = async (startDate: Date, endDate: Date) => {
+        if (isLoading.value.notes) return;
+        isLoading.value.notes = true;
+        try {
+            const response = await getMyDutyNotes({
+                startDate: dayjs(startDate).toISOString(),
+                endDate: dayjs(endDate).toISOString(),
+            });
+            dutyNotes.value = response;
+        } catch (error) {
+            console.error('Failed to fetch my duty notes:', error);
+            dutyNotes.value = [];
+        } finally {
+            isLoading.value.notes = false;
+        }
+    };
+    
+    /**
+     * @description 获取当前用户有权限的值班组
+     */
+    const fetchUserDutyGroups = async (forceRefresh = false) => {
+        if (isLoading.value.userGroups) return;
+        if (!forceRefresh && userDutyGroups.value.length > 0) return;
+
+        isLoading.value.userGroups = true;
+        try {
+            const response = await getUserPermittedDutyGroups();
+            userDutyGroups.value = response || [];
+        } catch (error) {
+            console.error('Failed to fetch user duty groups:', error);
+        } finally {
+            isLoading.value.userGroups = false;
+        }
+    };
+
+
+    return {
+        // State
+        dutyGroups,
+        dutySchedule,
+        dutyNotes,
+        userDutyGroups,
+        isLoading,
+
+        // Getters
+        dutyGroupsList,
+
+        // Actions
+        fetchDutyGroups,
+        fetchDutySchedule,
+        fetchDutyNotes,
+        fetchMyDutyNotes,
+        fetchUserDutyGroups,
+    };
+});

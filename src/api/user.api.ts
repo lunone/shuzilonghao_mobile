@@ -86,7 +86,7 @@ export const getUserProfile = (data: UserIdDTO): Promise<any> => {
 // 获取员工列表
 export const getStaffList = (): Promise<UserItem[]> => {
     // 获取列表，失败时返回空数组
-    return request({ url: '/user/staff', defaultValue: [] });
+    return request({ url: '/staff/list', defaultValue: [] });
 };
 
 // 获取用户角色列表
