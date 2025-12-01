@@ -25,6 +25,7 @@
                     <view class="day-number-wrapper" :class="{ 'selected-day': isSelected(day.date) }">
                         <p class="day-number">{{ day.day }}</p>
                         <view v-if="day.hasCurrentUser" class="duty-dot"></view>
+                        <view v-if="day.hasNotes" class="notes-dot"></view>
                     </view>
                 </view>
             </view>
@@ -36,6 +37,7 @@
                     <view class="day-number-wrapper" :class="{ 'selected-day': isSelected(day.date), 'today': isToday(day.date) }">
                         <p class="day-number">{{ day.day }}</p>
                         <view v-if="day.hasCurrentUser" class="duty-dot"></view>
+                        <view v-if="day.hasNotes" class="notes-dot"></view>
                     </view>
                 </view>
             </view>
@@ -102,7 +104,9 @@ const currentUserId = ref<string | null>(null);
 
 // 获取当前登录用户ID
 const getCurrentUserId = () => {
-    return userStore.me?.id || null;
+    const userId = userStore.me?.id || null;
+    console.log('当前用户ID:', userId);
+    return userId;
 };
 
 // --- 日期计算 ---
@@ -128,21 +132,30 @@ const isCurrentUserOnDuty = (users: any[]) => {
     return users.some(user => user.userId === currentUserId.value);
 };
 
-// --- 日历生成 ---
+// 检查某天是否有交接日志
+const hasDutyNotes = (dateStr: string) => {
+    return dutyStore.dutyNotes.some(note => {
+        const noteDay = dayjs(note.date).utc().format('YYYY-MM-DD');
+        return noteDay === dateStr;
+    });
+};
+
 const weekCalendar = computed(() => {
     const startOfWeek = currentDate.value.startOf('isoWeek');
-    const week: { date: string; day: number; users: any[]; hasCurrentUser: boolean }[] = [];
+    const week: { date: string; day: number; users: any[]; hasCurrentUser: boolean; hasNotes: boolean }[] = [];
     for (let i = 0; i < 7; i++) {
         const day = startOfWeek.add(i, 'day');
         const dateStr = day.format('YYYY-MM-DD');
         const users = dutyStore.dutySchedule[dateStr] || [];
         const hasCurrentUser = isCurrentUserOnDuty(users);
+        const hasNotes = hasDutyNotes(dateStr);
         
         week.push({
             date: dateStr,
             day: day.date(),
             users: users,
             hasCurrentUser: hasCurrentUser,
+            hasNotes: hasNotes,
         });
     }
     return week;
@@ -160,6 +173,7 @@ const monthCalendar = computed(() => {
         const dateStr = currentDay.format('YYYY-MM-DD');
         const users = dutyStore.dutySchedule[dateStr] || [];
         const hasCurrentUser = isCurrentUserOnDuty(users);
+        const hasNotes = hasDutyNotes(dateStr);
         
         days.push({
             date: dateStr,
@@ -167,6 +181,7 @@ const monthCalendar = computed(() => {
             isCurrentMonth: currentDay.isSame(currentDate.value, 'month'),
             users: users,
             hasCurrentUser: hasCurrentUser,
+            hasNotes: hasNotes,
         });
         currentDay = currentDay.add(1, 'day');
     }
@@ -262,10 +277,10 @@ const navigateToDutyUser = () => {
     uni.navigateTo({ url: '/pages/staff/dutyUser' });
 };
 
-// --- 生命周期 ---
 onMounted(async () => {
     await Promise.all([
         userStore.fetchStaff(),
+        userStore.fetchMe(), // 确保获取用户信息
         dutyStore.fetchDutyGroups(),
         dutyStore.fetchUserDutyGroups()
     ]);
@@ -440,6 +455,15 @@ onMounted(async () => {
         width: 6px;
         border-radius: 9999px;
         background-color: @primary-color;
+    }
+    .notes-dot {
+        position: absolute;
+        bottom: 6px;
+        left: 14px;
+        height: 6px;
+        width: 6px;
+        border-radius: 9999px;
+        background-color: #ff9500; // 橙色，区别于值班小点的蓝色
     }
 }
 
