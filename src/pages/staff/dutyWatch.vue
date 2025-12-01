@@ -1,18 +1,15 @@
 <template>
     <view class="container">
         <header class="header">
-            <view class="header-main">
-                <view class="header-left">
-                    <!-- Placeholder for menu icon -->
-                </view>
-                <h1 class="header-title">值班日历</h1>
-                <view class="header-right">
-                    <!-- Placeholder for more_vert icon -->
-                </view>
-            </view>
             <view class="header-bottom">
-                <view class="month-selector">
-                    <p class="month-text">{{ headerDateText }}</p>
+                <view class="date-navigator">
+                    <button class="nav-button" @click="navigateDate(-1)">
+                        <text class="arrow left"></text>
+                    </button>
+                    <p class="month-text" @click="goToday">{{ headerDateText }}</p>
+                    <button class="nav-button" @click="navigateDate(1)">
+                        <text class="arrow right"></text>
+                    </button>
                 </view>
                 <view class="view-switcher">
                     <view :class="['switch-label', { active: viewMode === 'week' }]" @click="switchView('week')">周</view>
@@ -22,24 +19,13 @@
         </header>
 
         <main class="main-content">
-            <view class="week-navigator">
-                <button class="nav-button" @click="navigateDate(-1)">
-                    <text class="arrow left"></text>
-                    上{{ viewMode === 'week' ? '周' : '月' }}
-                </button>
-                <button class="nav-button-today" @click="goToday">本{{ viewMode === 'week' ? '周' : '月' }}</button>
-                <button class="nav-button" @click="navigateDate(1)">
-                    下{{ viewMode === 'week' ? '周' : '月' }}
-                    <text class="arrow right"></text>
-                </button>
-            </view>
 
             <view v-if="viewMode === 'week'" class="calendar-grid">
                 <view v-for="(day, index) in weekCalendar" :key="day.date" class="day-cell" @click="selectDay(day)">
                     <p class="day-name" :class="{ 'text-primary': isToday(day.date) }">{{ weekHeaders[index] }}</p>
                     <view class="day-number-wrapper" :class="{ 'selected-day': isSelected(day.date) }">
                         <p class="day-number">{{ day.day }}</p>
-                        <view v-if="day.users.length > 0" class="duty-dot"></view>
+                        <!-- <view v-if="day.users.length > 0" class="duty-dot"></view> -->
                     </view>
                 </view>
             </view>
@@ -50,7 +36,7 @@
                     @click="selectDay(day)">
                     <view class="day-number-wrapper" :class="{ 'selected-day': isSelected(day.date), 'today': isToday(day.date) }">
                         <p class="day-number">{{ day.day }}</p>
-                        <view v-if="day.users.length > 0" class="duty-dot"></view>
+                        <!-- <view v-if="day.users.length > 0" class="duty-dot"></view> -->
                     </view>
                 </view>
             </view>
@@ -59,8 +45,8 @@
                 <h2 class="duty-info-header">{{ selectedDayText }}</h2>
                 <view v-for="group in selectedDayDuties" :key="group.groupId" class="duty-group">
                     <h3 class="group-name">{{ group.groupName }}</h3>
-                    <view v-for="user in group.users" :key="user.userId" class="user-info">
-                        <image class="user-avatar" :src="user.avatar || '/static/default_avatar.png'" />
+                    <view v-for="user in group.users" :key="user.userId" class="user-info" @click="handleUserClick(user)">
+                        <view class="zl-icon-user user-avatar"></view>
                         <view class="user-details">
                             <p class="user-name">{{ user.name }}</p>
                             <p class="user-department">{{ group.groupName }}</p>
@@ -86,6 +72,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/zh-cn';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import weekday from 'dayjs/plugin/weekday';
+import { call } from '@/utils/tools';
 
 dayjs.extend(isoWeek);
 dayjs.extend(weekday);
@@ -174,6 +161,7 @@ const selectedDayDuties = computed(() => {
             userId: duty.userId,
             name: staffInfo?.name || '未知',
             avatar: staffInfo?.avatar,
+            phone: staffInfo?.phone,
         });
     });
     return Object.values(grouped);
@@ -202,6 +190,12 @@ const selectDay = (day: { date: string }) => {
     selectedDate.value = dayjs(day.date);
 };
 
+const handleUserClick = (user: { phone?: string }) => {
+    if (user.phone) {
+        call(user.phone);
+    }
+};
+
 const navigateToDutyUser = () => {
     uni.navigateTo({ url: '/pages/staff/dutyUser' });
 };
@@ -215,6 +209,8 @@ onMounted(async () => {
 
 
 <style scoped lang="less">
+@import "@/css/icon.less";
+
 // Variables
 @primary-color: #137fec;
 @background-light: #f6f7f8;
@@ -239,12 +235,7 @@ onMounted(async () => {
     padding: 8px 16px;
 }
 
-.header-main {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 0 8px;
-}
+
 
 .header-title {
     font-size: 18px;
@@ -263,11 +254,44 @@ onMounted(async () => {
     padding: 12px 0;
 }
 
-.month-selector {
+.date-navigator {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
     .month-text {
         font-size: 18px;
         font-weight: bold;
         color: @text-slate-900;
+    }
+
+    .nav-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px;
+        background-color: transparent;
+        border: none;
+        border-radius: 9999px;
+        width: 32px;
+        height: 32px;
+
+        &:active {
+            background-color: #e5e7eb;
+        }
+    }
+
+    .arrow {
+        border: solid @text-slate-600;
+        border-width: 0 2px 2px 0;
+        display: inline-block;
+        padding: 3px;
+        &.left {
+            transform: rotate(135deg);
+        }
+        &.right {
+            transform: rotate(-45deg);
+        }
     }
 }
 
@@ -294,39 +318,6 @@ onMounted(async () => {
     padding: 0 16px 96px;
 }
 
-.week-navigator {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    .nav-button, .nav-button-today {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        padding: 6px 12px;
-        background-color: #e5e7eb;
-        color: @text-slate-600;
-        font-size: 14px;
-        font-weight: 500;
-        border: none;
-        border-radius: 9999px;
-    }
-    .nav-button-today {
-      background-color: transparent;
-    }
-    .arrow {
-        border: solid @text-slate-600;
-        border-width: 0 2px 2px 0;
-        display: inline-block;
-        padding: 3px;
-        &.left {
-            transform: rotate(135deg);
-        }
-        &.right {
-            transform: rotate(-45deg);
-        }
-    }
-}
 
 .calendar-grid {
     display: grid;
@@ -369,9 +360,9 @@ onMounted(async () => {
         justify-content: center;
         width: 100%;
         aspect-ratio: 1 / 1;
-        border-radius: 9999px;
+        border-radius: 12px;
         &.selected-day {
-            background-color: @primary-color;
+            background-color: fade(@primary-color, 50%);
             color: @white-color;
             .day-number {
                 font-weight: bold;
@@ -424,6 +415,12 @@ onMounted(async () => {
         width: 40px;
         height: 40px;
         border-radius: 9999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        background-color: #e5e7eb;
+        color: @text-slate-600;
     }
     .user-details {
         .user-name {

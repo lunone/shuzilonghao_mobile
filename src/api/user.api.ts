@@ -43,6 +43,7 @@ export type UserItem = {
     name?: string,
     avatar?: string,
     gender?: number,
+    phone?: string,
     position: string,
     department: number,
     type: string,
