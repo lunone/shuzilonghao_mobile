@@ -1,5 +1,5 @@
 import { request } from '@/utils/request';
-import type { DutyAllResponse, DutyGroup, DutyNote, UserDutyGroup } from '@/types/duty';
+import type { DutyAllResponse, DutyGroup, DutyNote, UserDutyGroup, CreateDutyNotePayload } from '@/types/duty';
 
 /**
  * @description 获取一段时间内所有人的排班情况
@@ -51,4 +51,23 @@ export const getUserPermittedDutyGroups = (): Promise<UserDutyGroup[]> => {
  */
 export const getMyDutyNotes = (data: { startDate: string; endDate: string }): Promise<DutyNote[]> => {
     return request({ url: '/duty/note/list', data, defaultValue: [] });
+};
+
+/**
+ * @description 创建新的交接日志
+ * @param {CreateDutyNotePayload} data - 日志内容
+ * @returns {Promise<DutyNote>}
+ */
+export const createDutyNote = (data: CreateDutyNotePayload): Promise<DutyNote> => {
+    return request({ url: '/duty/note/create', data });
+};
+
+/**
+ * @description 删除指定的交接日志
+ * @param {object} data - 包含要删除的日志ID
+ * @param {number} data.id - 日志ID
+ * @returns {Promise<boolean>}
+ */
+export const deleteDutyNote = (data: { id: number }): Promise<boolean> => {
+    return request({ url: '/duty/note/delete', data, defaultValue: false });
 };

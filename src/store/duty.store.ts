@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { getDutyAll, getDutyGroups, getDutyNotes, getUserPermittedDutyGroups, getMyDutyNotes } from '@/api/duty.api';
-import type { DutyAllResponse, DutyGroup, DutyNote, UserDutyGroup } from '@/types/duty';
+import { getDutyAll, getDutyGroups, getDutyNotes, getUserPermittedDutyGroups, getMyDutyNotes, createDutyNote, deleteDutyNote } from '@/api/duty.api';
+import type { DutyAllResponse, DutyGroup, DutyNote, UserDutyGroup, CreateDutyNotePayload } from '@/types/duty';
 import dayjs from 'dayjs';
 
 export const useDutyStore = defineStore('duty', () => {
@@ -127,6 +127,44 @@ export const useDutyStore = defineStore('duty', () => {
     };
 
 
+    /**
+     * @description 创建交接日志
+     */
+    const addDutyNote = async (payload: CreateDutyNotePayload) => {
+        try {
+            const newNote = await createDutyNote(payload);
+            if (newNote) {
+                // 将新日志添加到列表开头，并按创建日期重新排序
+                dutyNotes.value.unshift(newNote);
+                dutyNotes.value.sort((a, b) => dayjs(b.createDate).unix() - dayjs(a.createDate).unix());
+            }
+            return newNote;
+        } catch (error) {
+            console.error('Failed to create duty note:', error);
+            return null;
+        }
+    };
+
+    /**
+     * @description 删除交接日志
+     */
+    const removeDutyNote = async (noteId: number) => {
+        try {
+            const success = await deleteDutyNote({ id: noteId });
+            if (success) {
+                // 从列表中移除对应的日志
+                const index = dutyNotes.value.findIndex(note => note.id === noteId);
+                if (index > -1) {
+                    dutyNotes.value.splice(index, 1);
+                }
+            }
+            return success;
+        } catch (error) {
+            console.error('Failed to delete duty note:', error);
+            return false;
+        }
+    };
+
     return {
         // State
         dutyGroups,
@@ -144,5 +182,7 @@ export const useDutyStore = defineStore('duty', () => {
         fetchDutyNotes,
         fetchMyDutyNotes,
         fetchUserDutyGroups,
+        addDutyNote,
+        removeDutyNote,
     };
 });

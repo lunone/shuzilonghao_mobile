@@ -40,3 +40,12 @@ export interface UserDutyGroup {
     name: string;
     members: string[];
 }
+
+
+// 新增: 用于创建交接日志的请求体类型
+export interface CreateDutyNotePayload {
+  scheduleDate: string; // YYYY-MM-DD
+  content: string;
+  level: number;
+  groupId: number;
+}
