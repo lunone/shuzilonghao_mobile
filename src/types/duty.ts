@@ -27,11 +27,12 @@ export interface DutyGroup {
 // Based on /duty/note/list response
 export interface DutyNote {
   id: number;
-  date: string; // YYYY-MM-DD
+  date: string; // YYYY-MM-DD or ISO Date String
   createDate: string; // ISO Date String
   content: string;
   level: number;
   userId: string;
+  groupId: number; // Add groupId to align with data structure
 }
 
 // Based on /duty/groups response
@@ -44,7 +45,7 @@ export interface UserDutyGroup {
 
 // 新增: 用于创建交接日志的请求体类型
 export interface CreateDutyNotePayload {
-  scheduleDate: string; // YYYY-MM-DD
+  date: string; // YYYY-MM-DD or ISO Date String
   content: string;
   level: number;
   groupId: number;

@@ -135,8 +135,9 @@ export const useDutyStore = defineStore('duty', () => {
             const newNote = await createDutyNote(payload);
             if (newNote) {
                 // 将新日志添加到列表开头，并按创建日期重新排序
-                dutyNotes.value.unshift(newNote);
-                dutyNotes.value.sort((a, b) => dayjs(b.createDate).unix() - dayjs(a.createDate).unix());
+                // Add the new note and re-sort by date
+                dutyNotes.value.push(newNote);
+                dutyNotes.value.sort((a, b) => dayjs(b.date).diff(dayjs(a.date)));
             }
             return newNote;
         } catch (error) {
