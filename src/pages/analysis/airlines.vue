@@ -6,8 +6,10 @@
         <!-- <div class="divider"></div> -->
         <div class="container">
             <div class="filters">
-                <button v-for="city in cityList" :key="city" @click="selectedCity = city"
-                    :class="{ active: selectedCity === city }">
+                <button v-for="city in cityList" :key="city" 
+                    @click="!loading && (selectedCity = city)"
+                    :disabled="loading"
+                    :class="{ active: selectedCity === city, disabled: loading }">
                     {{ getAirportName(city) }}
                 </button>
             </div>
@@ -131,14 +133,25 @@ const fetchData = async (startDate: Date, endDate: Date) => {
         }
         allStats.value = Object.values(cities);
         
-        // 确保郑州站点在数据加载完成后处于激活状态
-        if (allStats.value.length > 0) {
+        // 只有在初始加载且没有选择城市时才设置默认城市
+        if (allStats.value.length > 0 && !selectedCity.value) {
             const hasCgoData = allStats.value.some(city => city.name === 'CGO');
             if (hasCgoData) {
                 selectedCity.value = 'CGO';
             } else {
                 // 如果没有郑州数据，选择第一个可用的站点
                 selectedCity.value = allStats.value[0].name;
+            }
+        } else if (allStats.value.length > 0) {
+            // 检查当前选中的城市是否在数据中，如果不在则重置为默认
+            const hasSelectedCity = allStats.value.some(city => city.name === selectedCity.value);
+            if (!hasSelectedCity) {
+                const hasCgoData = allStats.value.some(city => city.name === 'CGO');
+                if (hasCgoData) {
+                    selectedCity.value = 'CGO';
+                } else {
+                    selectedCity.value = allStats.value[0].name;
+                }
             }
         }
     } catch (err) {
@@ -246,11 +259,22 @@ const getTrendColor = (percentage: number) => {
         font-size: 14px;
         color: #333;
         flex-shrink: 0; // Prevent button from shrinking
+        transition: all 0.3s ease;
+
+        &:hover {
+            opacity: 0.8;
+        }
 
         &.active {
             background-color: #2952a4;
             color: white;
             border-color: #2952a4;
+        }
+
+        &.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
         }
     }
 }

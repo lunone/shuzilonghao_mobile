@@ -129,12 +129,12 @@
                 "navigationBarTitleText": "人力资源"
             }
         },
-        {
-            "path": "pages/living/mealDetail",
-            "style": {
-                "navigationBarTitleText": "餐食详情"
-            }
-        },
+        // {
+        //     "path": "pages/living/mealDetail",
+        //     "style": {
+        //         "navigationBarTitleText": "餐食详情"
+        //     }
+        // },
         {
             "path": "pages/role/agent",
             "style": {
