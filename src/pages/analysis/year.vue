@@ -34,7 +34,7 @@ let statsYear = {} as Record<string, StatMulti>;
 const option = ref<any>();
 
 const yearsRef = ref([]);
-const title = computed(() => selectYear.value ? `${selectYear.value}年` : `三年`)
+const title = computed(() => selectYear.value ? `${selectYear.value}年` : `多年`)
 const tips = computed(() => selectYear.value ? '返回多年统计' : '点击下方柱体显示年份详情')
 // 数据获取
 async function fetchData(startDate: Date, endDate: Date) {
@@ -130,20 +130,20 @@ watch(stats, (newStats, oldStats) => {
             {
                 name: '飞行小时',
                 type: 'column',
-                color: '#FAC858',
+                color: '#8dabc7',
                 data: adjustedData.hour,
                 textColor: '#37383a',
                 formatter: (val) => numberByWan((val - BASE_HEIGHT).toFixed(1)) // 还原小时数
             }, {
                 name: '货运总量(吨)',
                 type: 'column',
-                color: '#1890FF',
+                color: '#6a9a8a',
                 data: adjustedData.cargo,
                 formatter: (val) => numberByWan(((val - BASE_HEIGHT) / CARGO_SCALE).toFixed(1)) // 还原并格式化
             }, {
                 name: '航班班次',
                 type: 'column',
-                color: '#91CB74',
+                color: '#d9a08b',
                 // label: { show: false },
                 data: adjustedData.flights,
                 formatter: (val) => numberByWan((val - BASE_HEIGHT) / FLIGHT_SCALE) // 还原真实值
@@ -181,24 +181,34 @@ watch(stats, (newStats, oldStats) => {
 @import '@/css/base.less';
 
 .year-chart {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: 100%;
+    background: #f7f8fa;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e8e8e8;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-sizing: border-box;
 
     .title {
-        .row;
-        margin: 0;
-        overflow: hidden;
-        background-color: #ccc;
-        padding: 5px 10px;
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
+        display: flex;
+        align-items: baseline;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
 
-        .left {}
+        .left {
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+        }
 
         .mid {
-            color: #aaa;
-            font-size: .8rem;
+            font-size: 12px;
+            color: #999;
+            margin-left: 8px;
         }
 
         .right {}

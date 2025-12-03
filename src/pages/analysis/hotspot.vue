@@ -9,7 +9,7 @@
                 <uni-icons type="paperplane-filled" size="24" color="#333"></uni-icons>
                 <div class="metric-text">
                     <span class="label">航班</span>
-                    <span class="value">{{ stat.flightCount }}</span>
+                    <span class="value">{{ stat.flightCount }} 班</span>
                 </div>
                 <div class="trend-chart"></div>
             </div>

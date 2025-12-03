@@ -1,12 +1,16 @@
 <template>
     <div class="analysis-wrapper">
         <year-vue class="year" />
+        <div class="card-header">
+            <span class="title">热点城市</span>
+            <span class="more-btn" @click="goToAirlines">分析</span>
+        </div>
         <div class="card-stack">
             <hotspot v-for="city in cities" :key="city.code" class="star" :station="city.code" />
         </div>
-        <div class="content">
+        <!-- <div class="content">
             <zl-shortcut :links="links" class="links" />
-        </div>
+        </div> -->
     </div>
 </template>
 <script setup lang="ts">
@@ -24,6 +28,11 @@ const links = ref([[
     { size: 6, link: '/pages/analysis/airlines', class: 'location', text: '航线分析', error: '' },
 ]]);
 
+function goToAirlines() {
+    uni.navigateTo({
+        url: '/pages/analysis/airlines'
+    });
+}
 </script>
 <style lang="less" scoped>
 @import "@/css/base.less";
@@ -38,6 +47,38 @@ const links = ref([[
         width: 100%;
         padding: 10px;
         box-sizing: border-box
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        width: 100%;
+        box-sizing: border-box;
+
+        .title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .more-btn {
+            font-size: 12px;
+            color: #333;
+            background-color: #e8e8e8;
+            padding: 4px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .more-btn::after {
+            content: '>';
+            margin-left: 4px;
+            font-family: monospace;
+        }
     }
 
     .card-stack {
