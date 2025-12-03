@@ -65,7 +65,7 @@ const callUser = (userId: string) => {
 
 // 跳转到值班总览页面
 const navigateToDutyWatch = () => {
-    uni.navigateTo({ url: '/pages/staff/dutyWatch' });
+    uni.navigateTo({ url: '/pages/duty/duty' });
 };
 
 // 页面加载时初始化

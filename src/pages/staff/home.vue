@@ -11,7 +11,7 @@
         <div v-if="userStore.hasPermission('page:duty:list')" class="section duty">
             <Duty />
         </div>
-        <Meals class="meals" />
+        <!-- <Meals class="meals" /> -->
 
         <Flight />
     </div>
@@ -23,8 +23,8 @@
 import { onMounted, computed } from 'vue'
 import { useUserStore } from '@/store/user.store'
 import StatVue from '@/pages/staff/stat.vue';
-import Duty from '@/pages/staff/duty.vue';
-import Meals from '@/pages/staff/meals.vue';
+import Duty from '@/pages/duty/dutyWidget.vue';
+// import Meals from '@/pages/staff/meals.vue';
 
 import Flight from '@/pages/flight/flight.vue';
 // 引入 custom-tab-bar 组件

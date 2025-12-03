@@ -130,12 +130,6 @@
             }
         },
         {
-            "path": "pages/living/dutyAct",
-            "style": {
-                "navigationBarTitleText": "排班"
-            }
-        },
-        {
             "path": "pages/living/mealDetail",
             "style": {
                 "navigationBarTitleText": "餐食详情"
@@ -178,9 +172,9 @@
             }
         },
         {
-            "path": "pages/staff/dutyWatch",
+            "path": "pages/duty/duty",
             "style": {
-                "navigationBarTitleText": "值班总览"
+                "navigationBarTitleText": "值班"
             }
         }
     ],

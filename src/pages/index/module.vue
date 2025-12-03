@@ -69,7 +69,7 @@ const MODULE_PERMISSIONS = {
     modules: [
       { path: "pages/sms/sms", text: "安全数据", icon: "forbidden", permission: "safety:data" },
       { path: "pages/maintenance/maintenance", text: "故障管理", icon: "maintenance", permission: "maintenance:view" },
-      { path: "pages/living/dutyAct", text: "排班管理", icon: "duty", permission: "schedule:view" }
+    //   { path: "pages/living/dutyAct", text: "排班管理", icon: "duty", permission: "schedule:view" }
     ]
   },
   pilot: {

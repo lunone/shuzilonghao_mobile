@@ -1,6 +1,6 @@
 // 包租航线相关接口定义
 
-import type { DateRangeQueryDTO } from './common.interface';
+import type { DateRangeQueryDTO } from './common';
 
 // 包租航线DTO
 export interface CharterFlightDTO extends DateRangeQueryDTO {
