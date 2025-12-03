@@ -51,6 +51,7 @@ export interface StationStats {
   flightCount: number;
   totalHours: number;
   averageDelay: number;
+  netWeightCargo: number;
 }
 
 // 机组同事统计

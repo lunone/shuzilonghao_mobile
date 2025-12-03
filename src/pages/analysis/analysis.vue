@@ -1,7 +1,9 @@
 <template>
     <div class="analysis-wrapper">
         <year-vue class="year" />
-        <star-vue class="star" />
+        <div class="card-stack">
+            <hotspot v-for="city in cities" :key="city.code" class="star" :station="city.code" />
+        </div>
         <div class="content">
             <zl-shortcut :links="links" class="links" />
         </div>
@@ -10,7 +12,13 @@
 <script setup lang="ts">
 import { ref, computed, watch, Ref } from 'vue';
 import yearVue from './year.vue';
-import starVue from './star.vue';
+import hotspot from './hotspot.vue';
+
+const cities = ref([
+    { name: '郑州', code: 'ZHCC' },
+    { name: '西安', code: 'ZLXY' },
+]);
+
 const links = ref([[
     { size: 6, link: '/pages/analysis/overview', class: 'health', text: '趋势分析', error: '' },
     { size: 6, link: '/pages/analysis/airlines', class: 'location', text: '航线分析', error: '' },
@@ -26,11 +34,24 @@ const links = ref([[
     justify-content: flex-start;
     width: 100%;
 
-    .year,
-    .star {
+    .year {
         width: 100%;
         padding: 10px;
         box-sizing: border-box
+    }
+
+    .card-stack {
+        width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 10px; // 卡片之间的间距
+        padding: 0 10px 10px;
+    }
+
+    .star {
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .content {
