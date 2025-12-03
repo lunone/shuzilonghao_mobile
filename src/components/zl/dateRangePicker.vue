@@ -1,8 +1,9 @@
 <template>
-    <div class="dates" @click="showCalendar = true">
-        <div class="date">{{ dayjs(model[0]).format(format) }}</div>
-        <div class="sep">{{ seprater }}</div>
-        <div class="date">{{ dayjs(model[1]).format(format) }}</div>
+    <div class="date-picker-container">
+        <span class="date-text">
+            {{ dayjs(model[0]).format('MM月DD日') }} {{ seprater }} {{ dayjs(model[1]).format('MM月DD日') }}
+        </span>
+        <button class="calendar-btn" @click="showCalendar = true">日历</button>
     </div>
     <press-calendar :show="showCalendar" type="range" @confirm="onConfirm" :minDate="dayjs(minDate).valueOf()"
         :maxDate="dayjs(maxDate).valueOf()" :show-confirm="false" />
@@ -32,35 +33,33 @@ const onConfirm = (detail: [Date, Date]) => {
 }
 </script>
 <style lang="less" scoped>
-.dates {
+.date-picker-container {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    margin: 10px 15px;
-    padding: 8px 20px;
-    border-radius: 8px;
-    background-color: #f5f7fa; // 改为更柔和的浅蓝灰色
-    box-shadow:
-        0 2px 4px rgba(0, 0, 0, 0.05), // 外投影增加层次
-        inset 0 1px 2px rgba(255, 255, 255, 0.8); // 内阴影增加立体感
-    border: 1px solid #e0e0e0; // 添加浅色边框
-    transition: all 0.2s ease;
-    cursor: pointer;
+    padding: 8px 15px;
+    background-color: #6f7d99;
+    border-radius: 20px;
 
-
-    .date {
-        font-size: 1.1em;
-        color: #333; // 改为更沉稳的深灰色
-        font-weight: 600;
-        padding: 4px 8px;
-        border-radius: 4px;
-        background-color: rgba(255, 255, 255, 0.9);
+    .date-text {
+        color: white;
+        font-size: 14px;
+        flex: 1;
+        text-align: left;
     }
 
-    .sep {
-        color: #666;
-        margin: 0 12px;
-        font-weight: 500;
+    .calendar-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 14px;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
     }
 }
 </style>
