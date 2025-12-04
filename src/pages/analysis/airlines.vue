@@ -94,12 +94,8 @@ const fetchData = async (startDate: Date, endDate: Date) => {
                 .filter(k => k !== 'total')
                 .map(acReg => ({ acReg, stats: flightData[acReg] }));
 
-            // Mock data for trend and percentage as it's not in the API response
+            // 使用真实的后端数据
             const total = (flightData as any).total;
-            total.cargo = Math.round(total.hour.total * 1000);
-            total.weight = Math.round(total.hour.total * 10);
-            total.percentage = Math.round(Math.random() * 40) - 20;
-            total.trend = Array.from({ length: 10 }, () => Math.random());
 
 
             const routeInfo = { route: key, aircrafts, total };
@@ -174,8 +170,8 @@ const getTrendColor = (percentage: number) => {
 };
 const formatFlightData = (flight: any) => {
     return [
-        { label: '货量', value: `${flight.total.cargo.toLocaleString()} 千克`, icon: 'gift-filled' },
-        { label: '重量', value: `${flight.total.weight.toLocaleString()} 吨`, icon: 'refreshempty' },
+        { label: '货量', value: `${flight.total.netWeightCargo.total.toFixed(1)} 吨`, icon: 'gift-filled' },
+        { label: '小时', value: `${flight.total.hour.total.toFixed(1)} 小时`, icon: 'refreshempty' },
         { label: '航班', value: flight.total.counter, icon: 'paperplane-filled' },
     ];
 };
