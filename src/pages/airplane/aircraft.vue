@@ -31,7 +31,7 @@ const stat = computed(() => {// todo:页面变更飞机变0
         const endDate = dayjs(aircraft.endDate).startOf('day');
         if (!aircraft.endDate || (startDate.isBefore(today) && endDate.isAfter(today))) {
             if (aircraft.regId.length < 6) {
-                const acTypeLong = aircraft.acTypeLong;
+                const acTypeLong = aircraft.acTypeLong || aircraft.acType || '未知机型';
                 stat[acTypeLong] = stat[acTypeLong] || 0;
                 stat[acTypeLong]++;
             }

@@ -140,8 +140,11 @@ export interface MelItem {
 export type AircraftListResponse = string[];
 
 // 获取飞机列表
-export const getAircrafts = (): Promise<AircraftListResponse> => {
-    return request({ url: '/aircraft/list' });
+export const getAircrafts = (): Promise<AircraftItem[]> => {
+    return request({ url: '/aircraft/list' }).then(data => {
+        // 如果后端直接返回数组，直接返回；如果返回包装结构，则返回data字段
+        return Array.isArray(data) ? data : data?.data || [];
+    });
 };
 
 // 获取MEL事件

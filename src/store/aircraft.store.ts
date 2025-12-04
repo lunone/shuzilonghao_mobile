@@ -20,10 +20,17 @@ export const useAircraftStore = defineStore('aircraft', () => {
         if (isLoading.aircraft) return;
         isLoading.aircraft = true;
         if (!aircraftsArr.value.length) {
-            // 目前API只返回飞机注册号列表，暂时注释获取详细数据的逻辑
-            // const response = await getAircrafts();
-            // const res = response as AircraftItem[];
-            // TODO: 需要调用获取飞机详细信息的API
+            try {
+                // 调用API获取飞机列表数据
+                const response = await getAircrafts();
+                console.log('飞机列表API响应:', response);
+                
+                // 直接使用API返回的飞机数据
+                aircraftsArr.value = response;
+                console.log('飞机数据加载完成:', aircraftsArr.value.length, '架飞机');
+            } catch (error) {
+                console.error('获取飞机列表失败:', error);
+            }
         }
         isLoading.aircraft = false;
     };

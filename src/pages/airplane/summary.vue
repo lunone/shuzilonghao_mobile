@@ -26,7 +26,7 @@ const pieOption = computed(() => {
         if (!aircraft.endDate || (startDate.isBefore(today) && endDate.isAfter(today))) {
             if (aircraft.regId.length < 6) {
                 // 统计在役飞机,738前面俩字符
-                const acType = aircraft.acTypeLong;
+                const acType = aircraft.acTypeLong || aircraft.acType || '未知机型';
                 stat[acType] = stat[acType] || 0;
                 stat[acType]++;
                 all++;
