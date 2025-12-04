@@ -34,7 +34,7 @@ const userStore = useUserStore()
 const links = [
     [
         { size: 12, link: '/pages/analysis/analysis', class: 'analysis', text: '运行分析' },
-        { size: 6, link: '/pages/airplane/airplane', class: 'airplane', text: '机队' },
+        { size: 6, link: '/pages/airplane/aircraftList', class: 'airplane', text: '机队' },
         { size: 6, link: '/pages/sale/sale', class: 'sale', text: '销售', error: '敬请期待' },
         { size: 6, link: '/pages/hr/Hr', class: 'person', text: '人员', error: '敬请期待' },
     ],

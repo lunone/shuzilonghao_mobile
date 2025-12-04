@@ -1,32 +1,92 @@
 <template>
     <div class="detail">
-        <div class="mate">
-            <div class="name">
-                <span class="id">{{ aircraft.acReg }}</span>
-                <span class="type">({{ aircraft.acType }})</span>
-            </div>
-        </div>
-        <div class="items">
-            <!-- 退役的飞机要显示退役日期 -->
-            <!-- <div v-if="groupName == 'retired'">{{ aircraft.endDate }} 退役</div> -->
-            <!-- 默认显示的 -->
-            <!-- <template v-for="flag in [true, false]" :key="flag"> -->
-            <template v-for="showOBj in aircraftKeysArray" :key="showOBj.key">
-                <div class="item">
-                    <span class="key">{{ showOBj.name }}</span>
+        <!-- 基本尺寸信息 -->
+        <div class="detail-group">
+            <h4 class="group-title">基本尺寸</h4>
+            <div class="items">
+                <div class="item" v-for="item in basicDimensions" :key="item.key">
+                    <span class="key">{{ item.name }}</span>
                     <span class="value">
-                        <!-- {{ _.attempt(showOBj.func || (_ => _),  aircraft[showOBj.key]) }} -->
-                        {{ calac(showOBj.func, aircraft[showOBj.key]) }}
-                        {{ showOBj.unit || '' }}
+                        {{ calac(item.func, aircraft[item.key]) }}
+                        {{ item.unit || '' }}
                     </span>
                 </div>
-            </template>
-            <!-- </template> -->
+            </div>
+        </div>
+
+        <!-- 发动机信息 -->
+        <div class="detail-group">
+            <h4 class="group-title">发动机信息</h4>
+            <div class="items">
+                <div class="item" v-for="item in engineInfo" :key="item.key">
+                    <span class="key">{{ item.name }}</span>
+                    <span class="value">
+                        {{ calac(item.func, aircraft[item.key]) }}
+                        {{ item.unit || '' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 重量数据 -->
+        <div class="detail-group">
+            <h4 class="group-title">重量数据</h4>
+            <div class="items">
+                <div class="item" v-for="item in weightData" :key="item.key">
+                    <span class="key">{{ item.name }}</span>
+                    <span class="value">
+                        {{ calac(item.func, aircraft[item.key]) }}
+                        {{ item.unit || '' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 运营参数 -->
+        <div class="detail-group">
+            <h4 class="group-title">运营参数</h4>
+            <div class="items">
+                <div class="item" v-for="item in operationParams" :key="item.key">
+                    <span class="key">{{ item.name }}</span>
+                    <span class="value">
+                        {{ calac(item.func, aircraft[item.key]) }}
+                        {{ item.unit || '' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 设备能力 -->
+        <div class="detail-group">
+            <h4 class="group-title">设备能力</h4>
+            <div class="items">
+                <div class="item" v-for="item in equipmentCapability" :key="item.key">
+                    <span class="key">{{ item.name }}</span>
+                    <span class="value">
+                        {{ calac(item.func, aircraft[item.key]) }}
+                        {{ item.unit || '' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 运营标志 -->
+        <div class="detail-group">
+            <h4 class="group-title">运营标志</h4>
+            <div class="items">
+                <div class="item" v-for="item in operationFlags" :key="item.key">
+                    <span class="key">{{ item.name }}</span>
+                    <span class="value">
+                        {{ calac(item.func, aircraft[item.key]) }}
+                        {{ item.unit || '' }}
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 <script lang="ts" setup>
-import { AircraftItem } from '@/api/flight.api';
+import { AircraftItem } from '@/api/aircraft.api';
 import { PropType, ref } from 'vue';
 
 const props = defineProps({
@@ -45,6 +105,81 @@ function calac(func, val) {
     }
     return val;
 }
+// 基本尺寸信息
+const basicDimensions: { key: keyof AircraftItem, name: string, unit?: string, func?: (...args: any[]) => unknown }[] = [
+    { key: 'totalLength', name: '长度', unit: '米' },
+    { key: 'totalHeight', name: '高度', unit: '米' },
+    { key: 'wingSpan', name: '翼展', func: (v: number) => v.toFixed(1), unit: '米' },
+    { key: 'winglet', name: '翼尖小翼' },
+];
+
+// 发动机信息
+const engineInfo: { key: keyof AircraftItem, name: string, unit?: string, func?: (...args: any[]) => unknown }[] = [
+    { key: 'engineModel', name: '发动机' },
+    { key: 'engPower', name: '推力', unit: '千瓦' },
+    { key: 'toga', name: '起飞全发TOGA推力', unit: '千瓦' },
+    { key: 'togaInvalid', name: '起飞一发失效TOGA推力', unit: '千瓦' },
+];
+
+// 重量数据
+const weightData: { key: keyof AircraftItem, name: string, unit?: string, func?: (...args: any[]) => unknown }[] = [
+    { key: 'oew', name: '空机重', unit: '公斤' },
+    { key: 'bew', name: '基本空机重量', unit: '公斤' },
+    { key: 'maxDepartWeight', name: '最大起飞重量', unit: '公斤' },
+    { key: 'maxLandfallWeight', name: '最大着陆重量', unit: '公斤' },
+    { key: 'maxNoOilWeight', name: '最大无油重量', unit: '公斤' },
+    { key: 'maxTakeOffWeight', name: '最大起飞重量', unit: '公斤' },
+    { key: 'maxLandWeight', name: '最大着陆重量', unit: '公斤' },
+    { key: 'maxZerofuelWeight', name: '最大无油重量', unit: '公斤' },
+];
+
+// 运营参数
+const operationParams: { key: keyof AircraftItem, name: string, unit?: string, func?: (...args: any[]) => unknown }[] = [
+    { key: 'availableSeatNum', name: '可用座位数' },
+    { key: 'maxPayload', name: '最大载荷', unit: '公斤' },
+    { key: 'availableLoad', name: '可用载荷', unit: '公斤' },
+    { key: 'maxTaxiWt', name: '最大滑行重量', unit: '公斤' },
+    { key: 'limitTkofWt', name: '最大起飞限制重量', unit: '公斤' },
+    { key: 'limitLndWt', name: '最大着陆限制重量', unit: '公斤' },
+];
+
+// 设备能力
+const equipmentCapability: { key: keyof AircraftItem, name: string, unit?: string, func?: (...args: any[]) => unknown }[] = [
+    { key: 'iscat2', name: '是否CAT II' },
+    { key: 'rvsmYn', name: 'RVSM 标志' },
+    { key: 'rnpApchYn', name: 'RNP APCH 标志' },
+    { key: 'rnpArYn', name: 'RNP AR 标志' },
+    { key: 'oxygenTime', name: '供氧时长', unit: '分钟' },
+    { key: 'plateauYn', name: '高原标志' },
+    { key: 'cat2Yn', name: 'CAT2 标志' },
+    { key: 'overwaterFlag', name: '跨水标识' },
+    { key: 'extOverwaterFlag', name: '扩展跨水标志' },
+    { key: 'hightPalteauFlag', name: '高高原标志' },
+    { key: 'etops', name: 'ETOPS 分钟数', unit: '分钟' },
+    { key: 'isHf', name: '是否有HF' },
+    { key: 'isSatelliteTelephone', name: '便捷式或固定式卫星电话' },
+];
+
+// 运营标志
+const operationFlags: { key: keyof AircraftItem, name: string, unit?: string, func?: (...args: any[]) => unknown }[] = [
+    { key: 'validFlag', name: '有效标志' },
+    { key: 'startDate', name: '初次服役' },
+    { key: 'pOrC', name: '客货标志' },
+    { key: 'carrier', name: '承运人' },
+    { key: 'layout', name: '布局' },
+    { key: 'class', name: '飞机分类' },
+    { key: 'restGrade', name: '该飞机休息设施等级' },
+    { key: 'oewIdx', name: '空机重量指数' },
+    { key: 'oewGc', name: '空机重量 GC' },
+    { key: 'callFreq', name: '呼叫频率', unit: '赫兹' },
+    { key: 'modS', name: 'MOD S' },
+    { key: 'telNo', name: '电话号码' },
+    { key: 'fltStartDate', name: '飞行开始日期' },
+    { key: 'fltEndDate', name: '飞行结束日期' },
+    { key: 'rmk', name: 'RMK项' },
+    { key: 'regId', name: '飞机ID' },
+];
+
 const aircraftKeysArray: { key: keyof AircraftItem, name: string, unit?: string, default: boolean, func?: (...args: any[]) => unknown }[] = [
     { key: 'totalLength', name: '长度', default: true, unit: '米' },
     { key: 'totalHeight', name: '高度', default: true, unit: '米' },
@@ -144,61 +279,58 @@ const aircraftKeysArray: { key: keyof AircraftItem, name: string, unit?: string,
 </script>
 <style lang="less" scoped>
 .detail {
-    display: flex;
-    flex-direction: column;
-    margin: 10px;
-    padding: 2px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
-    .mate {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 4px;
-        background-color: #e0e0e0;
-        border-radius: 5px;
+    .detail-group {
+        border-bottom: 1px solid #f0f0f0;
 
-        .id {
+        &:last-child {
+            border-bottom: none;
+        }
+
+        .group-title {
+            font-size: 16px;
             font-weight: bold;
-            color: #333;
+            color: #111418;
+            padding: 16px 16px 8px;
+            margin: 0;
+            background-color: #f8f9fa;
         }
 
-        .ac-type {
-            color: #555;
+        .items {
+            .item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 16px;
+                border-bottom: 1px solid #f9f9f9;
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                &.even {
+                    background-color: #f5f5f5;
+                }
+
+                .key {
+                    font-weight: 500;
+                    color: #333;
+                    font-size: 14px;
+                }
+
+                .value {
+                    color: #555;
+                    font-size: 14px;
+                    text-align: right;
+                    flex: 1;
+                    margin-left: 16px;
+                }
+            }
         }
-    }
-
-    .items {
-        margin-top: 20px;
-
-        .item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-
-            &.even {
-                background-color: #f5f5f5;
-            }
-
-            .key {
-                font-weight: bold;
-                color: #333;
-                font-size: 0.9rem;
-            }
-
-            .value {
-                color: #555;
-                font-size: 0.9rem;
-            }
-        }
-    }
-
-    .more {
-        display: flex;
-        text-align: center;
     }
 }
 </style>

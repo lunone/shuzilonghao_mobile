@@ -61,7 +61,7 @@ const MODULE_PERMISSIONS = {
       { path: "pages/analysis/year", text: "历史情况", icon: "analysis", permission: "analysis:year" },
       { path: "pages/analysis/airlines", text: "航线分析", icon: "airline", permission: "analysis:airline" },
       { path: "pages/analysis/overview", text: "运行概览", icon: "info", permission: "analysis:overview" },
-      { path: "pages/airplane/airplane", text: "机队分析", icon: "aircraft", permission: "airplane:analysis" }
+      { path: "pages/airplane/aircraftList", text: "机队分析", icon: "aircraft", permission: "airplane:analysis" }
     ]
   },
   safety: {
