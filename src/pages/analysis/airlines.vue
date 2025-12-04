@@ -6,43 +6,25 @@
         <!-- <div class="divider"></div> -->
         <div class="container">
             <div class="filters">
-                <button v-for="city in cityList" :key="city" 
-                    @click="!loading && (selectedCity = city)"
-                    :disabled="loading"
-                    :class="{ active: selectedCity === city, disabled: loading }">
+                <button v-for="city in cityList" :key="city" @click="!loading && (selectedCity = city)"
+                    :disabled="loading" :class="{ active: selectedCity === city, disabled: loading }">
                     {{ getAirportName(city) }}
                 </button>
             </div>
 
             <div class="tabs">
-                <button @click="activeTab = 'arrival'" :class="{ active: activeTab === 'arrival' }">进港</button>
-                <button @click="activeTab = 'departure'" :class="{ active: activeTab === 'departure' }">出港</button>
+                <wd-button size="small" :type="activeTab === 'arrival' ? 'primary' : 'default'" @click="activeTab = 'arrival'">进港</wd-button>
+                <wd-button size="small" :type="activeTab === 'departure' ? 'primary' : 'default'" @click="activeTab = 'departure'">出港</wd-button>
             </div>
 
             <div v-if="loading" class="loading">加载中...</div>
             <div v-else-if="error" class="error">{{ error }}</div>
             <div v-else class="airlines-list">
-                <div v-for="flight in displayedFlights" :key="flight.route" class="airline-card">
-                    <div class="route-info">
-                        <h4 class="route-title">{{flight.route.split('-').map(c => getAirportName(c)).join(' → ')}}
-                        </h4>
-                        <p>货量: {{ flight.total.cargo.toLocaleString() }} 千克</p>
-                        <p>重量: {{ flight.total.weight.toLocaleString() }} 吨</p>
-                        <p>航班: {{ flight.total.counter }}</p>
-                    </div>
-                    <div class="route-chart">
-                        <div class="chart-placeholder">
-                            <!-- Simplified chart representation -->
-                            <svg viewBox="0 0 80 40" xmlns="http://www.w3.org/2000/svg">
-                                <path :d="generateSparkline(flight.total.trend)"
-                                    :stroke="getTrendColor(flight.total.percentage)" stroke-width="2" fill="none" />
-                            </svg>
-                        </div>
-                        <span class="chart-percentage" :style="{ color: getTrendColor(flight.total.percentage) }">
-                            {{ flight.total.percentage > 0 ? '+' : '' }}{{ flight.total.percentage }}%
-                        </span>
-                    </div>
-                </div>
+
+                <StationStatsCard v-for="flight in displayedFlights" :key="flight.route"
+                    :title="flight.route.split('-').map(c => getAirportName(c)).join(' → ')"
+                    :data="formatFlightData(flight)" />
+
             </div>
         </div>
     </div>
@@ -54,6 +36,7 @@ import dayjs from 'dayjs';
 import zlDateRangePicker from '@/components/zl/dateRangePicker.vue';
 import { getStatByAirline } from '@/api/statistics.api';
 import { useAirportStore } from '@/store/airport.store';
+import StationStatsCard from './components/StationStatsCard.vue';
 
 const airportStore = useAirportStore();
 const { getCity: getAirportName } = airportStore;
@@ -132,7 +115,7 @@ const fetchData = async (startDate: Date, endDate: Date) => {
             cities[arrival].arrival.push(routeInfo);
         }
         allStats.value = Object.values(cities);
-        
+
         // 只有在初始加载且没有选择城市时才设置默认城市
         if (allStats.value.length > 0 && !selectedCity.value) {
             const hasCgoData = allStats.value.some(city => city.name === 'CGO');
@@ -189,13 +172,20 @@ const getTrendColor = (percentage: number) => {
     if (percentage < 0) return '#f44336'; // Red for negative
     return '#9e9e9e'; // Grey for zero
 };
+const formatFlightData = (flight: any) => {
+    return [
+        { label: '货量', value: `${flight.total.cargo.toLocaleString()} 千克`, icon: 'gift-filled' },
+        { label: '重量', value: `${flight.total.weight.toLocaleString()} 吨`, icon: 'refreshempty' },
+        { label: '航班', value: flight.total.counter, icon: 'paperplane-filled' },
+    ];
+};
 </script>
 
 <style lang="less" scoped>
 @import "@/css/base.less";
 
 .page-container {
-    background-color: #f3f4f6;
+    background-color: #f8f8f8;
     min-height: 100vh;
 }
 
@@ -206,7 +196,7 @@ const getTrendColor = (percentage: number) => {
     // border-bottom-right-radius: 20px;
 
     ::v-deep .zl-date-range-picker {
-        background-color: rgba(255, 255, 255, 0.2);
+        background-color: rgba(255, 255, 255, 0.9);
         border-radius: 20px;
 
         .date-range-text {
@@ -218,17 +208,17 @@ const getTrendColor = (percentage: number) => {
             display: inline-block;
             width: 16px;
             height: 16px;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>');
+            // background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>');
             background-size: contain;
             background-repeat: no-repeat;
         }
     }
 }
 
-.divider {
-    height: 10px;
-    background-color: #f3f4f6;
-}
+// .divider {
+//     height: 10px;
+//     background-color: #f8f8f8;
+// }
 
 .container {
     padding: 15px;
@@ -251,10 +241,10 @@ const getTrendColor = (percentage: number) => {
     }
 
     button {
-        padding: 4px 12px;
+        padding: 0px 10px;
         border: 1px solid #dcdcdc;
         background-color: #fff;
-        border-radius: 16px; // Adjust border radius
+        border-radius: 8px; // Adjust border radius
         cursor: pointer;
         font-size: 14px;
         color: #333;
@@ -266,9 +256,9 @@ const getTrendColor = (percentage: number) => {
         }
 
         &.active {
-            background-color: #2952a4;
+            background-color: #4a90e2;
             color: white;
-            border-color: #2952a4;
+            border-color: #4a90e2;
         }
 
         &.disabled {
@@ -281,70 +271,12 @@ const getTrendColor = (percentage: number) => {
 
 .tabs {
     display: flex;
+    gap: 10px;
     margin-bottom: 15px;
-    background-color: #e5e7eb;
-    border-radius: 8px;
-    padding: 2px; // Reduce padding
 
-    button {
+    ::v-deep .wd-button {
         flex: 1;
-        padding: 1px; // Reduce vertical padding further
-        border: none;
-        background-color: transparent;
-        cursor: pointer;
-        font-size: 16px;
-        color: #666;
-        border-radius: 6px;
-        transition: all 0.3s ease;
-
-        &.active {
-            background-color: #fff;
-            color: #2952a4;
-            font-weight: bold;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); // Subtle shadow
-        }
-    }
-}
-
-.airline-card {
-    background-color: #fff;
-    border-radius: 12px;
-    margin-bottom: 15px;
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-
-    .route-info {
-        .route-title {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        p {
-            font-size: 14px;
-            color: #666;
-            margin: 4px 0;
-        }
-    }
-
-    .route-chart {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-
-        .chart-placeholder {
-            width: 80px;
-            height: 40px;
-        }
-
-        .chart-percentage {
-            font-size: 14px;
-            font-weight: bold;
-            margin-top: 5px;
-        }
     }
 }
 </style>
+
