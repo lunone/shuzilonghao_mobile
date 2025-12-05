@@ -13,7 +13,7 @@
           <p class="flight-route">{{ flight.route }}</p>
         </div>
         <div class="flight-duration">
-          <p class="duration-label">执飞时长</p>
+          <p class="duration-label">飞行小时</p>
           <p class="duration-value">{{ flight.duration }}</p>
         </div>
       </div>

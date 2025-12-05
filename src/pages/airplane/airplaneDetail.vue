@@ -39,7 +39,91 @@
         <!-- 飞机详细信息 -->
         <div class="data-section">
             <h3 class="section-group-title">详细信息</h3>
-            <DetailAircraft :aircraft="aircraft" />
+            <!-- 基本尺寸信息 -->
+            <div class="detail">
+                <div class="detail-group">
+                    <h4 class="group-title">基本尺寸</h4>
+                    <div class="items">
+                        <div class="item" v-for="item in basicDimensions" :key="item.key">
+                            <span class="key">{{ item.name }}</span>
+                            <span class="value">
+                                {{ aircraft ? calac(item.func, aircraft[item.key]) : '-' }}
+                                {{ item.unit || '' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 发动机信息 -->
+                <div class="detail-group">
+                    <h4 class="group-title">发动机信息</h4>
+                    <div class="items">
+                        <div class="item" v-for="item in engineInfo" :key="item.key">
+                            <span class="key">{{ item.name }}</span>
+                            <span class="value">
+                                {{ aircraft ? calac(item.func, aircraft[item.key]) : '-' }}
+                                {{ item.unit || '' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 重量数据 -->
+                <div class="detail-group">
+                    <h4 class="group-title">重量数据</h4>
+                    <div class="items">
+                        <div class="item" v-for="item in weightData" :key="item.key">
+                            <span class="key">{{ item.name }}</span>
+                            <span class="value">
+                                {{ aircraft ? calac(item.func, aircraft[item.key]) : '-' }}
+                                {{ item.unit || '' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 运营参数 -->
+                <div class="detail-group">
+                    <h4 class="group-title">运营参数</h4>
+                    <div class="items">
+                        <div class="item" v-for="item in operationParams" :key="item.key">
+                            <span class="key">{{ item.name }}</span>
+                            <span class="value">
+                                {{ aircraft ? calac(item.func, aircraft[item.key]) : '-' }}
+                                {{ item.unit || '' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 设备能力 -->
+                <div class="detail-group">
+                    <h4 class="group-title">设备能力</h4>
+                    <div class="items">
+                        <div class="item" v-for="item in equipmentCapability" :key="item.key">
+                            <span class="key">{{ item.name }}</span>
+                            <span class="value">
+                                {{ aircraft ? calac(item.func, aircraft[item.key]) : '-' }}
+                                {{ item.unit || '' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 运营标志 -->
+                <div class="detail-group">
+                    <h4 class="group-title">运营标志</h4>
+                    <div class="items">
+                        <div class="item" v-for="item in operationFlags" :key="item.key">
+                            <span class="key">{{ item.name }}</span>
+                            <span class="value">
+                                {{ aircraft ? calac(item.func, aircraft[item.key]) : '-' }}
+                                {{ item.unit || '' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -49,10 +133,10 @@ import { onLoad } from '@dcloudio/uni-app';
 import { ref } from 'vue';
 import { AircraftItem } from '@/api/aircraft.api';
 import { useAircraftStore } from '@/store/aircraft.store';
-import DetailAircraft from './detail.vue';
-import AircraftUtilizationCard from './components/AircraftUtilizationCard.vue';
-import RecentFlightsCard from './components/RecentFlightsCard.vue';
-import MelRetentionCard from './components/MelRetentionCard.vue';
+
+import AircraftUtilizationCard from '@/pages/analysis/AircraftUtilizationCard.vue';
+import RecentFlightsCard from '@/pages/flight/RecentFlightsCard.vue';
+import MelRetentionCard from '@/pages/maintenance/mel/MelRetentionCard.vue';
 import dayjs from 'dayjs';
 
 // 获取页面参数
@@ -80,10 +164,10 @@ const getAircraftStatus = (aircraft: AircraftItem | null) => {
 
     const today = dayjs().startOf('day');
     const startDate = dayjs(aircraft.startDate || -1).startOf('day');
-    const endDate = dayjs(aircraft.endDate).startOf('day');
+    const endDate = aircraft.endDate ? dayjs(aircraft.endDate).startOf('day') : null;
 
-    if (!aircraft.endDate || (startDate.isBefore(today) && endDate.isAfter(today))) {
-        if (aircraft.regId.length < 6) {
+    if (!aircraft.endDate || (startDate.isBefore(today) && endDate?.isAfter(today))) {
+        if (aircraft.regId && aircraft.regId.length < 6) {
             return '在役';
         } else {
             return '引进中';
@@ -92,6 +176,95 @@ const getAircraftStatus = (aircraft: AircraftItem | null) => {
         return '退役';
     }
 };
+
+function calac(func, val) {
+    if (val === null || val === undefined) {
+        return '-';
+    }
+    if (typeof func === 'function') {
+        try {
+            return func(val)
+        } catch (error) {
+            return 'error';
+        }
+    }
+    return val;
+}
+
+// 基本尺寸信息
+const basicDimensions: { key: keyof AircraftItem, name: string, unit?: string, func?: (...args: any[]) => unknown }[] = [
+    { key: 'totalLength', name: '长度', unit: '米' },
+    { key: 'totalHeight', name: '高度', unit: '米' },
+    { key: 'wingSpan', name: '翼展', func: (v: number) => v.toFixed(1), unit: '米' },
+    { key: 'winglet', name: '翼尖小翼' },
+];
+
+// 发动机信息
+const engineInfo: { key: keyof AircraftItem, name: string, unit?: string, func?: (...args: any[]) => unknown }[] = [
+    { key: 'engineModel', name: '发动机' },
+    { key: 'engPower', name: '推力', unit: '千瓦' },
+    { key: 'toga', name: '起飞全发TOGA推力', unit: '千瓦' },
+    { key: 'togaInvalid', name: '起飞一发失效TOGA推力', unit: '千瓦' },
+];
+
+// 重量数据
+const weightData: { key: keyof AircraftItem, name: string, unit?: string, func?: (...args: any[]) => unknown }[] = [
+    { key: 'oew', name: '空机重', unit: '公斤' },
+    { key: 'bew', name: '基本空机重量', unit: '公斤' },
+    { key: 'maxDepartWeight', name: '最大起飞重量', unit: '公斤' },
+    { key: 'maxLandfallWeight', name: '最大着陆重量', unit: '公斤' },
+    { key: 'maxNoOilWeight', name: '最大无油重量', unit: '公斤' },
+    { key: 'maxTakeOffWeight', name: '最大起飞重量', unit: '公斤' },
+    { key: 'maxLandWeight', name: '最大着陆重量', unit: '公斤' },
+    { key: 'maxZerofuelWeight', name: '最大无油重量', unit: '公斤' },
+];
+
+// 运营参数
+const operationParams: { key: keyof AircraftItem, name: string, unit?: string, func?: (...args: any[]) => unknown }[] = [
+    { key: 'availableSeatNum', name: '可用座位数' },
+    { key: 'maxPayload', name: '最大载荷', unit: '公斤' },
+    { key: 'availableLoad', name: '可用载荷', unit: '公斤' },
+    { key: 'maxTaxiWt', name: '最大滑行重量', unit: '公斤' },
+    { key: 'limitTkofWt', name: '最大起飞限制重量', unit: '公斤' },
+    { key: 'limitLndWt', name: '最大着陆限制重量', unit: '公斤' },
+];
+
+// 设备能力
+const equipmentCapability: { key: keyof AircraftItem, name: string, unit?: string, func?: (...args: any[]) => unknown }[] = [
+    { key: 'iscat2', name: '是否CAT II' },
+    { key: 'rvsmYn', name: 'RVSM 标志' },
+    { key: 'rnpApchYn', name: 'RNP APCH 标志' },
+    { key: 'rnpArYn', name: 'RNP AR 标志' },
+    { key: 'oxygenTime', name: '供氧时长', unit: '分钟' },
+    { key: 'plateauYn', name: '高原标志' },
+    { key: 'cat2Yn', name: 'CAT2 标志' },
+    { key: 'overwaterFlag', name: '跨水标识' },
+    { key: 'extOverwaterFlag', name: '扩展跨水标志' },
+    { key: 'hightPalteauFlag', name: '高高原标志' },
+    { key: 'etops', name: 'ETOPS 分钟数', unit: '分钟' },
+    { key: 'isHf', name: '是否有HF' },
+    { key: 'isSatelliteTelephone', name: '便捷式或固定式卫星电话' },
+];
+
+// 运营标志
+const operationFlags: { key: keyof AircraftItem, name: string, unit?: string, func?: (...args: any[]) => unknown }[] = [
+    { key: 'validFlag', name: '有效标志' },
+    { key: 'startDate', name: '初次服役' },
+    { key: 'pOrC', name: '客货标志' },
+    { key: 'carrier', name: '承运人' },
+    { key: 'layout', name: '布局' },
+    { key: 'class', name: '飞机分类' },
+    { key: 'restGrade', name: '该飞机休息设施等级' },
+    { key: 'oewIdx', name: '空机重量指数' },
+    { key: 'oewGc', name: '空机重量 GC' },
+    { key: 'callFreq', name: '呼叫频率', unit: '赫兹' },
+    { key: 'modS', name: 'MOD S' },
+    { key: 'telNo', name: '电话号码' },
+    { key: 'fltStartDate', name: '飞行开始日期' },
+    { key: 'fltEndDate', name: '飞行结束日期' },
+    { key: 'rmk', name: 'RMK项' },
+    { key: 'regId', name: '飞机ID' },
+];
 </script>
 
 <style lang="less" scoped>
@@ -100,14 +273,14 @@ const getAircraftStatus = (aircraft: AircraftItem | null) => {
 .aircraft-detail-page {
     min-height: 100vh;
     background-color: #f5f5f5;
-    padding: 0 16px;
+    padding: 0 8px;
 
     .aircraft-header {
         background: linear-gradient(135deg, @color-airplane, @color-airplane-button-select);
-        color: white;
+        // color: white;
         padding: 20px;
-        border-radius: 0 0 16px 16px;
-        margin: 0 -16px 16px -16px;
+        border-radius: 16px;
+        margin: 0px;
 
         .header-info {
             margin-bottom: 16px;
@@ -156,6 +329,62 @@ const getAircraftStatus = (aircraft: AircraftItem | null) => {
             color: #333;
             margin: 0 0 12px 0;
             padding: 0 4px;
+        }
+    }
+
+    .detail {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+        .detail-group {
+            border-bottom: 1px solid #f0f0f0;
+
+            &:last-child {
+                border-bottom: none;
+            }
+
+            .group-title {
+                font-size: 16px;
+                font-weight: bold;
+                color: #111418;
+                padding: 16px 16px 8px;
+                margin: 0;
+                background-color: #f8f9fa;
+            }
+
+            .items {
+                .item {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 12px 16px;
+                    border-bottom: 1px solid #f9f9f9;
+
+                    &:last-child {
+                        border-bottom: none;
+                    }
+
+                    &.even {
+                        background-color: #f5f5f5;
+                    }
+
+                    .key {
+                        font-weight: 500;
+                        color: #333;
+                        font-size: 14px;
+                    }
+
+                    .value {
+                        color: #555;
+                        font-size: 14px;
+                        text-align: right;
+                        flex: 1;
+                        margin-left: 16px;
+                    }
+                }
+            }
         }
     }
 }
