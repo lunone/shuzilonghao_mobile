@@ -187,7 +187,7 @@ const getStatusClass = (aircraft: AircraftItem) => {
 
 const goToDetail = (acReg: string) => {
     uni.navigateTo({
-        url: `/pages/airplane/detailPage?acReg=${acReg}`
+        url: `/pages/airplane/airplaneDetail?acReg=${acReg}`
     });
 };
 

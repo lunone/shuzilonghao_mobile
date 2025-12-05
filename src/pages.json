@@ -74,9 +74,15 @@
             }
         },
         {
-            "path": "pages/airplane/detailPage",
+            "path": "pages/airplane/airplaneDetail",
             "style": {
                 "navigationBarTitleText": "飞机详情"
+            }
+        },
+        {
+            "path": "pages/airport/airportDetail",
+            "style": {
+                "navigationBarTitleText": "机场详情"
             }
         },
         {

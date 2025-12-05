@@ -141,7 +141,7 @@ export const confirmQrLogin = (ticketId: string): Promise<any> => {
  */
 export const getServerStatus = () => {
     return request<{ message: string }>({
-        url: '/api/status',
+        url: '/login/health',
         auth: false, // 明确指定此请求无需认证
         hideErrorToast: true,
         noRetryOnFail: true, // 禁止此请求在失败时触发自动重试登录
