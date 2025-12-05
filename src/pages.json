@@ -68,6 +68,12 @@
             }
         },
         {
+            "path": "pages/analysis/airlineStat",
+            "style": {
+                "navigationBarTitleText": "航线统计"
+            }
+        },
+        {
             "path": "pages/airplane/aircraftList",
             "style": {
                 "navigationBarTitleText": "机队分析"

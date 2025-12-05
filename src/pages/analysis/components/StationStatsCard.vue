@@ -1,5 +1,5 @@
 <template>
-    <div class="region-card" v-if="displayData">
+    <div class="region-card" v-if="displayData" @click="handleClick">
         <div class="card-header">
             <span class="region-name">{{ title }}</span>
             <span class="time-label" v-if="timeLabel">{{ timeLabel }}</span>
@@ -20,6 +20,8 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 
+const emit = defineEmits(['click']);
+
 type StatItem = {
     label: string;
     value: string | number;
@@ -33,6 +35,10 @@ const props = defineProps({
 });
 
 const displayData = computed(() => props.data);
+
+const handleClick = () => {
+    emit('click');
+};
 </script>
 
 <style lang="less" scoped>
@@ -47,6 +53,12 @@ const displayData = computed(() => props.data);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border: 1px solid #e8e8e8;
     display: flex;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+
+    &:hover {
+        transform: translateY(-2px);
+    }
     flex-direction: column;
     gap: 12px;
     box-sizing: border-box;

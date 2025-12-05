@@ -23,7 +23,7 @@
 
                 <StationStatsCard v-for="flight in displayedFlights" :key="flight.route"
                     :title="flight.route.split('-').map(c => getAirportName(c)).join(' → ')"
-                    :data="formatFlightData(flight)" />
+                    :data="formatFlightData(flight)" @click="navigateToDetail(flight)" />
 
             </div>
         </div>
@@ -174,6 +174,13 @@ const formatFlightData = (flight: any) => {
         { label: '小时', value: `${flight.total.hour.total.toFixed(1)} 小时`, icon: 'refreshempty' },
         { label: '航班', value: flight.total.counter, icon: 'paperplane-filled' },
     ];
+};
+
+const navigateToDetail = (flight: any) => {
+    const data = encodeURIComponent(JSON.stringify(flight));
+    uni.navigateTo({
+        url: `/pages/analysis/airlineStat?data=${data}`
+    });
 };
 </script>
 
