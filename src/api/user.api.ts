@@ -56,8 +56,8 @@ export type UserItem = {
 }
 
 interface UserInitResponse {
-  user: UserItem;
-  permissionTree: PermissionTree[];
+    user: UserItem;
+    permissionTree: PermissionTree[];
 }
 
 // 初始化用户信息
@@ -132,4 +132,19 @@ export const getUserPermissions = (data: UserIdDTO): Promise<any[]> => {
  */
 export const confirmQrLogin = (ticketId: string): Promise<any> => {
     return request({ url: '/login/qr/confirm', data: { ticketId } });
+};
+
+
+/**
+ * @description 获取服务器状态信息
+ * @returns Promise<{ message: string }>
+ */
+export const getServerStatus = () => {
+    return request<{ message: string }>({
+        url: '/api/status',
+        auth: false, // 明确指定此请求无需认证
+        hideErrorToast: true,
+        noRetryOnFail: true, // 禁止此请求在失败时触发自动重试登录
+        defaultValue: { message: '无法连接到服务器，请检查您的网络连接。' }
+    });
 };

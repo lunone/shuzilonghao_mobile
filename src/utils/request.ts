@@ -41,9 +41,21 @@ const option: AxiosRequestConfig = {
 const instance = axios.create(option)
 
 const beforeRequest = (config: any) => {
-    // todo:判断白名单
-    config.headers[CONFIG.key.token] = uni.getStorageSync(CONFIG.key.token);
-    return config
+    // 默认需要认证
+    const requireAuth = config.auth !== false;
+
+    // 定义认证白名单
+    const whiteList = [CONFIG.url.login, '/api/status']; // 登录和状态接口不需要token
+
+    if (requireAuth && !whiteList.includes(config.url)) {
+        const token = uni.getStorageSync(CONFIG.key.token);
+        if (token) {
+            config.headers[CONFIG.key.token] = token;
+        } else {
+            // 如果需要认证但没有token，理论上应该在这里中断，但401逻辑会处理
+        }
+    }
+    return config;
 }
 // 请求拦截器
 instance.interceptors.request.use(beforeRequest)
@@ -76,10 +88,24 @@ instance.interceptors.response.use(
 
         // --- 处理 401: Token 无效或过期 ---
         if (response.status === 401) {
+            // 最高优先级检查：如果请求被标记为“失败时无需重试”，则立即中断
+            if (originalRequest.noRetryOnFail) {
+                return Promise.reject(error);
+            }
+
+            // 如果此请求已重试过，说明刷新后的token仍然无效，中断循环
+            if (originalRequest._isRetry) {
+                uni.removeStorageSync(CONFIG.key.token);
+                // 跳转到错误状态页，不再显示toast
+                uni.reLaunch({ url: '/pages/public/error' });
+                return Promise.reject(new Error('LOGIN_CYCLE_INTERRUPTED'));
+            }
+
             // 如果正在刷新token，则等待刷新完成后重试
             if (refreshTokenPromise) {
                 try {
                     await refreshTokenPromise;
+                    originalRequest._isRetry = true; // 标记为已重试
                     return instance(originalRequest);
                 } catch (refreshError) {
                     return Promise.reject(refreshError);
@@ -117,6 +143,7 @@ instance.interceptors.response.use(
             try {
                 await refreshTokenPromise;
                 // 刷新成功后，重试原始请求
+                originalRequest._isRetry = true; // 标记为已重试
                 return instance(originalRequest);
             } catch (refreshError) {
                 // 刷新失败，原始请求也失败
@@ -197,6 +224,8 @@ export type RequestParams<T = any> = {
     loadingText?: string;
     hideErrorToast?: boolean;
     defaultValue?: T;
+    auth?: boolean; // 新增：是否需要认证，默认为true
+    noRetryOnFail?: boolean; // 新增：如果401，是否禁止重试，默认为false
 };
 
 /**
@@ -219,6 +248,8 @@ export const request = async <T = any>(
         loadingText = '加载中...',
         hideErrorToast = false,
         defaultValue,
+        auth,
+        noRetryOnFail,
     } = params;
 
     const hasDefaultValue = defaultValue !== undefined;
@@ -226,7 +257,8 @@ export const request = async <T = any>(
     showLoading && loadingManager.show(loadingText);
 
     try {
-        const response = await instance({ url, data });
+        const config: any = { url, data, auth, noRetryOnFail };
+        const response = await instance(config);
 
         // 检查业务逻辑错误
         if (response.data.code) {
@@ -239,7 +271,10 @@ export const request = async <T = any>(
         return response?.data?.data;
 
     } catch (error: any) {
-        if (!hideErrorToast) {
+        // 如果错误是登录循环中断的特定错误，则不显示toast
+        if (error.message === 'LOGIN_CYCLE_INTERRUPTED') {
+            // 静默处理
+        } else if (!hideErrorToast) {
             const response = error.response;
             let errorMessage = '请求失败';
 
