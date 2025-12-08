@@ -29,7 +29,7 @@ export type FlightItem = {
     arrName?: string,
     dep: string,
     depName?: string,
-    isAltn: Boolean
+    isAltn: Boolean,
     isCancle: Boolean,
     isDelay: Boolean,
     isNoRelease: Boolean,
@@ -85,4 +85,14 @@ export const getFlightsByATD = async (data: DateRangeQueryDTO): Promise<FlightIt
 // 获取航班计划
 export const getFlightPlan = async (data: DateRangeQueryDTO): Promise<FlightPlanStats> => {
     return request({ url: '/flight/plan', data });
+};
+
+// 获取最近执飞航班列表
+export const getRecentFlights = async (data: { acReg: string; startDate: string; endDate: string }): Promise<FlightItem[]> => {
+    return request({ url: '/flight/recent-flights', data });
+};
+
+// 获取航班详细信息
+export const getFlightDetail = async (data: { flightId: number }): Promise<FlightItem> => {
+    return request({ url: '/flight/detail', data });
 };

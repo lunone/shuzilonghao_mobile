@@ -5,27 +5,21 @@
             <h1 class="route-title">{{ routeTitle }}</h1>
 
             <!-- 飞机汇总总量 -->
-            <div class="card">
-                <div class="card-title">飞机汇总总量</div>
-                <div class="summary-metrics">
-                    <SummaryItem label="货量" :stats="totalStats.netWeightCargo" unit="吨" />
-                    <SummaryItem label="小时" :stats="totalStats.hour" unit="小时" />
-                    <SummaryItem label="航班" :stats="{ total: totalStats.counter }" unit="班" :is-counter="true" />
-                </div>
+
+            <div class="summary-metrics">
+                <AircraftStatsItem aircraft-reg="汇总" :aircraft-type="routeTitle" :stats="totalStats" />
             </div>
 
+
             <!-- 各机号详情 -->
-            <div class="card">
-                <div class="card-title">各机号详情</div>
-                <div class="aircraft-list">
-                    <div v-for="craft in aircrafts" :key="craft.acReg" class="aircraft-item">
-                        <div class="aircraft-reg">{{ craft.acReg }}</div>
-                        <div class="aircraft-stats">
-                            <span>{{ craft.stats.netWeightCargo.total.toFixed(1) }} 吨</span>
-                            <span>{{ craft.stats.hour.total.toFixed(1) }} 小时</span>
-                            <span>{{ craft.stats.counter }} 班</span>
-                        </div>
-                    </div>
+            <div class="aircraft-details-section">
+                <div class="section-header">
+                    <h2 class="section-title">各机号详细统计</h2>
+                    <div class="section-divider"></div>
+                </div>
+                <div class="aircraft-stats-grid">
+                    <AircraftStatsItem v-for="craft in aircrafts" :key="craft.acReg" :aircraft-reg="craft.acReg"
+                        :aircraft-type="craft.acType" :stats="craft.stats" />
                 </div>
             </div>
         </div>
@@ -35,45 +29,97 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { useAirportStore } from '@/store/airport.store';
+import { getRouteStatistics, type RouteStatisticsQueryDTO } from '@/api/statistics.api';
 import SummaryItem from './components/SummaryItem.vue';
+import AircraftStatsItem from './components/AircraftStatsItem.vue';
+import dayjs from 'dayjs';
 
 const airportStore = useAirportStore();
 const { getCity: getAirportName } = airportStore;
 
 const routeTitle = ref('');
+const currentRoute = ref(''); // 当前航线路径
 const totalStats = ref<any>({});
 const aircrafts = ref<any[]>([]);
 const loading = ref(true);
 const error = ref('');
+const routeData = ref<RouteStatisticsQueryDTO | null>(null);
 
-onLoad((options: any) => {
+// 获取航线统计数据
+const fetchRouteStatistics = async (routeParams: RouteStatisticsQueryDTO) => {
+    loading.value = true;
+    error.value = '';
+
+    try {
+        const data = await getRouteStatistics(routeParams);
+
+        totalStats.value = data.total;
+
+        // 飞机数据直接平铺在根级别，只取total
+        const aircraftArray = Object.entries(data)
+            .filter(([key]) => key !== 'total')
+            .map(([acReg, stats]) => ({
+                acReg,
+                acType: (stats as any).acType,
+                stats
+            }));
+
+        aircrafts.value = aircraftArray
+            .sort((a: any, b: any) => b.stats.netWeightCargo.total - a.stats.netWeightCargo.total);
+
+        uni.setNavigationBarTitle({ title: routeTitle.value });
+
+    } catch (err) {
+        console.error('获取航线统计数据失败:', err);
+        error.value = '获取航线数据失败';
+    } finally {
+        loading.value = false;
+    }
+};
+
+onLoad(async (options: any) => {
+    // 初始化机场数据
+    if (Object.keys(airportStore.code4).length === 0) {
+        airportStore.fetchAirports();
+    }
+
     if (options && options.data) {
         try {
+            // 解析传入的航线参数
             const flightData = JSON.parse(decodeURIComponent(options.data));
+
+            // 构建API请求参数
+            const routeParams: RouteStatisticsQueryDTO = {
+                route: flightData.route,
+                startDate: flightData.startDate || dayjs().subtract(30, 'day').format('YYYY-MM-DD'),
+                endDate: flightData.endDate || dayjs().format('YYYY-MM-DD'),
+                carrier: flightData.carrier
+            };
+
+            currentRoute.value = flightData.route;
+            routeData.value = routeParams;
+
+            // 设置页面标题 - 从airport.store获取航站名称
             const [departure, arrival] = flightData.route.split('-');
             routeTitle.value = `${getAirportName(departure)} → ${getAirportName(arrival)}`;
-            
-            totalStats.value = flightData.total;
-            aircrafts.value = flightData.aircrafts
-                .sort((a:any, b:any) => b.stats.netWeightCargo.total - a.stats.netWeightCargo.total);
-            
             uni.setNavigationBarTitle({ title: routeTitle.value });
+
+            // 获取真实数据
+            await fetchRouteStatistics(routeParams);
+
         } catch (e) {
             console.error("Data parsing error:", e);
             error.value = "无法解析航线数据";
+            loading.value = false;
         }
     } else {
         error.value = "未提供航线数据";
+        loading.value = false;
     }
-    loading.value = false;
 });
-
-if (Object.keys(airportStore.code4).length === 0) {
-    airportStore.fetchAirports();
-}
 </script>
 
 <style lang="less" scoped>
@@ -97,16 +143,37 @@ if (Object.keys(airportStore.code4).length === 0) {
     border-radius: 8px;
     padding: 16px;
     margin-bottom: 16px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.summary-card {
+    border-left: 4px solid #52c41a;
 }
 
 .card-title {
+    position: relative;
     font-size: 16px;
     font-weight: bold;
     color: #333;
     margin-bottom: 16px;
     padding-bottom: 8px;
     border-bottom: 1px solid #f0f0f0;
+
+    .title-text {
+        background-color: #fff;
+        padding-right: 8px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .title-divider {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background-color: #f0f0f0;
+    }
 }
 
 .summary-metrics {
@@ -115,39 +182,44 @@ if (Object.keys(airportStore.code4).length === 0) {
     gap: 20px;
 }
 
-.aircraft-list {
-    .aircraft-item {
+.aircraft-details-section {
+    margin-top: 24px;
+
+    .section-header {
+        position: relative;
+        margin-bottom: 20px;
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+            background-color: #f0f2f5;
+            padding-right: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-divider {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(to right, #1890ff, #722ed1);
+            transform: translateY(-50%);
+        }
+    }
+
+    .aircraft-stats-grid {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px solid #f0f0f0;
-
-        &:last-child {
-            border-bottom: none;
-        }
-
-        .aircraft-reg {
-            font-size: 15px;
-            font-weight: 500;
-            color: #1890ff;
-        }
-
-        .aircraft-stats {
-            display: flex;
-            gap: 16px;
-            font-size: 14px;
-            color: #555;
-            
-            span {
-                min-width: 80px;
-                text-align: right;
-            }
-        }
+        flex-direction: column;
+        gap: 16px;
     }
 }
 
-.loading, .error {
+.loading,
+.error {
     text-align: center;
     color: #999;
     padding-top: 40px;

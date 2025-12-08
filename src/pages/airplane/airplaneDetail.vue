@@ -1,22 +1,34 @@
 <template>
     <div class="aircraft-detail-page">
-        <!-- 顶部飞机基本信息 -->
-        <div class="aircraft-header">
-            <div class="header-info">
-                <h2 class="aircraft-id">{{ aircraft?.acReg || '飞机代码' }}</h2>
-                <p class="aircraft-type">{{ aircraft?.acType || '飞机类型' }}</p>
-            </div>
-            <div class="header-stats">
-                <div class="stat-item">
-                    <span class="stat-label">在役状态</span>
-                    <span class="stat-value">{{ getAircraftStatus(aircraft) }}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">初次服役</span>
-                    <span class="stat-value">{{ formatDate(aircraft?.startDate) }}</span>
-                </div>
-            </div>
+        <!-- 加载状态 -->
+        <div v-if="loading" class="loading-container">
+            <p class="loading-text">加载中...</p>
         </div>
+        
+        <!-- 错误状态 -->
+        <div v-else-if="error" class="error-container">
+            <p class="error-text">{{ error }}</p>
+        </div>
+        
+        <!-- 主要内容 -->
+        <div v-else-if="aircraft" class="aircraft-content">
+            <!-- 顶部飞机基本信息 -->
+            <div class="aircraft-header">
+                <div class="header-info">
+                    <h2 class="aircraft-id">{{ aircraft.acReg || '飞机代码' }}</h2>
+                    <p class="aircraft-type">{{ aircraft.acType || '飞机类型' }}</p>
+                </div>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">在役状态</span>
+                        <span class="stat-value">{{ getAircraftStatus(aircraft) }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">初次服役</span>
+                        <span class="stat-value">{{ formatDate(aircraft.startDate) }}</span>
+                    </div>
+                </div>
+            </div>
 
         <!-- 飞机运营数据分组 -->
         <div class="data-section">
@@ -125,6 +137,12 @@
                 </div>
             </div>
         </div>
+        </div>
+        
+        <!-- 无数据状态 -->
+        <div v-else class="no-data-container">
+            <p class="no-data-text">未找到飞机信息</p>
+        </div>
     </div>
 </template>
 
@@ -133,6 +151,7 @@ import { onLoad } from '@dcloudio/uni-app';
 import { ref } from 'vue';
 import { AircraftItem } from '@/api/aircraft.api';
 import { useAircraftStore } from '@/store/aircraft.store';
+import { getAircraftDetail } from '@/api/aircraft.api';
 
 import AircraftUtilizationCard from '@/pages/analysis/AircraftUtilizationCard.vue';
 import RecentFlightsCard from '@/pages/flight/RecentFlightsCard.vue';
@@ -142,13 +161,48 @@ import dayjs from 'dayjs';
 // 获取页面参数
 const aircraft = ref<AircraftItem | null>(null);
 const aircarftStore = useAircraftStore();
+const loading = ref(true);
+const error = ref('');
+
+// 获取飞机详细信息
+const fetchAircraftDetail = async (acReg: string) => {
+    loading.value = true;
+    error.value = '';
+
+    try {
+        // 首先尝试从store中获取基础信息
+        let aircraftData = aircarftStore.arr.find(item => item.acReg === acReg) || null;
+        
+        // 如果store中没有或信息不完整，则从API获取详细信息
+        if (!aircraftData || !aircraftData.totalLength) {
+            aircraftData = await getAircraftDetail({ acReg });
+        }
+        
+        aircraft.value = aircraftData;
+        
+    } catch (err) {
+        console.error('获取飞机详细信息失败:', err);
+        error.value = '获取飞机信息失败';
+        
+        // 如果API调用失败，尝试使用store中的基础数据
+        const basicData = aircarftStore.arr.find(item => item.acReg === acReg);
+        if (basicData) {
+            aircraft.value = basicData;
+            error.value = '';
+        }
+    } finally {
+        loading.value = false;
+    }
+};
 
 // 从页面参数获取飞机信息
 onLoad((options) => {
     const acReg = options.acReg as string;
     if (acReg) {
-        // 从store中查找飞机信息
-        aircraft.value = aircarftStore.arr.find(item => item.acReg === acReg) || null;
+        fetchAircraftDetail(acReg);
+    } else {
+        loading.value = false;
+        error.value = '缺少飞机注册号';
     }
 });
 
@@ -274,6 +328,23 @@ const operationFlags: { key: keyof AircraftItem, name: string, unit?: string, fu
     min-height: 100vh;
     background-color: #f5f5f5;
     padding: 0 8px;
+
+    .loading-container, .error-container, .no-data-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 200px;
+        text-align: center;
+        
+        .loading-text, .error-text, .no-data-text {
+            font-size: 16px;
+            color: #666;
+        }
+        
+        .error-text {
+            color: #dc3545;
+        }
+    }
 
     .aircraft-header {
         background: linear-gradient(135deg, @color-airplane, @color-airplane-button-select);

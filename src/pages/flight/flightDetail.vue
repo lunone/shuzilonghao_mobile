@@ -60,6 +60,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
+import { getFlightDetail } from '@/api/flight.api'
 import type { FlightItem } from '@/api/flight.api'
 
 // Props
@@ -82,48 +83,18 @@ const emit = defineEmits<{
 const loading = ref(false)
 const flightDetail = ref<FlightItem | null>(null)
 
-// 模拟从服务器获取数据
+// 从服务器获取数据
 const fetchFlightDetail = async (id: number) => {
+  if (!id) {
+    flightDetail.value = null;
+    return;
+  }
+
   loading.value = true
   try {
-    // 模拟API调用 - API: POST /api/flight/detail
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    // 模拟数据 - 在实际项目中，这里应该是API调用
-    const mockData: FlightItem = {
-      id: id,
-      date: '2024-09-03',
-      bay: 'A1',
-      flightNo: 'CA1234',
-      carrier: '中国国航',
-      abroad: false,
-      acReg: 'B-1234',
-      acType: 'B737',
-      acLinkLine: 1,
-      flightKind: '客运正班',
-      std: '08:00',
-      etd: '08:05',
-      atd: '08:03',
-      sta: '10:30',
-      eta: '10:35',
-      ata: '10:32',
-      dep: 'PEK',
-      depName: '北京首都',
-      arr: 'SHA',
-      arrName: '上海虹桥',
-      isAltn: false,
-      isCancle: false,
-      isDelay: false,
-      isNoRelease: false,
-      isPatch: false,
-      isPrint: true,
-      isRelease: true,
-      isReturn: false,
-      isTelegram: false,
-      netWeightCargo: 15000
-    }
-
-    flightDetail.value = mockData
+    // 调用真实API - API: POST /api/flight/detail
+    const data = await getFlightDetail({ flightId: id });
+    flightDetail.value = data;
   } catch (error) {
     console.error('获取航班详情失败:', error)
     flightDetail.value = null

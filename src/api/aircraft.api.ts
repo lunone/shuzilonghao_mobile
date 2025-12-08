@@ -151,3 +151,20 @@ export const getAircrafts = (): Promise<AircraftItem[]> => {
 export const getMels = (data: MelQueryDTO): Promise<MelItem[]> => {
     return request({ url: '/me/mel', data });
 };
+
+// 获取飞机详细信息
+export const getAircraftDetail = async (data: { acReg: string }): Promise<AircraftItem> => {
+    return request({ url: '/aircraft/detail', data });
+};
+
+// 飞机利用率数据类型
+export interface AircraftUtilization {
+    acReg: string;
+    utilization: number;
+    trend?: number;
+}
+
+// 获取飞机利用率数据
+export const getAircraftUtilization = async (data: { acReg: string; startDate: string; endDate: string }): Promise<AircraftUtilization> => {
+    return request({ url: '/aircraft/utilization', data });
+};

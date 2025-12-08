@@ -3,92 +3,76 @@ import type { DateRangeQueryDTO } from '@/types/common';
 
 // 统计相关接口定义 (从 stat.interface.ts 移动而来)
 
-// 机组飞行小时统计
-export interface CrewHourStats {
-  pilotCode: string;
-  pilotName: string;
-  totalHours: number;
-  monthStats: Record<string, number>;
-}
 
 // 周期统计和
 export interface PeriodStats {
-  counter: number;
-  hour: number;
-  netWeightCargo: number;
-  averageLoadFactor?: number;
+    counter: number;
+    hour: number;
+    netWeightCargo: number;
+    averageLoadFactor?: number;
 }
 
 // 月度统计
 export interface MonthlyStats {
-  year: number;
-  month: number;
-  flightCount: number;
-  totalHours: number;
-  netWeightCargo: number;
-  activeDays: number;
+    year: number;
+    month: number;
+    flightCount: number;
+    totalHours: number;
+    netWeightCargo: number;
+    activeDays: number;
 }
 
 // 按航空公司统计
 export interface AirlineStats {
-  airlineCode: string;
-  airlineName: string;
-  flightCount: number;
-  totalHours: number;
-  marketShare: number;
+    airlineCode: string;
+    airlineName: string;
+    flightCount: number;
+    totalHours: number;
+    marketShare: number;
 }
 
 // 按站点统计DTO
 export interface StationStatsDTO {
-  station: string;
-  startDate: Date | string;
-  endDate: Date | string;
+    station: string;
+    startDate: Date | string;
+    endDate: Date | string;
 }
 
 // 按站点统计响应
 export interface StationStats {
-  station: string;
-  flightCount: number;
-  totalHours: number;
-  averageDelay: number;
-  netWeightCargo: number;
+    station: string;
+    flightCount: number;
+    totalHours: number;
+    averageDelay: number;
+    netWeightCargo: number;
 }
 
-// 机组同事统计
-export interface CrewMateStats {
-  pcode: string;
-  startDate: Date | string;
-  endDate: Date | string;
+
+// 航线统计数据类型（更新后的结构 - 飞机数据直接平铺在根级别）
+export interface AircraftStats {
+    counter: number;         // 航班总数
+    hour: { total: number, avg: number, max: number, min: number }; // 飞行时间统计
+    netWeightCargo: { total: number, avg: number, max: number, min: number }; // 货量统计
+    acType?: string;         // 飞机型号（可选）
 }
 
-// 机组疲劳统计
-export interface CrewFatigueStats {
-  pcode: string;
-  startDate: Date | string;
-  endDate: Date | string;
+export interface RouteStatistics {
+    total: {                // 总统计
+        counter: number;     // 航班总数
+        hour: { total: number, avg: number, max: number, min: number };     // 总飞行小时
+        netWeightCargo: { total: number, avg: number, max: number, min: number };  // 总货量（吨）
+    };
+    // 飞机数据直接平铺在根级别，其他字段包含飞机注册号为key的统计数据
+    [key: string]: AircraftStats | RouteStatistics['total'] | undefined;
 }
 
-// 机组机搭子统计响应
-export interface CrewCrewMateStats {
-  pilotA: string;
-  pilotB: string;
-  flightCount: number;
-  totalHours: number;
+// 航线统计查询DTO
+export interface RouteStatisticsQueryDTO {
+    route: string;
+    startDate: string;
+    endDate: string;
+    carrier?: string;
 }
-
-// 机组疲劳统计响应
-export interface CrewFatigueStatsResponse {
-  pilotCode: string;
-  fatigueLevel: 'low' | 'medium' | 'high';
-  restHours: number;
-  flightHours: number;
-  lastRest: Date | string;
-}
-
-// 获取机组飞行小时统计
-export const getStatCrewFh = (data: DateRangeQueryDTO): Promise<CrewHourStats[]> => {
-    return request({ url: '/stat/crew/fh', data });
-};
 
 // 获取周期统计
 export const getStatPeriod = (data: DateRangeQueryDTO): Promise<PeriodStats> => {
@@ -115,12 +99,9 @@ export const getStatByStation = (data: StationStatsDTO): Promise<StationStats[]>
     return request({ url: '/stat/by/station', data });
 };
 
-// 获取机组同事统计
-export const getCrewMate = (data: CrewMateStats): Promise<CrewCrewMateStats[]> => {
-    return request({ url: '/stat/crew/mate', data });
-};
 
-// 获取机组疲劳统计
-export const getCrewFatigue = (data: CrewFatigueStats): Promise<CrewFatigueStatsResponse[]> => {
-    return request({ url: '/stat/crew/fatigue', data });
+
+// 获取航线统计数据
+export const getRouteStatistics = async (data: RouteStatisticsQueryDTO): Promise<RouteStatistics> => {
+    return request({ url: '/stat/by/route', data });
 };

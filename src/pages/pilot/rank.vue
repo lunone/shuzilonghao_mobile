@@ -71,7 +71,7 @@
 <script lang="ts" setup>
 import { ref, watch, onMounted, PropType, Ref, computed } from 'vue'
 import dayjs from 'dayjs';
-import { getStatCrewFh } from '@/api/statistics.api';
+import { getStatCrewFh } from '@/api/pilot.api';
 import Profile from '@/pages/hr/profile.vue';
 import { usePilotStore } from '@/store/pilot.store';
 const { getTech, fetchPilots } = usePilotStore();
