@@ -25,7 +25,7 @@
 import { ref, onMounted } from 'vue';
 import dayjs from 'dayjs';
 
-// 模拟数据
+// 模拟数据 - API: POST /api/flight/recent-flights
 const recentFlights = ref([
   {
     id: 1,

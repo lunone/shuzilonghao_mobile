@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 
-// 模拟数据
+// 模拟数据 - API: POST /api/aircraft/utilization
 const utilizationData = ref({
   sevenDays: 9.8,
   thirtyDays: 10.2

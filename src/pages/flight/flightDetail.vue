@@ -86,7 +86,7 @@ const flightDetail = ref<FlightItem | null>(null)
 const fetchFlightDetail = async (id: number) => {
   loading.value = true
   try {
-    // 模拟API调用
+    // 模拟API调用 - API: POST /api/flight/detail
     await new Promise(resolve => setTimeout(resolve, 1000))
 
     // 模拟数据 - 在实际项目中，这里应该是API调用
