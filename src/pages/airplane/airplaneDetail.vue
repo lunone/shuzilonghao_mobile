@@ -45,7 +45,13 @@
         <!-- 维护保留单分组 -->
         <div class="data-section">
             <h3 class="section-group-title">维护信息</h3>
-            <MelRetentionCard :acReg="aircraft?.acReg" />
+            <!-- 修复：添加日期参数以获取更准确的MEL数据 -->
+            <MelRetentionCard 
+                :acReg="aircraft?.acReg"
+                :startDate="defaultStartDate"
+                :endDate="defaultEndDate"
+                :dateType="'inputterDate'"
+            />
         </div>
 
         <!-- 飞机详细信息 -->
@@ -148,7 +154,7 @@
 
 <script setup lang="ts">
 import { onLoad } from '@dcloudio/uni-app';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { AircraftItem } from '@/api/aircraft.api';
 import { useAircraftStore } from '@/store/aircraft.store';
 import { getAircraftDetail } from '@/api/aircraft.api';
@@ -163,6 +169,15 @@ const aircraft = ref<AircraftItem | null>(null);
 const aircarftStore = useAircraftStore();
 const loading = ref(true);
 const error = ref('');
+
+// 计算默认日期范围（最近一个月）
+const defaultStartDate = computed(() => {
+    return dayjs().subtract(30, 'day').format('YYYY-MM-DD');
+});
+
+const defaultEndDate = computed(() => {
+    return dayjs().format('YYYY-MM-DD');
+});
 
 // 获取飞机详细信息
 const fetchAircraftDetail = async (acReg: string) => {
