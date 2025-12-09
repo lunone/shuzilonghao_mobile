@@ -1,7 +1,10 @@
 <template>
     <div class="aircraft-stats-item">
         <div class="aircraft-header">
-            <span class="aircraft-reg">{{ aircraftReg }}</span>
+            <span v-if="isSummary" class="aircraft-reg">{{ aircraftReg }}</span>
+            <navigator v-else :url="`/pages/airplane/airplaneDetail?acReg=${aircraftReg}`" class="aircraft-reg-link">
+                {{ aircraftReg }}
+            </navigator>
             <span v-if="aircraftType" class="aircraft-type">{{ aircraftType }}</span>
         </div>
         
@@ -35,14 +38,31 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import SummaryItem from './SummaryItem.vue';
+import { useAircraftStore } from '@/store/aircraft.store';
 
 const props = defineProps({
     aircraftReg: { type: String, required: true },
-    aircraftType: { type: String, default: '' },
     stats: {
         type: Object,
         required: true
     }
+});
+
+const aircraftStore = useAircraftStore();
+
+// 判断是否是汇总数据
+const isSummary = computed(() => {
+    return props.aircraftReg === '汇总';
+});
+
+// 从 store 中获取飞机类型
+const aircraftType = computed(() => {
+    if (isSummary.value) {
+        return '';
+    }
+    
+    const aircraftInfo = aircraftStore.obj[props.aircraftReg];
+    return aircraftInfo?.acType || '';
 });
 
 // 兼容两种数据结构的counter统计
@@ -90,10 +110,18 @@ const getCounterStats = () => {
     padding-bottom: 8px;
     border-bottom: 1px solid #f0f0f0;
 
-    .aircraft-reg {
+    .aircraft-reg, .aircraft-reg-link {
         font-size: 14px;
         font-weight: bold;
         color: #1890ff;
+    }
+
+    .aircraft-reg-link {
+        text-decoration: none;
+        
+        &:active {
+            opacity: 0.7;
+        }
     }
 
     .aircraft-type {

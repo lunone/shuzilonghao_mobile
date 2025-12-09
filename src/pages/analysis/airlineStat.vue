@@ -7,7 +7,7 @@
             <!-- 飞机汇总总量 -->
 
             <div class="summary-metrics">
-                <AircraftStatsItem aircraft-reg="汇总" :aircraft-type="routeTitle" :stats="totalStats" />
+                <AircraftStatsItem aircraft-reg="汇总" :stats="totalStats" />
             </div>
 
 
@@ -19,7 +19,7 @@
                 </div>
                 <div class="aircraft-stats-grid">
                     <AircraftStatsItem v-for="craft in aircrafts" :key="craft.acReg" :aircraft-reg="craft.acReg"
-                        :aircraft-type="craft.acType" :stats="craft.stats" />
+                        :stats="craft.stats" />
                 </div>
             </div>
         </div>
@@ -32,12 +32,14 @@
 import { ref, onMounted } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { useAirportStore } from '@/store/airport.store';
+import { useAircraftStore } from '@/store/aircraft.store';
 import { getRouteStatistics, type RouteStatisticsQueryDTO } from '@/api/statistics.api';
 import SummaryItem from './components/SummaryItem.vue';
 import AircraftStatsItem from './components/AircraftStatsItem.vue';
 import dayjs from 'dayjs';
 
 const airportStore = useAirportStore();
+const aircraftStore = useAircraftStore();
 const { getCity: getAirportName } = airportStore;
 
 const routeTitle = ref('');
@@ -81,6 +83,9 @@ const fetchRouteStatistics = async (routeParams: RouteStatisticsQueryDTO) => {
 };
 
 onLoad(async (options: any) => {
+    // 初始化飞机数据
+    await aircraftStore.fetchAircrafts();
+    
     // 初始化机场数据
     if (Object.keys(airportStore.code4).length === 0) {
         airportStore.fetchAirports();
