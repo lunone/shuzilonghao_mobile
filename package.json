@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "uni -p mp-weixin",
     "build": "uni build -p mp-weixin",
-    "type-check": "vue-tsc --noEmit"
+    "type-check": "vue-tsc --noEmit",
+    "clean": "rimraf dist/dev/mp-weixin && npm run dev"
   },
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-4070620250821001",

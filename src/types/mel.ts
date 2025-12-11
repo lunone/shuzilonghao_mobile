@@ -54,7 +54,7 @@ export interface MelQueryDto {
 
 export interface MelDetailDto {
     id: number;               // 主键ID（必填）
-    source: string;           // 数据来源：base-主基地，outstation-外站（必填）
+    source?: string;          // 数据来源：base-主基地，outstation-外站（可选）
 }
 
 export interface MelByAircraftDto {
@@ -85,53 +85,272 @@ export interface MelByATADto {
     size?: number;            // 每页数量
 }
 
-// MEL完整实体接口 - 用于fullEntity字段
-export interface MelFullEntity {
-    // 包含数据库所有字段，这里暂时使用VMel的字段作为基础
-    id: number;
+// 主基地数据完整实体接口 - 使用实际API返回的大写字段名
+export interface MelBaseFullEntity {
+    DDF_NO: string;
+    PKID: number;
+    ACNO: string;
+    ATA1: string;
+    TERMINAL: string;
+    APPLY_DATE: string;
+    BLTYP: string;
+    BLBS: string;
+    BLREA: string;
+    TRANSCRIBED_FROM: string;
+    FAUREP: string;
+    REPAIR_PERIOD_DAY: string;
+    REPAIR_PERIOD_UNIT: string;
+    WORKING_DATE: string;
+    EXPECTED_REPAIR_TIME: string;
+    RII: string;
+    UNIT_OPERATION_MEASURES: string;
+    OPERATIONAL_RESTRICTIONS: string;
+    WARNING_SIGN: string;
+    MAINTENANCE_MEASURES: string;
+    OBSERVATION_PROJECT: string;
+    P_SOURCE_ATA: string;
+    CHECK_INTERVAL: string;
+    CHECK_INTERVAL_UNIT: string;
+    HANDLE_PEOPLE: string;
+    APPROVED_PERSON: string;
+    INSPECTION_STANDARDS: string;
+    OFF_CONDITION: string;
+    REASONS_FOR_RENEWAL: string;
+    RENEWAL_DAT: string;
+    RENEWAL_DAT_UNIT: string;
+    RENEWAL_DATE: string;
+    RENEWAL_APPLY_MAN: string;
+    RENEWAL_APPROVED_MAN: string;
+    CORRECTIVE_ACTION: string;
+    CLOSE_DATE: string;
+    CLOSE_MAN: string;
+    CONTROL_LIST: string;
+    FEEDBACK_MAN: string;
+    FEEDBACK_DATE: string;
+    FEEDBACK_COMNET: string;
+    NOTE: string;
+    INPUTTER_ID: string;
+    INPUTTER_NAME: string;
+    INPUTTER_DATE: string;
+    OPEARTOR_NAME: string;
+    OPEARTOR_ID: string;
+    OPEARTOR_DATE: string;
+    STATUS: string;
+    OLD_DDF_NO: string;
+    NOW_DDF_NO: string;
+    REPAIR_PERIOD_FC: string;
+    REPAIR_PERIOD_FH: string;
+    CLOSE_APPROVED_MAN: string;
+    ACTYPE: string;
+    DYD: string;
+    FH: string;
+    FC: string;
+    FLD: string;
+    NEXT_A: string;
+    NEXT_C: string;
+    BLBS_NO: string;
+    SEAT_NO: string;
+    M_NO: string;
+    REPEAT_CHECK: string;
+    ETOPS_PKID: string;
+    LS_MEMO: string;
+    SG_MEMO: string;
+    LS: string;
+    SP: string;
+    SG: string;
+    OI: string;
+    APPROVE_EMP: string;
+    APPROVE_NAME: string;
+    APPROVE_DATE: string;
+    REVIEW_EMP: string;
+    REVIEW_NAME: string;
+    REVIEW_DATE: string;
+    RENEW_INS_PKID: string;
+    REPAIR_DATE: string;
+    ZB_PKID: string;
+    CLOSE_PKID: string;
+    OUT_PKID: string;
+    TYPE: string;
+    REPEAT_DAY: string;
+    REPEAT_FH: string;
+    REPEAT_FC: string;
+    HD_CHECK: string;
+    RE_PKIDS: string;
+    ATA2: string;
+    OTHER_RP: string;
+    FAUREP_EN: string;
+    ETOPS_NO: string;
+    SP_SON: string;
+    OTHER_RP_CHECK: string;
+    ETOPS: string;
+    XB_TIME: string;
+    NEXT_A_DESC: string;
+    NEXT_C_DESC: string;
+    NOTES: string;
+    REPEAT_CHECK_RE: string;
+    SCAL_DATE: string;
+    FLB_NO: string;
+    SRC_NRC: string;
+    TS: string;
+    TS_MEMO: string;
+    TRANSFER: string;
+    IF_BUSINESS: string;
+    EXPECT_REPAIR_TIME: string;
+    POST_TREATMENT: string;
+    ATA_SOURCE: string;
+    PERSONS: string;
+    TH: string;
+    OPERATIONAL_DESC: string;
+    
+    // 为了向后兼容，添加小写字段名
+    ddfNo?: string;
+    pkid?: number;
+    acReg?: string;
+    ata1?: string;
+    terminal?: string;
+    applyDate?: string;
+    deffer?: string;
+    blbs?: string;
+    blrea?: string;
+    transcribedFrom?: string;
+    des?: string;
+    repairPeriodDay?: string;
+    repairPeriodUnit?: string;
+    workingDate?: string;
+    expectedRepairTime?: string;
+    rii?: string;
+    operation?: string;
+    operationalRestrictions?: string;
+    warningSign?: string;
+    maintenanceMeasures?: string;
+    obserse?: string;
+    pSourceAta?: string;
+    checkInterval?: string;
+    checkIntervalUnit?: string;
+    handlePeople?: string;
+    approvedPerson?: string;
+    inspectionStandards?: string;
+    offCondition?: string;
+    reasonsForRenewal?: string;
+    renewalDat?: string;
+    renewalDatUnit?: string;
+    renewalDate?: string;
+    renewalApplyMan?: string;
+    renewalApprovedMan?: string;
+    correctiveAction?: string;
+    closeDate?: string;
+    closeMan?: string;
+    controlList?: string;
+    feedbackMan?: string;
+    feedbackDate?: string;
+    feedbackComnet?: string;
+    note?: string;
+    inputterId?: string;
+    inputter?: string;
+    inputterDate?: string;
+    opeartorName?: string;
+    opeartorId?: string;
+    opeartorDate?: string;
+    status?: string;
+    oldDdfNo?: string;
+    nowDdfNo?: string;
+    repairPeriodFc?: string;
+    repairPeriodFh?: string;
+    closeApprovedMan?: string;
+    actype?: string;
+    dyd?: string;
+    fh?: string;
+    fc?: string;
+    fld?: string;
+    nextA?: string;
+    nextC?: string;
+    melNo?: string;
+    seatNo?: string;
+    mNo?: string;
+    repeatCheck?: string;
+    etopsPkid?: string;
+    lsMemo?: string;
+    sgMemo?: string;
+    ls?: string;
+    sp?: string;
+    sg?: string;
+    oi?: string;
+    approveEmp?: string;
+    approver?: string;
+    approveDate?: string;
+    reviewEmp?: string;
+    reviewName?: string;
+    reviewDate?: string;
+    renewInsPkid?: string;
+    repairDate?: string;
+    zbPkid?: string;
+    closePkid?: string;
+    outPkid?: string;
+    type?: string;
+    repeatDay?: string;
+    repeatFh?: string;
+    repeatFc?: string;
+    hdCheck?: string;
+    rePkids?: string;
+    ata2?: string;
+    otherRp?: string;
+    faurepEn?: string;
+    etopsNo?: string;
+    spSon?: string;
+    otherRpCheck?: string;
+    etops?: string;
+    xbTime?: string;
+    nextADesc?: string;
+    nextCDesc?: string;
+    notes?: string;
+    repeatCheckRe?: string;
+    scalDate?: string;
+    flbNo?: string;
+    srcNrc?: string;
+    ts?: string;
+    tsMemo?: string;
+    transfer?: string;
+    ifBusiness?: string;
+    postTreatment?: string;
+    ataSource?: string;
+    persons?: string;
+    th?: string;
+    operationalDesc?: string;
+}
+
+// 外站数据完整实体接口
+export interface MelOutstationFullEntity {
+    pkid: number;
     ddfNo: string;
-    melNo: string;
     acReg: string;
-    acType: string;
     ata1: string;
-    ata2: string;
+    status: string;
+    flightSite: string;
     des: string;
+    melNo: string;
+    seatNo: string;
+    corrAction: string;
+    ifLimit: string;
     inputter: string;
-    approver: string;
     inputterDate: string;
     applyDate: string;
-    repairDate: string;
-    approveDate: string;
-    deffer: string;
-    type: string;
-    status: string;
-    source: string;
-    // 可能还有其他数据库字段，根据实际后端实现补充
-    [key: string]: any;      // 允许其他未知字段
+    modifyBy: string;
+    modifyDate: string;
+    closeBy: string;
+    closeDate: string;
+    creatName: string;
+    closeName: string;
+    updateTime: string;
+    actype: string;
+    ata2: string;
 }
+
+// MEL完整实体接口 - 联合类型
+export type MelFullEntity = MelBaseFullEntity | MelOutstationFullEntity;
 
 // MEL详情响应接口
 export interface MelDetailResponse {
-    // 基础MEL信息
-    id: number;
-    ddfNo: string;
-    melNo: string;
-    acReg: string;
-    acType: string;
-    ata1: string;
-    ata2: string;
-    des: string;
-    inputter: string;
-    approver: string;
-    inputterDate: string;
-    applyDate: string;
-    repairDate: string;
-    approveDate: string;
-    deffer: string;
-    type: string;
-    status: string;
     source: string;
-    // 完整实体对象
     fullEntity: MelFullEntity;
 }
 

@@ -189,12 +189,22 @@ const fetchAdvancedQuery = async () => {
 
 // 查看MEL详情
 const viewMelDetail = async (id: number, source: string) => {
+  console.log('点击MEL项，ID:', id, 'Source:', source);
+  
   try {
-    const detail = await melStore.fetchDetail(id, source);
-    console.log('MEL详情:', detail);
-    // 这里可以跳转到详情页面或显示详情弹窗
+    // 跳转到详情页面
+    const url = `/pages/maintenance/mel/melDetail?id=${id}&source=${source || ''}`;
+    console.log('跳转URL:', url);
+    
+    uni.navigateTo({
+      url: url
+    });
   } catch (error) {
-    console.error('获取MEL详情失败:', error);
+    console.error('跳转到MEL详情页面失败:', error);
+    uni.showToast({
+      title: '跳转失败',
+      icon: 'none'
+    });
   }
 };
 

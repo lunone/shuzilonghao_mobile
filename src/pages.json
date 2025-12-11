@@ -200,6 +200,12 @@
             "style": {
                 "navigationBarTitleText": "值班"
             }
+        },
+        {
+            "path": "pages/maintenance/mel/melDetail",
+            "style": {
+                "navigationBarTitleText": "MEL详情"
+            }
         }
     ],
     "tabBar": { // 这里并没有被渲染，存在价值，第一引入了tabBar机制，第二list传入了tab白名单。

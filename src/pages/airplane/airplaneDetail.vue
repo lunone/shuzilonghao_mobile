@@ -4,12 +4,12 @@
         <div v-if="loading" class="loading-container">
             <p class="loading-text">加载中...</p>
         </div>
-        
+
         <!-- 错误状态 -->
         <div v-else-if="error" class="error-container">
             <p class="error-text">{{ error }}</p>
         </div>
-        
+
         <!-- 主要内容 -->
         <div v-else-if="aircraft" class="aircraft-content">
             <!-- 顶部飞机基本信息 -->
@@ -30,121 +30,117 @@
                 </div>
             </div>
 
-        <!-- 飞机运营数据分组 -->
-        <div class="data-section">
-            <h3 class="section-group-title">运营数据</h3>
-            <AircraftUtilizationCard :acReg="aircraft?.acReg" />
-        </div>
+            <!-- 飞机运营数据分组 -->
+            <div class="data-section">
+                <h3 class="section-group-title">运营数据</h3>
+                <AircraftUtilizationCard :acReg="aircraft?.acReg" />
+            </div>
 
-        <!-- 航班执飞记录分组 -->
-        <div class="data-section">
-            <h3 class="section-group-title">航班记录</h3>
-            <RecentFlightsCard :acReg="aircraft?.acReg" />
-        </div>
+            <!-- 航班执飞记录分组 -->
+            <div class="data-section">
+                <h3 class="section-group-title">航班记录</h3>
+                <RecentFlightsCard :acReg="aircraft?.acReg" />
+            </div>
 
-        <!-- 维护保留单分组 -->
-        <div class="data-section">
-            <h3 class="section-group-title">维护信息</h3>
-            <!-- 修复：添加日期参数以获取更准确的MEL数据 -->
-            <MelRetentionCard 
-                :acReg="aircraft?.acReg"
-                :startDate="defaultStartDate"
-                :endDate="defaultEndDate"
-                :dateType="'inputterDate'"
-            />
-        </div>
+            <!-- 维护保留单分组 -->
+            <div class="data-section">
+                <h3 class="section-group-title">维护信息</h3>
+                <!-- 修复：添加日期参数以获取更准确的MEL数据 -->
+                <Mel :acReg="aircraft?.acReg" :startDate="defaultStartDate" :endDate="defaultEndDate"
+                    :dateType="'inputterDate'" />
+            </div>
 
-        <!-- 飞机详细信息 -->
-        <div class="data-section">
-            <h3 class="section-group-title">详细信息</h3>
-            <!-- 基本尺寸信息 -->
-            <div class="detail">
-                <div class="detail-group">
-                    <h4 class="group-title">基本尺寸</h4>
-                    <div class="items">
-                        <div class="item" v-for="item in basicDimensions" :key="item.key">
-                            <span class="key">{{ item.name }}</span>
-                            <span class="value">
-                                {{ aircraft ? calac(item.func, aircraft[item.key]) : '-' }}
-                                {{ item.unit || '' }}
-                            </span>
+            <!-- 飞机详细信息 -->
+            <div class="data-section">
+                <h3 class="section-group-title">详细信息</h3>
+                <!-- 基本尺寸信息 -->
+                <div class="detail">
+                    <div class="detail-group">
+                        <h4 class="group-title">基本尺寸</h4>
+                        <div class="items">
+                            <div class="item" v-for="item in basicDimensions" :key="item.key">
+                                <span class="key">{{ item.name }}</span>
+                                <span class="value">
+                                    {{ aircraft ? calac(item.func, aircraft[item.key]) : '-' }}
+                                    {{ item.unit || '' }}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- 发动机信息 -->
-                <div class="detail-group">
-                    <h4 class="group-title">发动机信息</h4>
-                    <div class="items">
-                        <div class="item" v-for="item in engineInfo" :key="item.key">
-                            <span class="key">{{ item.name }}</span>
-                            <span class="value">
-                                {{ aircraft ? calac(item.func, aircraft[item.key]) : '-' }}
-                                {{ item.unit || '' }}
-                            </span>
+                    <!-- 发动机信息 -->
+                    <div class="detail-group">
+                        <h4 class="group-title">发动机信息</h4>
+                        <div class="items">
+                            <div class="item" v-for="item in engineInfo" :key="item.key">
+                                <span class="key">{{ item.name }}</span>
+                                <span class="value">
+                                    {{ aircraft ? calac(item.func, aircraft[item.key]) : '-' }}
+                                    {{ item.unit || '' }}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- 重量数据 -->
-                <div class="detail-group">
-                    <h4 class="group-title">重量数据</h4>
-                    <div class="items">
-                        <div class="item" v-for="item in weightData" :key="item.key">
-                            <span class="key">{{ item.name }}</span>
-                            <span class="value">
-                                {{ aircraft ? calac(item.func, aircraft[item.key]) : '-' }}
-                                {{ item.unit || '' }}
-                            </span>
+                    <!-- 重量数据 -->
+                    <div class="detail-group">
+                        <h4 class="group-title">重量数据</h4>
+                        <div class="items">
+                            <div class="item" v-for="item in weightData" :key="item.key">
+                                <span class="key">{{ item.name }}</span>
+                                <span class="value">
+                                    {{ aircraft ? calac(item.func, aircraft[item.key]) : '-' }}
+                                    {{ item.unit || '' }}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- 运营参数 -->
-                <div class="detail-group">
-                    <h4 class="group-title">运营参数</h4>
-                    <div class="items">
-                        <div class="item" v-for="item in operationParams" :key="item.key">
-                            <span class="key">{{ item.name }}</span>
-                            <span class="value">
-                                {{ aircraft ? calac(item.func, aircraft[item.key]) : '-' }}
-                                {{ item.unit || '' }}
-                            </span>
+                    <!-- 运营参数 -->
+                    <div class="detail-group">
+                        <h4 class="group-title">运营参数</h4>
+                        <div class="items">
+                            <div class="item" v-for="item in operationParams" :key="item.key">
+                                <span class="key">{{ item.name }}</span>
+                                <span class="value">
+                                    {{ aircraft ? calac(item.func, aircraft[item.key]) : '-' }}
+                                    {{ item.unit || '' }}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- 设备能力 -->
-                <div class="detail-group">
-                    <h4 class="group-title">设备能力</h4>
-                    <div class="items">
-                        <div class="item" v-for="item in equipmentCapability" :key="item.key">
-                            <span class="key">{{ item.name }}</span>
-                            <span class="value">
-                                {{ aircraft ? calac(item.func, aircraft[item.key]) : '-' }}
-                                {{ item.unit || '' }}
-                            </span>
+                    <!-- 设备能力 -->
+                    <div class="detail-group">
+                        <h4 class="group-title">设备能力</h4>
+                        <div class="items">
+                            <div class="item" v-for="item in equipmentCapability" :key="item.key">
+                                <span class="key">{{ item.name }}</span>
+                                <span class="value">
+                                    {{ aircraft ? calac(item.func, aircraft[item.key]) : '-' }}
+                                    {{ item.unit || '' }}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- 运营标志 -->
-                <div class="detail-group">
-                    <h4 class="group-title">运营标志</h4>
-                    <div class="items">
-                        <div class="item" v-for="item in operationFlags" :key="item.key">
-                            <span class="key">{{ item.name }}</span>
-                            <span class="value">
-                                {{ aircraft ? calac(item.func, aircraft[item.key]) : '-' }}
-                                {{ item.unit || '' }}
-                            </span>
+                    <!-- 运营标志 -->
+                    <div class="detail-group">
+                        <h4 class="group-title">运营标志</h4>
+                        <div class="items">
+                            <div class="item" v-for="item in operationFlags" :key="item.key">
+                                <span class="key">{{ item.name }}</span>
+                                <span class="value">
+                                    {{ aircraft ? calac(item.func, aircraft[item.key]) : '-' }}
+                                    {{ item.unit || '' }}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        </div>
-        
+
         <!-- 无数据状态 -->
         <div v-else class="no-data-container">
             <p class="no-data-text">未找到飞机信息</p>
@@ -161,7 +157,7 @@ import { getAircraftDetail } from '@/api/aircraft.api';
 
 import AircraftUtilizationCard from '@/pages/analysis/AircraftUtilizationCard.vue';
 import RecentFlightsCard from '@/pages/flight/RecentFlightsCard.vue';
-import MelRetentionCard from '@/pages/maintenance/mel/MelRetentionCard.vue';
+import Mel from '@/pages/maintenance/mel/melList.vue';
 import dayjs from 'dayjs';
 
 // 获取页面参数
@@ -187,18 +183,18 @@ const fetchAircraftDetail = async (acReg: string) => {
     try {
         // 首先尝试从store中获取基础信息
         let aircraftData = aircarftStore.arr.find(item => item.acReg === acReg) || null;
-        
+
         // 如果store中没有或信息不完整，则从API获取详细信息
         if (!aircraftData || !aircraftData.totalLength) {
             aircraftData = await getAircraftDetail({ acReg });
         }
-        
+
         aircraft.value = aircraftData;
-        
+
     } catch (err) {
         console.error('获取飞机详细信息失败:', err);
         error.value = '获取飞机信息失败';
-        
+
         // 如果API调用失败，尝试使用store中的基础数据
         const basicData = aircarftStore.arr.find(item => item.acReg === acReg);
         if (basicData) {
@@ -344,18 +340,22 @@ const operationFlags: { key: keyof AircraftItem, name: string, unit?: string, fu
     background-color: #f5f5f5;
     padding: 0 8px;
 
-    .loading-container, .error-container, .no-data-container {
+    .loading-container,
+    .error-container,
+    .no-data-container {
         display: flex;
         justify-content: center;
         align-items: center;
         min-height: 200px;
         text-align: center;
-        
-        .loading-text, .error-text, .no-data-text {
+
+        .loading-text,
+        .error-text,
+        .no-data-text {
             font-size: 16px;
             color: #666;
         }
-        
+
         .error-text {
             color: #dc3545;
         }

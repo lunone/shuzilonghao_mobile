@@ -74,7 +74,7 @@
   - `size?: number` - 每页数量
 
 ### 6. 根据日期范围查询
-- **路径**: `POST /mel/by/date-range`
+- **路径**: `POST /mel/by/date`
 - **描述**: 根据日期范围查询
 - **参数**: `MelByDateRangeDto`
   - `startDate?: Date` - 开始日期

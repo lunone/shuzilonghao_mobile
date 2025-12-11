@@ -1,5 +1,7 @@
 <template>
-    <nav-vue title="维修活动" text="主页" url='/home' />
+    <div class="maintenance-header">
+        <div class="header-title">维修活动</div>
+    </div>
     <van-notice-bar wrapable :scrollable="false" left-icon="info-o">
         该功能时间原因未完成。非真实数据，仅做演示。
     </van-notice-bar>
@@ -14,6 +16,16 @@
                 <span>全年机械原因396事件万架次率为6.6每万架次，同比下降68%，</span>
             </div>
             <bar-chart :option="barOption" />
+        </div>
+        <van-divider>MEL保留单管理</van-divider>
+        <div class="mel-section">
+            <div class="title">MEL保留单</div>
+            <div class="mel-description">
+                点击查看MEL保留单列表和详情
+            </div>
+            <button class="mel-button" @click="goToMelList">
+                查看MEL列表
+            </button>
         </div>
         <van-divider>工作部分</van-divider>
         <div class="recent-activities">
@@ -61,9 +73,14 @@
 </template>
 
 <script setup lang="ts">
-import NavVue from '@/components/Nav.vue';
-import BarChart from '@/components/chart/BarChart.vue';
 import { computed } from 'vue';
+
+// 跳转到MEL列表页面
+const goToMelList = () => {
+    uni.navigateTo({
+        url: '/pages/maintenance/mel/melList'
+    });
+};
 
 // 模拟数据
 const recentActivities = [
@@ -155,6 +172,19 @@ const barOption = computed(() => {
 
 <style lang="less" scoped>
 @import "@/css/base.less";
+
+.maintenance-header {
+    background: white;
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    
+    .header-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+    }
+}
 
 .maintenance-container {
     padding: 20px;
@@ -256,6 +286,41 @@ const barOption = computed(() => {
                 .warehouse-destination {
                     flex: 1;
                 }
+            }
+        }
+    }
+
+    .mel-section {
+        padding: 16px;
+        background: white;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+        .mel-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .mel-button {
+            background: #137fec;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+
+            &:hover {
+                background: #0e6bb8;
+            }
+
+            &:active {
+                background: #0a5294;
             }
         }
     }

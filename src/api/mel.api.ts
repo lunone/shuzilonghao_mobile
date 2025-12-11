@@ -41,11 +41,14 @@ export class MelAPIService {
      * 获取单个MEL记录详情
      */
     static async getMelDetail(params: MelDetailDto): Promise<MelDetailResponse> {
-        return request({
+        console.log('调用MEL详情API，参数:', params);
+        const result = await request({
             url: '/mel/detail',
             data: params,
             showLoading: true
         });
+        console.log('MEL详情API返回结果:', result);
+        return result;
     }
 
     /**
@@ -209,7 +212,7 @@ export class MelQueryBuilderImpl implements MelQueryBuilder {
         return MelAPIService.getMelStats(this.params);
     }
 
-    async detail(id: number, source: string): Promise<MelDetailResponse> {
+    async detail(id: number, source?: string): Promise<MelDetailResponse> {
         return MelAPIService.getMelDetail({ id, source });
     }
 

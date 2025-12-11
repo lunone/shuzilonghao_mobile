@@ -139,7 +139,7 @@ export const useMelStore = defineStore('mel', () => {
     /**
      * 获取MEL详情
      */
-    const fetchDetail = async (id: number, source: string) => {
+    const fetchDetail = async (id: number, source?: string) => {
         loading.value.detail = true;
         clearError();
         
