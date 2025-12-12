@@ -206,6 +206,69 @@
             "style": {
                 "navigationBarTitleText": "MEL详情"
             }
+        },
+        {
+            "path": "pages/mel/index",
+            "style": {
+                "navigationBarTitleText": "MEL管理",
+                "navigationBarBackgroundColor": "#137fec"
+            }
+        },
+        {
+            "path": "pages/mel/list/index",
+            "style": {
+                "navigationBarTitleText": "MEL列表",
+                "navigationBarBackgroundColor": "#137fec"
+            }
+        },
+        {
+            "path": "pages/mel/list/search",
+            "style": {
+                "navigationBarTitleText": "高级搜索",
+                "navigationBarBackgroundColor": "#137fec"
+            }
+        },
+        {
+            "path": "pages/mel/detail/index",
+            "style": {
+                "navigationBarTitleText": "MEL详情",
+                "navigationBarBackgroundColor": "#137fec"
+            }
+        },
+        {
+            "path": "pages/mel/stats/index",
+            "style": {
+                "navigationBarTitleText": "统计概览",
+                "navigationBarBackgroundColor": "#137fec"
+            }
+        },
+        {
+            "path": "pages/mel/stats/status",
+            "style": {
+                "navigationBarTitleText": "状态统计",
+                "navigationBarBackgroundColor": "#137fec"
+            }
+        },
+        {
+            "path": "pages/mel/stats/ata",
+            "style": {
+                "navigationBarTitleText": "ATA统计",
+                "navigationBarBackgroundColor": "#137fec"
+            }
+        },
+        {
+            "path": "pages/mel/stats/monthly",
+            "style": {
+                "navigationBarTitleText": "月度统计",
+                "navigationBarBackgroundColor": "#137fec"
+            }
+        },
+        {
+            "path": "pages/mel/aircraft/index",
+            "style": {
+                "navigationBarTitleText": "按飞机查询",
+                "navigationBarBackgroundColor": "#137fec"
+            }
         }
     ],
     "tabBar": { // 这里并没有被渲染，存在价值，第一引入了tabBar机制，第二list传入了tab白名单。
