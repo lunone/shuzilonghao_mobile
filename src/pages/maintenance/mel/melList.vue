@@ -218,14 +218,14 @@ watch(() => props.acReg, (newAcReg) => {
   if (newAcReg) {
     fetchDefaultData();
   }
-}, { immediate: true });
+});
 
 // 监听日期参数变化
 watch(() => [props.startDate, props.endDate], () => {
   if (props.startDate && props.endDate) {
     fetchDefaultData();
   }
-}, { immediate: true });
+});
 
 // 组件挂载时获取数据
 onMounted(() => {

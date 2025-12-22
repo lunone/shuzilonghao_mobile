@@ -157,14 +157,31 @@ export const getAircraftDetail = async (data: { acReg: string }): Promise<Aircra
     return request({ url: '/aircraft/detail', data });
 };
 
+// 每日飞机利用率数据
+export interface DailyUtilization {
+    date: string;
+    flightHours: number;
+    fleetSize: number;
+    utilization: number;
+}
+
+// 飞机利用率汇总数据
+export interface UtilizationSummary {
+    startDate: string;
+    endDate: string;
+    totalFlightMinutes: number;
+    totalFlightHours: number;
+    totalFleetDays: number;
+    avgDailyUtilization: number;
+}
+
 // 飞机利用率数据类型
 export interface AircraftUtilization {
-    acReg: string;
-    utilization: number;
-    trend?: number;
+    summary: UtilizationSummary;
+    details: DailyUtilization[];
 }
 
 // 获取飞机利用率数据
 export const getAircraftUtilization = async (data: { acReg: string; startDate: string; endDate: string }): Promise<AircraftUtilization> => {
-    return request({ url: '/aircraft/utilization', data });
+    return request({ url: '/stat/utilization', data });
 };

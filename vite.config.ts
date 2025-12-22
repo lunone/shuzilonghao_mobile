@@ -15,8 +15,8 @@ export default defineConfig({
         API_BASE_URL: JSON.stringify(
             process.env.NODE_ENV === 'production'
                 ? 'https://app.airlonghao.com/sz'
-                // : 'http://127.0.0.1:7004'
-                : 'https://app.airlonghao.com/sz2'
+                : 'http://127.0.0.1:7004'
+                // : 'https://app.airlonghao.com/sz2'
         )
     },
     css: {

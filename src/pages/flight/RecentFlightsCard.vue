@@ -107,12 +107,6 @@ watch(() => props.acReg, (newAcReg) => {
     fetchRecentFlights();
   }
 }, { immediate: true });
-
-onMounted(() => {
-  if (props.acReg) {
-    fetchRecentFlights();
-  }
-});
 </script>
 
 <style lang="less" scoped>

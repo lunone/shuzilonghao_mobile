@@ -1,24 +1,28 @@
 <template>
   <div class="utilization-card">
-    <h3 class="section-title">日利用率(7日/30日)</h3>
-    <div class="utilization-content">
-      <div v-if="loading" class="utilization-item">
-        <p class="utilization-label">加载中...</p>
-        <p class="utilization-value">--</p>
+    <div class="card-header">
+      <h3 class="section-title">利用率</h3>
+      <div v-if="!loading && !error && utilizationData.summary" class="avg-utilization">
+        <span class="avg-label">30天平均</span>
+        <span class="avg-value">{{ utilizationData.summary.avgDailyUtilization.toFixed(1) }}h</span>
       </div>
-      <div v-else-if="error" class="utilization-item">
-        <p class="utilization-label">获取失败</p>
-        <p class="utilization-value">--</p>
+    </div>
+    
+    <div class="chart-container">
+      <div v-if="loading" class="loading-container">
+        <p class="loading-text">加载中...</p>
+      </div>
+      <div v-else-if="error" class="error-container">
+        <p class="error-text">获取失败</p>
       </div>
       <template v-else>
-        <div class="utilization-item">
-          <p class="utilization-label">近7日</p>
-          <p class="utilization-value">{{ utilizationData.sevenDays.toFixed(1) }}h</p>
-        </div>
-        <div class="divider"></div>
-        <div class="utilization-item">
-          <p class="utilization-label">近30日</p>
-          <p class="utilization-value">{{ utilizationData.thirtyDays.toFixed(1) }}h</p>
+        <u-charts
+          v-if="chartOption && chartOption.categories && chartOption.categories.length > 0"
+          :option="chartOption"
+          :height="100"
+        />
+        <div v-else class="no-data-container">
+          <p class="no-data-text">暂无数据</p>
         </div>
       </template>
     </div>
@@ -26,9 +30,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import dayjs from 'dayjs';
-import { getAircraftUtilization, type AircraftUtilization } from '@/api/aircraft.api';
+import { getAircraftUtilization, type AircraftUtilization, type DailyUtilization } from '@/api/aircraft.api';
+import uCharts from '@/components/ucharts/ucharts.vue';
 
 // Props
 interface Props {
@@ -40,12 +45,70 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 // 响应式数据
-const utilizationData = ref({
-  sevenDays: 0,
-  thirtyDays: 0
+const utilizationData = ref<AircraftUtilization>({
+  summary: {
+    startDate: '',
+    endDate: '',
+    totalFlightMinutes: 0,
+    totalFlightHours: 0,
+    totalFleetDays: 0,
+    avgDailyUtilization: 0
+  },
+  details: []
 });
 const loading = ref(false);
 const error = ref('');
+
+// 计算图表选项
+const chartOption = computed(() => {
+  if (!utilizationData.value.details || utilizationData.value.details.length === 0) {
+    return null;
+  }
+
+  // 获取最近7天的数据
+  const sevenDaysData = utilizationData.value.details.slice(-7);
+  
+  // 格式化日期显示 (MM-DD)
+  const categories = sevenDaysData.map(item => dayjs(item.date).format('MM-DD'));
+  
+  // 获取利用率数据
+  const series = [{
+    name: '日利用率',
+    data: sevenDaysData.map(item => item.utilization.toFixed(1))
+  }];
+
+  return {
+    type: 'line',
+    color: ['#137fec'],
+    padding: [15, 10, 0, 15],
+    legend: {
+      show: false
+    },
+    xAxis: {
+      disableGrid: true,
+      itemCount: 7,
+      scrollShow: false,
+      fontSize: 10,
+      fontColor: '#617589'
+    },
+    yAxis: {
+      disabled: true,
+      data: [{
+        min: 0,
+        max: Math.max(...sevenDaysData.map(item => item.utilization)) * 1.2 || 10
+      }]
+    },
+    extra: {
+      line: {
+        type: 'curve',
+        width: 2,
+        activeType: 'hollow'
+      }
+    },
+    categories,
+    series
+  };
+});
 
 // 获取飞机利用率数据
 const fetchUtilizationData = async () => {
@@ -58,32 +121,21 @@ const fetchUtilizationData = async () => {
   error.value = '';
 
   try {
-    const today = dayjs();
-    const sevenDaysAgo = today.subtract(7, 'day');
-    const thirtyDaysAgo = today.subtract(30, 'day');
+    const yesterday = dayjs().subtract(1, 'day');
+    const thirtyOneDaysAgo = yesterday.subtract(30, 'day');
 
-    // 调用API获取利用率数据
+    // 调用API获取利用率数据（不包含今天当天）
     const utilization = await getAircraftUtilization({
       acReg: props.acReg,
-      startDate: thirtyDaysAgo.format('YYYY-MM-DD'),
-      endDate: today.format('YYYY-MM-DD')
+      startDate: thirtyOneDaysAgo.format('YYYY-MM-DD'),
+      endDate: yesterday.format('YYYY-MM-DD')
     });
 
-    // 适配组件数据格式
-    // 这里使用利用率数据来计算显示值，实际项目中可能需要根据业务逻辑调整
-    utilizationData.value = {
-      sevenDays: utilization.utilization || 0,
-      thirtyDays: utilization.utilization || 0
-    };
+    utilizationData.value = utilization;
 
   } catch (err) {
     console.error('获取飞机利用率失败:', err);
     error.value = '获取数据失败';
-    // 使用默认值
-    utilizationData.value = {
-      sevenDays: 0,
-      thirtyDays: 0
-    };
   } finally {
     loading.value = false;
   }
@@ -95,12 +147,6 @@ watch(() => props.acReg, (newAcReg) => {
     fetchUtilizationData();
   }
 }, { immediate: true });
-
-onMounted(() => {
-  if (props.acReg) {
-    fetchUtilizationData();
-  }
-});
 </script>
 
 <style lang="less" scoped>
@@ -111,43 +157,59 @@ onMounted(() => {
   margin: 8px 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
-  .section-title {
-    font-size: 16px;
-    font-weight: bold;
-    color: #111418;
-    margin-bottom: 12px;
-  }
-
-  .utilization-content {
+  .card-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: space-around;
-    text-align: center;
+    margin-bottom: 16px;
 
-    .utilization-item {
+    .section-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #111418;
+      margin: 0;
+    }
+
+    .avg-utilization {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 4px;
+      align-items: flex-end;
+      gap: 2px;
 
-      .utilization-label {
+      .avg-label {
         font-size: 12px;
         color: #617589;
         margin: 0;
       }
 
-      .utilization-value {
-        font-size: 24px;
+      .avg-value {
+        font-size: 18px;
         font-weight: bold;
         color: #137fec;
         margin: 0;
       }
     }
+  }
 
-    .divider {
-      width: 1px;
-      height: 40px;
-      background: #e0e0e0;
+  .chart-container {
+    height: 100px;
+    position: relative;
+
+    .loading-container,
+    .error-container,
+    .no-data-container {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .loading-text,
+      .error-text,
+      .no-data-text {
+        font-size: 14px;
+        color: #617589;
+        margin: 0;
+      }
     }
   }
 }
