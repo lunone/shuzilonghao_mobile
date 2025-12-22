@@ -4,7 +4,12 @@
     
     <!-- 加载状态 -->
     <div v-if="melStore.isLoadingAny" class="loading-state">
-      <uni-load-more :status="getLoadingStatus()" :content-text="loadingText" />
+      <div class="loading-spinner">
+        <div class="spinner-dot"></div>
+        <div class="spinner-dot"></div>
+        <div class="spinner-dot"></div>
+      </div>
+      <p class="loading-message">{{ loadingText }}</p>
     </div>
     
     <!-- 错误状态 -->
@@ -263,6 +268,35 @@ defineExpose({
     padding: 40px 20px;
     text-align: center;
     
+    .loading-spinner {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 12px;
+      justify-content: center;
+      
+      .spinner-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #777;
+        animation: loading-bounce 1.4s infinite ease-in-out both;
+        
+        &:nth-child(1) {
+          animation-delay: -0.32s;
+        }
+        
+        &:nth-child(2) {
+          animation-delay: -0.16s;
+        }
+      }
+    }
+    
+    .loading-message {
+      font-size: 14px;
+      color: #777;
+      margin: 0;
+    }
+    
     .error-message {
       color: #ff4757;
       margin: 12px 0;
@@ -403,6 +437,15 @@ defineExpose({
           font-size: 11px;
           color: #999;
           margin-left: auto;
+        }
+      }
+      
+      @keyframes loading-bounce {
+        0%, 80%, 100% {
+          transform: scale(0);
+        }
+        40% {
+          transform: scale(1);
         }
       }
     }
