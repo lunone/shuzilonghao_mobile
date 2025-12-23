@@ -74,6 +74,12 @@
             }
         },
         {
+            "path": "pages/analysis/aircraftUtilization",
+            "style": {
+                "navigationBarTitleText": "飞机利用率分析"
+            }
+        },
+        {
             "path": "pages/airplane/aircraftList",
             "style": {
                 "navigationBarTitleText": "机队分析"

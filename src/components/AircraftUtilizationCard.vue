@@ -46,6 +46,7 @@ interface Props {
   startDate?: string; // 自定义开始日期
   endDate?: string; // 自定义结束日期
   fleetMode?: boolean; // 机队模式，查询整个机队的利用率
+  utilizationData?: AircraftUtilization | null; // 外部传入的利用率数据
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -57,8 +58,14 @@ const props = withDefaults(defineProps<Props>(), {
   compactMode: false,
   startDate: '',
   endDate: '',
-  fleetMode: false
+  fleetMode: false,
+  utilizationData: null
 });
+
+// 定义事件
+const emit = defineEmits<{
+  dataLoaded: [data: AircraftUtilization];
+}>();
 
 // 响应式数据
 const utilizationData = ref<AircraftUtilization>({
@@ -128,6 +135,12 @@ const chartOption = computed(() => {
 
 // 获取飞机利用率数据
 const fetchUtilizationData = async () => {
+  // 如果有外部传入的数据，直接使用
+  if (props.utilizationData) {
+    utilizationData.value = props.utilizationData;
+    return;
+  }
+  
   if (!props.acReg && !props.fleetMode) {
     error.value = '缺少飞机注册号';
     return;
@@ -160,6 +173,11 @@ const fetchUtilizationData = async () => {
     });
 
     utilizationData.value = utilization;
+    
+    // 如果是机队模式，触发数据加载完成事件
+    if (props.fleetMode) {
+      emit('dataLoaded', utilization);
+    }
 
   } catch (err) {
     console.error('获取飞机利用率失败:', err);
@@ -169,19 +187,26 @@ const fetchUtilizationData = async () => {
   }
 };
 
+// 监听外部传入的数据变化
+watch(() => props.utilizationData, (newData) => {
+  if (newData) {
+    utilizationData.value = newData;
+  }
+}, { immediate: true });
+
 // 监听acReg变化，重新获取数据
 watch(() => props.acReg, (newAcReg) => {
   if (newAcReg || props.fleetMode) {
     fetchUtilizationData();
   }
-}, { immediate: true });
+});
 
 // 监听fleetMode变化，重新获取数据
 watch(() => props.fleetMode, () => {
   if (props.fleetMode || props.acReg) {
     fetchUtilizationData();
   }
-}, { immediate: true });
+});
 
 // 监听日期范围变化，重新获取数据
 watch(() => [props.startDate, props.endDate], () => {
