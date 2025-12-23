@@ -14,13 +14,30 @@
             </div>
         </div>
     </div>
+    
+    <!-- 飞机利用率卡片 -->
+    <div class="utilization-section">
+        <AircraftUtilizationCard
+            v-if="selectedAircraft"
+            :ac-reg="selectedAircraft"
+            title="飞机利用率"
+            avg-label="30天平均"
+            :compact-mode="true"
+            :chart-height="80"
+        />
+        <div v-else class="no-selection">
+            <p class="no-selection-text">请选择一架飞机查看利用率</p>
+        </div>
+    </div>
 </template>
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useAircraftStore } from '@/store/aircraft.store';
 import dayjs from 'dayjs';
+import AircraftUtilizationCard from '@/components/AircraftUtilizationCard.vue';
 
 const store = useAircraftStore();
+const selectedAircraft = ref('');
 
 const stat = computed(() => {// todo:页面变更飞机变0
     const today = dayjs().startOf('day');
@@ -43,6 +60,28 @@ const stat = computed(() => {// todo:页面变更飞机变0
 onMounted(() => {
     store.fetchAircrafts();
 });
+
+// 选择飞机的方法
+const selectAircraft = (acReg: string) => {
+    selectedAircraft.value = acReg;
+};
+
+// 暴露方法给父组件调用
+defineExpose({
+    selectAircraft
+});
+
+// 监听外部传入的飞机注册号
+const props = defineProps<{
+    acReg?: string;
+}>();
+
+// 如果外部传入了飞机注册号，则使用它
+watch(() => props.acReg, (newAcReg) => {
+    if (newAcReg) {
+        selectedAircraft.value = newAcReg;
+    }
+}, { immediate: true });
 
 </script>
 <style lang="less" scoped>
@@ -112,6 +151,24 @@ onMounted(() => {
                 color: @color-staff-hr-unit;
                 font-size: 0.85rem;
             }
+        }
+    }
+}
+
+.utilization-section {
+    margin-top: 12px;
+    
+    .no-selection {
+        background: white;
+        border-radius: 8px;
+        padding: 16px;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        
+        .no-selection-text {
+            font-size: 14px;
+            color: #8e8e93;
+            margin: 0;
         }
     }
 }

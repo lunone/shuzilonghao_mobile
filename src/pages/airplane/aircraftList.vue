@@ -33,10 +33,14 @@
                     <p class="stat-value">{{ availabilityRate }}%</p>
                 </div>
             </div>
-            <div class="utilization-card">
-                <p class="stat-label">日利用率(7日/30日)</p>
-                <p class="stat-value">{{ dailyUtilization }}</p>
-            </div>
+            <!-- 飞机利用率卡片 -->
+            <AircraftUtilizationCard
+                title="机队日利用率"
+                avg-label="30天平均"
+                :compact-mode="true"
+                :chart-height="80"
+                :fleet-mode="true"
+            />
 
             <!-- 搜索框 -->
             <div class="search-container">
@@ -50,11 +54,13 @@
             <div class="aircraft-list-section">
                 <h3 class="section-title">飞机列表</h3>
                 <div class="aircraft-list">
-                    <div 
-                        v-for="aircraft in filteredAircrafts" 
-                        :key="aircraft.acReg" 
+                    <div
+                        v-for="aircraft in filteredAircrafts"
+                        :key="aircraft.acReg"
                         class="aircraft-item"
+                        :class="{ 'selected': selectedAircraft === aircraft.acReg }"
                         @click="goToDetail(aircraft.acReg)"
+                        @longpress="selectAircraft(aircraft.acReg)"
                     >
                         <div class="aircraft-icon">
                             <span class="zl-icon-aircraft icon"></span>
@@ -83,12 +89,14 @@ import { ref, computed, onMounted } from 'vue';
 import { AircraftItem } from '@/api/aircraft.api';
 import { useAircraftStore } from '@/store/aircraft.store';
 import dayjs from 'dayjs';
+import AircraftUtilizationCard from '@/components/AircraftUtilizationCard.vue';
 
 // 获取store数据
 const aircarftStore = useAircraftStore();
 
 // 响应式数据
 const searchQuery = ref('');
+const selectedAircraft = ref('');
 const chartColors = ['#34C759', '#FF9500', '#007AFF', '#5856D6', '#FF3B30'];
 
 // 计算属性
@@ -189,6 +197,10 @@ const goToDetail = (acReg: string) => {
     uni.navigateTo({
         url: `/pages/airplane/airplaneDetail?acReg=${acReg}`
     });
+};
+
+const selectAircraft = (acReg: string) => {
+    selectedAircraft.value = selectedAircraft.value === acReg ? '' : acReg;
 };
 
 // 初始化数据
@@ -477,6 +489,11 @@ onMounted(() => {
                             &:last-child {
                                 margin-right: 0;
                             }
+                        }
+                        
+                        .aircraft-item.selected {
+                            border: 2px solid #137fec;
+                            background: rgba(19, 127, 236, 0.05);
                         }
                     }
                 }

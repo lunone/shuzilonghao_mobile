@@ -14,7 +14,7 @@
         </Permission>
 
         <div class="section asset">
-            <AircraftVue class="aircraft" />
+            <AircraftVue class="aircraft" :ac-reg="selectedAircraft" />
             <HrVue class="hr" />
         </div>
 
@@ -35,6 +35,7 @@
     </div>
 </template>
 <script lang="ts" setup>
+import { ref } from 'vue';
 import StatVue from '@/pages/staff/stat.vue';
 import todayFlightVue from '../flight/today.vue';
 import HrVue from '../hr/keyStaff.vue';
@@ -42,6 +43,9 @@ import AircraftVue from '@/pages/airplane/aircraft.vue';
 import PlanVue from '../flight/plan.vue';
 import dividerVue from '@/components/zl/divider.vue';
 import IncomeVue from '../sale/income.vue';
+
+// 选中的飞机注册号
+const selectedAircraft = ref('');
 
 const links = [
     [

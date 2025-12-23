@@ -182,6 +182,6 @@ export interface AircraftUtilization {
 }
 
 // 获取飞机利用率数据
-export const getAircraftUtilization = async (data: { acReg: string; startDate: string; endDate: string }): Promise<AircraftUtilization> => {
+export const getAircraftUtilization = async (data: { acReg?: string; startDate: string; endDate: string; type?: string }): Promise<AircraftUtilization> => {
     return request({ url: '/stat/utilization', data });
 };

@@ -155,7 +155,7 @@ import { AircraftItem } from '@/api/aircraft.api';
 import { useAircraftStore } from '@/store/aircraft.store';
 import { getAircraftDetail } from '@/api/aircraft.api';
 
-import AircraftUtilizationCard from '@/pages/analysis/AircraftUtilizationCard.vue';
+import AircraftUtilizationCard from '@/components/AircraftUtilizationCard.vue';
 import RecentFlightsCard from '@/pages/flight/RecentFlightsCard.vue';
 import Mel from '@/pages/maintenance/mel/melList.vue';
 import dayjs from 'dayjs';
