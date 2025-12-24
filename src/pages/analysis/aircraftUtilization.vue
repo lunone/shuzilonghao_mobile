@@ -17,7 +17,7 @@
     <!-- 飞机利用率走势图 -->
     <div class="chart-section">
       <AircraftUtilizationCard
-        title="机队利用率走势"
+        :title="`机队利用率走势 (${totalAircraftCount}架)`"
         avg-label="30天平均"
         :fleet-mode="true"
         :chart-height="120"
@@ -36,27 +36,16 @@
         <p class="loading-text">加载中...</p>
       </div>
       
-      <!-- 机型利用率列表 -->
+      <!-- 机型利用率图表列表 -->
       <div v-else class="aircraft-type-list">
-        <div
+        <AircraftUtilizationCard
           v-for="typeData in aircraftTypeUtilization"
           :key="typeData.acType"
-          class="type-item"
-        >
-          <div class="type-info">
-            <div class="type-name">{{ typeData.acType }}</div>
-            <div class="type-count">{{ typeData.aircraftCount }}架</div>
-          </div>
-          <div class="type-utilization">
-            <div class="utilization-bar">
-              <div
-                class="bar-fill"
-                :style="{ width: `${Math.min(100, (typeData.avgUtilization / 12) * 100)}%` }"
-              ></div>
-            </div>
-            <div class="utilization-value">{{ typeData.avgUtilization.toFixed(1) }}h</div>
-          </div>
-        </div>
+          :title="`${typeData.acType} (${typeData.aircraftCount}架)`"
+          avg-label="30天平均"
+          :chart-height="100"
+          :utilization-data="typeData.utilizationData"
+        />
       </div>
       
       <!-- 空状态 -->
@@ -83,6 +72,7 @@ const aircraftTypeUtilization = ref<Array<{
   acType: string;
   aircraftCount: number;
   avgUtilization: number;
+  utilizationData: AircraftUtilization;
 }>>([]);
 
 // 计算机队平均利用率
@@ -91,6 +81,12 @@ const fleetAvgUtilization = computed(() => {
     return 0;
   }
   return fleetUtilizationData.value.summary.avgDailyUtilization;
+});
+
+// 计算飞机总数
+const totalAircraftCount = computed(() => {
+  const validTypes = getValidAircraftTypes();
+  return validTypes.reduce((sum, type) => sum + type.aircraftCount, 0);
 });
 
 // 获取有效机型列表（过滤掉有endDate和regId长度大于4的飞机）
@@ -150,14 +146,26 @@ const fetchAircraftTypeUtilization = async () => {
       return {
         acType,
         aircraftCount,
-        avgUtilization: utilization.summary.avgDailyUtilization
+        avgUtilization: utilization.summary.avgDailyUtilization,
+        utilizationData: utilization
       };
     } catch (error) {
       console.error(`获取机型 ${acType} 利用率失败:`, error);
       return {
         acType,
         aircraftCount,
-        avgUtilization: 0
+        avgUtilization: 0,
+        utilizationData: {
+          summary: {
+            startDate: getDateString(-30),
+            endDate: getDateString(-1),
+            totalFlightMinutes: 0,
+            totalFlightHours: 0,
+            totalFleetDays: 0,
+            avgDailyUtilization: 0
+          },
+          details: []
+        }
       };
     }
   });
@@ -291,61 +299,6 @@ onMounted(async () => {
     display: flex;
     flex-direction: column;
     gap: 12px;
-
-    .type-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px;
-      background: #f8f9fa;
-      border-radius: 8px;
-
-      .type-info {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-
-        .type-name {
-          font-size: 14px;
-          font-weight: 600;
-          color: #111418;
-        }
-
-        .type-count {
-          font-size: 12px;
-          color: #617589;
-        }
-      }
-
-      .type-utilization {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        .utilization-bar {
-          width: 80px;
-          height: 6px;
-          background: #e5e5e5;
-          border-radius: 3px;
-          overflow: hidden;
-
-          .bar-fill {
-            height: 100%;
-            background: #137fec;
-            border-radius: 3px;
-            transition: width 0.3s ease;
-          }
-        }
-
-        .utilization-value {
-          font-size: 14px;
-          font-weight: 600;
-          color: #137fec;
-          min-width: 40px;
-          text-align: right;
-        }
-      }
-    }
   }
 }
 </style>
