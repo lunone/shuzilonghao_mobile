@@ -1,5 +1,9 @@
 <template>
-  <div class="utilization-card" :class="{ 'compact-mode': compactMode }">
+  <div
+    class="utilization-card"
+    :class="{ 'compact-mode': compactMode, 'clickable': clickable }"
+    @click="handleClick"
+  >
     <div class="card-header">
       <h3 class="section-title">{{ title }}</h3>
       <div v-if="!loading && !error && utilizationData.summary" class="avg-utilization">
@@ -47,6 +51,7 @@ interface Props {
   endDate?: string; // 自定义结束日期
   fleetMode?: boolean; // 机队模式，查询整个机队的利用率
   utilizationData?: AircraftUtilization | null; // 外部传入的利用率数据
+  clickable?: boolean; // 是否可点击
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -59,12 +64,14 @@ const props = withDefaults(defineProps<Props>(), {
   startDate: '',
   endDate: '',
   fleetMode: false,
-  utilizationData: null
+  utilizationData: null,
+  clickable: false
 });
 
 // 定义事件
 const emit = defineEmits<{
   dataLoaded: [data: AircraftUtilization];
+  click: [];
 }>();
 
 // 响应式数据
@@ -214,6 +221,13 @@ watch(() => [props.startDate, props.endDate], () => {
     fetchUtilizationData();
   }
 });
+
+// 处理点击事件
+const handleClick = () => {
+  if (props.clickable) {
+    emit('click');
+  }
+};
 </script>
 
 <style lang="less" scoped>
@@ -223,6 +237,16 @@ watch(() => [props.startDate, props.endDate], () => {
   padding: 16px;
   margin: 8px 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  &.clickable {
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:active {
+      background-color: #f5f5f5;
+      transform: scale(0.98);
+    }
+  }
 
   &.compact-mode {
     padding: 12px;
