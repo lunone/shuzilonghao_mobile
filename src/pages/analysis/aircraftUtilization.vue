@@ -17,7 +17,7 @@
     <!-- 飞机利用率走势图 -->
     <div class="chart-section">
       <AircraftUtilizationCard
-        :title="`机队利用率走势 (${totalAircraftCount}架)`"
+        :title="`机队 (${totalAircraftCount}架)利用率`"
         avg-label="30天平均"
         :fleet-mode="true"
         :chart-height="120"
@@ -264,13 +264,9 @@ onMounted(async () => {
 
 // 分机型利用率区域
 .aircraft-type-section {
-  background: white;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-
   .section-header {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
+    padding: 0 4px;
 
     .section-title {
       font-size: 16px;
