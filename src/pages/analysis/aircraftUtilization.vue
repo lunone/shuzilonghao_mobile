@@ -17,7 +17,7 @@
     <!-- 飞机利用率走势图 -->
     <div class="chart-section">
       <AircraftUtilizationCard
-        :title="`机队 (${totalAircraftCount}架)利用率`"
+        :title="`整体(${totalAircraftCount}架)利用率`"
         avg-label="30天平均"
         :fleet-mode="true"
         :chart-height="120"
