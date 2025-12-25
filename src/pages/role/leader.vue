@@ -1,8 +1,7 @@
 <template>
     <div class="main-container">
         <div class="section overview">
-            <StatVue class="day" :range="`day`" />
-            <StatVue class="year" />
+            <StatVue />
         </div>
         <zl-shortcut class="shortcut" :links="links" />
 

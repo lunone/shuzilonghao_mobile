@@ -1,8 +1,9 @@
 <template>
     <div class="wrapper">
-        <div v-for="(item, index) in sections" :key="index" class="section"
+        <!-- 日数据 -->
+        <div v-for="(item, index) in daySections" :key="'day-' + index" class="section"
             :class="['lastyear', 'thisyear', 'rate'][index]">
-            <div class="title">{{ titles[props.range][index] }}</div>
+            <div class="title">{{ dayTitles[index] }}</div>
             <template v-for="(unit, key) in fields" :key="key">
                 <div class="item">
                     <span class="value">{{ item[key] }}</span>
@@ -10,79 +11,148 @@
                 </div>
             </template>
         </div>
-        <div class="remark" v-if="props.range == 'year'">
+
+        <!-- 年数据 -->
+        <div v-for="(item, index) in yearSections" :key="'year-' + index" class="section"
+            :class="['lastyear', 'thisyear', 'rate'][index]">
+            <div class="title">{{ yearTitles[index] }}</div>
+            <template v-for="(unit, key) in fields" :key="key">
+                <div class="item">
+                    <span class="value">{{ item[key] }}</span>
+                    <span class="unit">{{ index == 2 ? '%' : unit }}</span>
+                </div>
+            </template>
+        </div>
+
+        <!-- 年数据时间范围说明 -->
+        <div class="remark">
             <i class="icon zl-icon-info" />
-            今年:{{ dayjs(dates.firstDayOfYear).format('YYYY/M/D') }}-{{ dayjs(dates.now).format('YYYY/M/D') }},去年:{{
-                dayjs(dates.firstDayOfLastYear).format('YYYY/M/D') }}-{{ dayjs(dates.dayBeforeOneYear).format('YYYY/M/D') }}
+            {{ timeRangeText }}
         </div>
     </div>
 </template>
 <script setup lang="ts">
-import { getStatPeriod, PeriodStats } from '@/api/statistics.api';
+import { getIndexSummary, IndexSummaryResponse } from '@/api/statistics.api';
 import dayjs from 'dayjs';
-import { computed, onMounted, PropType, reactive, Ref, ref } from 'vue';
+import { computed, onMounted, Ref, ref } from 'vue';
 import { numberByWan } from '@/utils/tools';
 
+// 模块级别的缓存数据，所有组件实例共享
+let cachedData: Ref<IndexSummaryResponse | null> | null = null;
+let isLoading = false;
 
-const props = defineProps({
-    range: { type: String as PropType<'year' | 'day'>, default: 'year' },
-})
-
-const dates = {
-    // day的
-    today: dayjs().startOf('day').toDate(),
-    yesterday: dayjs().subtract(1, 'day').startOf('day').toDate(),
-    theDayBeforeYesterday: dayjs().subtract(2, 'day').startOf('day').toDate(),
-    // year的
-    now: dayjs().toDate(),
-    dayBeforeOneYear: dayjs().subtract(1, 'year').toDate(),
-    firstDayOfYear: dayjs().startOf('year').toDate(),
-    firstDayOfLastYear: dayjs().subtract(1, 'year').startOf('year').toDate(),
+// 如果缓存不存在，创建新的
+if (!cachedData) {
+    cachedData = ref<IndexSummaryResponse | null>(null);
 }
 
-const lastRes: Ref<PeriodStats> = ref({ counter: 0, hour: 0, netWeightCargo: 0, averageLoadFactor: 0 });
-const currentRes: Ref<PeriodStats> = ref({ counter: 0, hour: 0, netWeightCargo: 0, averageLoadFactor: 0 });
+const summaryData = cachedData;
 
-const titles = { day: ['前日', '昨日', '变化'], year: ['去年', '今年', '变化'] }
-// 在 computed 属性后添加：
-const fields = { counter: '班', netWeightCargo: '吨', hour: '小时' }
+const dayTitles = ['前日', '昨日', '变化'];
+const yearTitles = ['去年', '今年', '变化'];
+const fields = { counter: '班', netWeightCargo: '吨', hour: '小时' };
 
-const rate = (last: number, current: number) => last > 0 ? ((current - last) / last * 100).toFixed(1) : '--';
-const formater = (src: PeriodStats) => ({
-    counter: numberByWan(src?.counter ?? 0),
-    netWeightCargo: numberByWan(((src?.netWeightCargo ?? 0) / 1e3) | 0),
-    hour: numberByWan((src?.hour ?? 0) | 0),
-})
-//  Record<keyof Stat, string | number>[]
-const sections = computed(() => [
-    formater(lastRes.value),
-    formater(currentRes.value),
-    Object.keys(fields).reduce((acc, key) => ({
-        ...acc, [key]: rate(lastRes.value[key as keyof typeof fields] ?? 0, currentRes.value[key as keyof typeof fields] ?? 0)
-    }), {} as Record<keyof typeof fields, string>),
-]);
+// 将变化率小数转换为百分比字符串
+const formatRate = (rate: number | null): string => {
+    if (rate === null) return '--';
+    return (rate * 100).toFixed(1);
+};
+
+// 格式化日期
+const formatDate = (dateStr: string): string => {
+    return dayjs(dateStr).format('YYYY/M/D');
+};
+
+// 日数据：前天、昨天、日变化率
+const daySections = computed(() => {
+    if (!summaryData.value) {
+        // 数据未加载时返回占位数据，防止页面抖动
+        return [
+            { counter: '--', netWeightCargo: '--', hour: '--' },
+            { counter: '--', netWeightCargo: '--', hour: '--' },
+            { counter: '--', netWeightCargo: '--', hour: '--' }
+        ];
+    }
+
+    const { counter, netWeightCargo, hour } = summaryData.value;
+
+    return [
+        {
+            counter: numberByWan(counter.theDayBeforeYesterday),
+            netWeightCargo: numberByWan(Math.floor(netWeightCargo.theDayBeforeYesterday / 1000)),
+            hour: numberByWan(Math.floor(hour.theDayBeforeYesterday)),
+        },
+        {
+            counter: numberByWan(counter.yesterday),
+            netWeightCargo: numberByWan(Math.floor(netWeightCargo.yesterday / 1000)),
+            hour: numberByWan(Math.floor(hour.yesterday)),
+        },
+        {
+            counter: formatRate(counter.dayRate),
+            netWeightCargo: formatRate(netWeightCargo.dayRate),
+            hour: formatRate(hour.dayRate),
+        }
+    ];
+});
+
+// 时间范围说明文本
+const timeRangeText = computed(() => {
+    if (!summaryData.value || !summaryData.value.time) {
+        // 数据未加载时返回占位文本，防止页面抖动
+        return '今年:----/--/--至----/--/--,去年:----/--/--至----/--/--';
+    }
+    const { time } = summaryData.value;
+    return `今年:${formatDate(time.thisYear[0])}-${formatDate(time.yesterday[1])},去年:${formatDate(time.lastYear[0])}-${formatDate(time.theDayBeforeYesterday[1])}`;
+});
+
+// 年数据：去年、今年、年变化率
+const yearSections = computed(() => {
+    if (!summaryData.value) {
+        // 数据未加载时返回占位数据，防止页面抖动
+        return [
+            { counter: '--', netWeightCargo: '--', hour: '--' },
+            { counter: '--', netWeightCargo: '--', hour: '--' },
+            { counter: '--', netWeightCargo: '--', hour: '--' }
+        ];
+    }
+
+    const { counter, netWeightCargo, hour } = summaryData.value;
+
+    return [
+        {
+            counter: numberByWan(counter.lastYear),
+            netWeightCargo: numberByWan(Math.floor(netWeightCargo.lastYear / 1000)),
+            hour: numberByWan(Math.floor(hour.lastYear)),
+        },
+        {
+            counter: numberByWan(counter.thisYear),
+            netWeightCargo: numberByWan(Math.floor(netWeightCargo.thisYear / 1000)),
+            hour: numberByWan(Math.floor(hour.thisYear)),
+        },
+        {
+            counter: formatRate(counter.yearRate),
+            netWeightCargo: formatRate(netWeightCargo.yearRate),
+            hour: formatRate(hour.yearRate),
+        }
+    ];
+});
 
 async function loadData() {
-    const lastRange = props.range == 'year' ? { startDate: dates.firstDayOfLastYear, endDate: dates.dayBeforeOneYear } : { startDate: dates.theDayBeforeYesterday, endDate: dates.yesterday };
-    const currentRange = props.range == 'year' ? { startDate: dates.firstDayOfYear, endDate: dates.now } : { startDate: dates.yesterday, endDate: dates.today };
+    // 如果正在加载或已经有数据，则不重复请求
+    if (isLoading || summaryData.value) return;
+
+    isLoading = true;
     try {
-        const [currentResult, lastResult] = await Promise.allSettled([
-            getStatPeriod(currentRange),
-            getStatPeriod(lastRange)
-        ]);
-        if (currentResult.status === 'fulfilled') {
-            currentRes.value = currentResult.value;
-        }
-        if (lastResult.status === 'fulfilled') {
-            lastRes.value = lastResult.value;
-        }
+        const now = dayjs().toISOString();
+        summaryData.value = await getIndexSummary(now);
     } catch (err) {
         console.warn('错误', err);
+    } finally {
+        isLoading = false;
     }
 }
 
 onMounted(loadData);
-
 </script>
 <style lang="less" scoped>
 @import "@/css/base.less";

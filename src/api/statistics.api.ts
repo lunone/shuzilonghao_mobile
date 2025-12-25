@@ -105,3 +105,36 @@ export const getStatByStation = (data: StationStatsDTO): Promise<StationStats[]>
 export const getRouteStatistics = async (data: RouteStatisticsQueryDTO): Promise<RouteStatistics> => {
     return get({ url: '/stats/route', data });
 };
+
+// ==================== 首页统计摘要 API ====================
+
+// 单个指标的完整数据
+export interface MetricData {
+    theDayBeforeYesterday: number;  // 前天
+    yesterday: number;              // 昨天
+    lastYear: number;               // 去年
+    thisYear: number;               // 今年
+    dayRate: number | null;    // 日变化率（小数）
+    yearRate: number | null;   // 年变化率（小数）
+}
+
+// 时间信息
+export interface TimeInfo {
+    theDayBeforeYesterday: [string, string];  // 前天 [start, end]
+    yesterday: [string, string];              // 昨天 [start, end]
+    lastYear: [string, string];               // 去年 [start, end]
+    thisYear: [string, string];               // 今年 [start, end]
+}
+
+// 首页统计响应
+export interface IndexSummaryResponse {
+    time: TimeInfo;
+    counter: MetricData;
+    netWeightCargo: MetricData;
+    hour: MetricData;
+}
+
+// 获取首页统计摘要
+export const getIndexSummary = (date: string): Promise<IndexSummaryResponse> => {
+    return get({ url: '/stats/index-summary', data: { date } });
+};

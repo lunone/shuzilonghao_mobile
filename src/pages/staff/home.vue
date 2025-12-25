@@ -2,12 +2,11 @@
     <div class="main-container">
         <!-- 使用 v-if 和 hasPermission 控制显示 -->
         <div v-if="userStore.hasPermission('page:stat:comp')" class="section overview">
-            <StatVue class="day" :range="`day`" />
-            <StatVue class="year" />
+            <StatVue />
         </div>
 
         <!-- <zl-shortcut class="shortcut" :links="links" /> -->
-        
+
         <div v-if="userStore.hasPermission('page:duty:list')" class="section duty">
             <Duty />
         </div>
@@ -20,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, computed } from 'vue'
+import { onMounted } from 'vue'
 import { useUserStore } from '@/store/user.store'
 import StatVue from '@/pages/staff/stat.vue';
 import Duty from '@/pages/duty/dutyWidget.vue';
@@ -29,8 +28,10 @@ import Duty from '@/pages/duty/dutyWidget.vue';
 import Flight from '@/pages/flight/flight.vue';
 // 引入 custom-tab-bar 组件
 import CustomTabBar from '@/components/zl/tabbar.vue';
+
 // 使用 userStore
 const userStore = useUserStore()
+
 const links = [
     [
         { size: 12, link: '/pages/analysis/analysis', class: 'analysis', text: '运行分析' },
