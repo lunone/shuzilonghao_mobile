@@ -1,4 +1,4 @@
-import { request } from '@/utils/request';
+import { get } from '@/utils/request';
 
 // 机场相关接口定义 (从 airport.interface.ts 移动而来)
 
@@ -28,5 +28,5 @@ export type AirportCode4Response = Record<string, AirportInfo>;
 
 // 获取机场列表
 export const getAirports = async (): Promise<AirportCode4Response> => {
-    return request({ url: '/airport/code4' });
+    return get({ url: '/airports/code4' });
 };

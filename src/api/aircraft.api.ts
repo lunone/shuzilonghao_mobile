@@ -1,4 +1,4 @@
-import { request } from '@/utils/request';
+import { request, get } from '@/utils/request';
 
 // 飞机相关接口定义 (从 aircraft.interface.ts 移动而来)
 
@@ -141,7 +141,7 @@ export type AircraftListResponse = string[];
 
 // 获取飞机列表
 export const getAircrafts = (): Promise<AircraftItem[]> => {
-    return request({ url: '/aircraft/list' }).then(data => {
+    return get({ url: '/aircrafts' }).then(data => {
         // 如果后端直接返回数组，直接返回；如果返回包装结构，则返回data字段
         return Array.isArray(data) ? data : data?.data || [];
     });
@@ -149,12 +149,12 @@ export const getAircrafts = (): Promise<AircraftItem[]> => {
 
 // 获取MEL事件
 export const getMels = (data: MelQueryDTO): Promise<MelItem[]> => {
-    return request({ url: '/me/mel', data });
+    return get({ url: '/maintenance/mel', data });
 };
 
 // 获取飞机详细信息
-export const getAircraftDetail = async (data: { acReg: string }): Promise<AircraftItem> => {
-    return request({ url: '/aircraft/detail', data });
+export const getAircraftDetail = async (acReg: string): Promise<AircraftItem> => {
+    return get({ url: `/shuzi/aircrafts/${acReg}` });
 };
 
 // 每日飞机利用率数据
@@ -183,5 +183,5 @@ export interface AircraftUtilization {
 
 // 获取飞机利用率数据
 export const getAircraftUtilization = async (data: { acReg?: string; startDate: string; endDate: string; type?: string }): Promise<AircraftUtilization> => {
-    return request({ url: '/stat/utilization', data });
+    return get({ url: '/stats/utilization', data });
 };

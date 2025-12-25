@@ -1,4 +1,4 @@
-import { request } from '@/utils/request';
+import { request, get, post, del } from '@/utils/request';
 import type { DutyAllResponse, DutyGroup, DutyNote, UserDutyGroup, CreateDutyNotePayload } from '@/types/duty';
 
 /**
@@ -9,7 +9,7 @@ import type { DutyAllResponse, DutyGroup, DutyNote, UserDutyGroup, CreateDutyNot
  * @returns {Promise<DutyAllResponse>}
  */
 export const getDutyAll = (data: { startDate: string; endDate: string }): Promise<DutyAllResponse> => {
-    return request({ url: '/duty/all', data, defaultValue: {} });
+    return get({ url: '/admin/duties/all', data, defaultValue: {} });
 };
 
 /**
@@ -19,7 +19,7 @@ export const getDutyAll = (data: { startDate: string; endDate: string }): Promis
  * @returns {Promise<DutyGroup[]>}
  */
 export const getDutyGroups = (data: { pageSize: number }): Promise<DutyGroup[]> => {
-    return request({ url: '/duty/group/list', data, defaultValue: [] });
+    return get({ url: '/system/duty-groups', data, defaultValue: [] });
 };
 
 /**
@@ -31,7 +31,7 @@ export const getDutyGroups = (data: { pageSize: number }): Promise<DutyGroup[]> 
  * @returns {Promise<DutyNote[]>}
  */
 export const getDutyNotes = (data: { startDate: string; endDate: string; groupId: number }): Promise<DutyNote[]> => {
-    return request({ url: '/duty/note/list', data, defaultValue: [] });
+    return get({ url: '/admin/duties/notes', data, defaultValue: [] });
 };
 
 /**
@@ -39,7 +39,7 @@ export const getDutyNotes = (data: { startDate: string; endDate: string; groupId
  * @returns {Promise<UserDutyGroup[]>}
  */
 export const getUserPermittedDutyGroups = (): Promise<UserDutyGroup[]> => {
-    return request({ url: '/duty/groups', defaultValue: [] });
+    return get({ url: '/admin/duties/groups/all', defaultValue: [] });
 };
 
 /**
@@ -50,7 +50,7 @@ export const getUserPermittedDutyGroups = (): Promise<UserDutyGroup[]> => {
  * @returns {Promise<DutyNote[]>}
  */
 export const getMyDutyNotes = (data: { startDate: string; endDate: string }): Promise<DutyNote[]> => {
-    return request({ url: '/duty/note/list', data, defaultValue: [] });
+    return get({ url: '/admin/duties/notes', data, defaultValue: [] });
 };
 
 /**
@@ -59,15 +59,14 @@ export const getMyDutyNotes = (data: { startDate: string; endDate: string }): Pr
  * @returns {Promise<DutyNote>}
  */
 export const createDutyNote = (data: CreateDutyNotePayload): Promise<DutyNote> => {
-    return request({ url: '/duty/note/create', data });
+    return post({ url: '/admin/duties/notes', data });
 };
 
 /**
  * @description 删除指定的交接日志
- * @param {object} data - 包含要删除的日志ID
- * @param {number} data.id - 日志ID
+ * @param {number} id - 日志ID
  * @returns {Promise<boolean>}
  */
-export const deleteDutyNote = (data: { id: number }): Promise<boolean> => {
-    return request({ url: '/duty/note/delete', data, defaultValue: false });
+export const deleteDutyNote = (id: number): Promise<boolean> => {
+    return del({ url: `/admin/duties/notes/${id}`, defaultValue: false });
 };

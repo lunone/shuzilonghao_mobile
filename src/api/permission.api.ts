@@ -1,4 +1,4 @@
-import { request } from '@/utils/request';
+import { request, get, post, put, del } from '@/utils/request';
 import type { IdDTO, BaseEntity, DateRangeQueryDTO } from '@/types/common';
 
 // 权限相关接口定义 (从 permission.interface.ts 移动而来)
@@ -178,52 +178,52 @@ export const ROLE_CODES = {
 
 // 创建权限
 export const createPermission = async (data: Partial<Permission>): Promise<Permission> => {
-    return request({ url: '/system/permission/create', data });
+    return post({ url: '/system/permissions', data });
 };
 
 // 更新权限
 export const updatePermission = async (data: { id: number; data: Partial<Permission> }): Promise<Permission> => {
-    return request({ url: '/system/permission/update', data });
+    return put({ url: `/system/permissions/${data.id}`, data: data.data });
 };
 
 // 删除权限
-export const deletePermission = async (data: IdDTO): Promise<void> => {
-    return request({ url: '/system/permission/delete', data });
+export const deletePermission = async (id: number): Promise<void> => {
+    return del({ url: `/system/permissions/${id}` });
 };
 
 // 获取权限列表
 export const getPermissionList = async (data?: any): Promise<{ list: Permission[]; total: number }> => {
-    return request({ url: '/system/permission/list', data });
+    return get({ url: '/system/permissions', data });
 };
 
 // 获取权限树
 export const getPermissionTree = async (): Promise<any[]> => {
-    return request({ url: '/system/permission/tree' });
+    return get({ url: '/system/permissions/tree' });
 };
 
 // 创建权限操作
 export const createPermissionAction = async (data: any): Promise<any> => {
-    return request({ url: '/system/permission-action/create', data });
+    return post({ url: '/system/permissions', data });
 };
 
 // 更新权限操作
 export const updatePermissionAction = async (data: any): Promise<any> => {
-    return request({ url: '/system/permission-action/update', data });
+    return put({ url: `/system/permissions/${data.id}`, data: data.data });
 };
 
 // 删除权限操作
-export const deletePermissionAction = async (data: any): Promise<any> => {
-    return request({ url: '/system/permission-action/delete', data });
+export const deletePermissionAction = async (id: number): Promise<any> => {
+    return del({ url: `/system/permissions/${id}` });
 };
 
 // 获取权限操作详情
-export const getPermissionActionDetail = async (data: any): Promise<any> => {
-    return request({ url: '/system/permission-action/detail', data });
+export const getPermissionActionDetail = async (id: number): Promise<any> => {
+    return get({ url: `/system/permissions/${id}` });
 };
 
 // 获取权限操作列表
-export const getPermissionActionList = async (): Promise<any[]> => {
-    return request({ url: '/system/permission-action/list' });
+export const getPermissionActionList = async (data?: any): Promise<any[]> => {
+    return get({ url: '/system/permissions', data });
 };
 
 // ADD: 在文件末尾添加以下接口定义

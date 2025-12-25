@@ -1,4 +1,4 @@
-import { request } from '@/utils/request';
+import { request, get } from '@/utils/request';
 import type { DateRangeQueryDTO } from '@/types/common';
 
 // 统计相关接口定义 (从 stat.interface.ts 移动而来)
@@ -76,32 +76,32 @@ export interface RouteStatisticsQueryDTO {
 
 // 获取周期统计
 export const getStatPeriod = (data: DateRangeQueryDTO): Promise<PeriodStats> => {
-    return request({ url: '/stat/period', data });
+    return get({ url: '/stats/summary', data });
 };
 
 // 获取月度统计
 export const getStatMonth = (data: DateRangeQueryDTO): Promise<MonthlyStats[]> => {
-    return request({ url: '/stat/month', data });
+    return get({ url: '/stats/monthly', data });
 };
 
 // 按航空公司统计
 export const getStatByAirline = (data: DateRangeQueryDTO): Promise<AirlineStats[]> => {
-    return request({ url: '/stat/by/airline', data });
+    return get({ url: '/stats/airline', data });
 };
 
 // 按飞机统计
 export const getStatByAircraft = (data: DateRangeQueryDTO): Promise<any[]> => {
-    return request({ url: '/stat/by/aircraft', data });
+    return get({ url: '/stats/airline', data });
 };
 
 // 按站点统计
 export const getStatByStation = (data: StationStatsDTO): Promise<StationStats[]> => {
-    return request({ url: '/stat/by/station', data });
+    return get({ url: '/stats/station', data });
 };
 
 
 
 // 获取航线统计数据
 export const getRouteStatistics = async (data: RouteStatisticsQueryDTO): Promise<RouteStatistics> => {
-    return request({ url: '/stat/by/route', data });
+    return get({ url: '/stats/route', data });
 };

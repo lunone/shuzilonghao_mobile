@@ -1,67 +1,67 @@
-import { request } from '@/utils/request';
+import { request, get, post, put, del } from '@/utils/request';
 import type { IdDTO } from '@/types/common';
 import type { Resource } from './permission.api';
 // 创建资源
 export const createResource = async (data: Partial<Resource>): Promise<Resource> => {
-    return request({ url: '/system/resource/create', data });
+    return post({ url: '/system/permissions', data });
 };
 
 // 更新资源
 export const updateResource = async (data: { id: number; data: Partial<Resource> }): Promise<any> => {
-    return request({ url: '/system/resource/update', data });
+    return put({ url: `/system/permissions/${data.id}`, data: data.data });
 };
 
 // 删除资源
-export const deleteResource = async (data: IdDTO): Promise<void> => {
-    return request({ url: '/system/resource/delete', data });
+export const deleteResource = async (id: number): Promise<void> => {
+    return del({ url: `/system/permissions/${id}` });
 };
 
 // 获取资源详情
-export const getResourceDetail = async (data: IdDTO): Promise<Resource> => {
-    return request({ url: '/system/resource/detail', data });
+export const getResourceDetail = async (id: number): Promise<Resource> => {
+    return get({ url: `/system/permissions/${id}` });
 };
 
 // 获取资源列表
-export const getResourceList = async (): Promise<Resource[]> => {
-    return request({ url: '/system/resource/list' });
+export const getResourceList = async (data?: any): Promise<Resource[]> => {
+    return get({ url: '/system/permissions', data });
 };
 
 // 获取资源树
 export const getResourceTree = async (): Promise<any[]> => {
-    return request({ url: '/system/resource/tree' });
+    return get({ url: '/system/permissions/tree' });
 };
 
 // 批量创建资源
 export const batchCreateResource = async (data: Partial<Resource>[]): Promise<Resource[]> => {
-    return request({ url: '/system/resource/batchCreate', data });
+    return post({ url: '/system/permissions/batch', data });
 };
 
 // 批量更新资源
 export const batchUpdateResource = async (data: { id: number; data: Partial<Resource> }[]): Promise<Resource[]> => {
-    return request({ url: '/system/resource/batchUpdate', data });
+    return put({ url: '/system/permissions/batch', data });
 };
 
 // 批量删除资源
-export const batchDeleteResource = async (data: IdDTO[]): Promise<void> => {
-    return request({ url: '/system/resource/batchDelete', data });
+export const batchDeleteResource = async (ids: number[]): Promise<void> => {
+    return del({ url: '/system/permissions/batch', data: ids });
 };
 
 // 分配资源权限
-export const assignResourcePermissions = async (data: { resourceId: number; permissionIds: number[] }): Promise<void> => {
-    return request({ url: '/system/resource/assignPermissions', data });
+export const assignResourcePermissions = async (data: { roleId: number; permissionIds: number[] }): Promise<void> => {
+    return put({ url: `/system/roles/${data.roleId}/permissions`, data: { permissionIds: data.permissionIds } });
 };
 
 // 获取资源权限
-export const getResourcePermissions = async (data: IdDTO): Promise<any[]> => {
-    return request({ url: '/system/resource/resourcePermissions', data });
+export const getResourcePermissions = async (roleId: number): Promise<any[]> => {
+    return get({ url: `/system/roles/${roleId}/permissions` });
 };
 
 // 获取资源权限ID
-export const getResourcePermissionIds = async (data: IdDTO): Promise<number[]> => {
-    return request({ url: '/system/resource/resourcePermissionIds', data });
+export const getResourcePermissionIds = async (roleId: number): Promise<number[]> => {
+    return get({ url: `/system/roles/${roleId}/permissions` });
 };
 
 // 获取拥有某个权限的资源列表
-export const getPermissionResources = async (data: IdDTO): Promise<Resource[]> => {
-    return request({ url: '/system/permission/resources', data });
+export const getPermissionResources = async (roleId: number): Promise<Resource[]> => {
+    return get({ url: `/system/roles/${roleId}/users` });
 };

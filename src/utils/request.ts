@@ -14,9 +14,17 @@ const option: AxiosRequestConfig = {
             ...config, url: baseURL + url, header: { ...headers },
         };
 
-        if (data || params) {
-            try { uniConfig.data = JSON.parse(data || params); }
-            catch (e) { uniConfig.data = data || params; }
+        // GET请求：将params序列化为查询字符串
+        if (params) {
+            const queryString = Object.keys(params)
+                .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+                .join('&');
+            uniConfig.url = uniConfig.url + (uniConfig.url.includes('?') ? '&' : '?') + queryString;
+        }
+        // POST/PUT/DELETE等请求：处理data
+        if (data) {
+            try { uniConfig.data = JSON.parse(data); }
+            catch (e) { uniConfig.data = data; }
         }
         uni.request({
             ...uniConfig,
@@ -220,6 +228,7 @@ export const loading = {
 export type RequestParams<T = any> = {
     url: string;
     data?: any;
+    method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'; // 新增：支持RESTful HTTP方法
     showLoading?: boolean;
     loadingText?: string;
     hideErrorToast?: boolean;
@@ -244,6 +253,7 @@ export const request = async <T = any>(
     const {
         url,
         data,
+        method = 'POST', // 默认保持POST，向后兼容
         showLoading = false,
         loadingText = '加载中...',
         hideErrorToast = false,
@@ -257,7 +267,14 @@ export const request = async <T = any>(
     showLoading && loadingManager.show(loadingText);
 
     try {
-        const config: any = { url, data, auth, noRetryOnFail };
+        const config: any = { url, method, data, auth, noRetryOnFail };
+
+        // GET请求时，将data转为params
+        if (method === 'GET' && data) {
+            config.params = data;
+            delete config.data;
+        }
+
         const response = await instance(config);
 
         // 检查业务逻辑错误
@@ -312,3 +329,19 @@ export const request = async <T = any>(
         }
     }
 };
+
+// 便捷的HTTP方法封装
+export const get = <T = any>(params: Omit<RequestParams<T>, 'method'>) =>
+    request<T>({ ...params, method: 'GET' });
+
+export const post = <T = any>(params: Omit<RequestParams<T>, 'method'>) =>
+    request<T>({ ...params, method: 'POST' });
+
+export const put = <T = any>(params: Omit<RequestParams<T>, 'method'>) =>
+    request<T>({ ...params, method: 'PUT' });
+
+export const del = <T = any>(params: Omit<RequestParams<T>, 'method'>) =>
+    request<T>({ ...params, method: 'DELETE' });
+
+export const patch = <T = any>(params: Omit<RequestParams<T>, 'method'>) =>
+    request<T>({ ...params, method: 'PATCH' });

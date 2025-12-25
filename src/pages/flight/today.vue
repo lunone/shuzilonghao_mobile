@@ -48,7 +48,7 @@ function showDetail(key) {
     // 这里弹出框
 }
 onMounted(async () => {
-    flights.value = await getFlightsByDate({ startDate: dayjs().startOf('day').toDate(), endDate: dayjs().endOf('day').toDate() }) as FlightItem[];
+    flights.value = await getFlightsByDate({ startDate: dayjs().startOf('day').toISOString(), endDate: dayjs().endOf('day').toISOString() }) as FlightItem[];
 });
 </script>
 <style lang="less" scoped>

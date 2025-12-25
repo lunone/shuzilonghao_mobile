@@ -1,4 +1,4 @@
-import { request } from '@/utils/request';
+import { request, get } from '@/utils/request';
 import type { DateRangeQueryDTO } from '@/types/common';
 
 // 飞行员相关接口定义 (从 pilot.interface.ts 移动而来)
@@ -157,49 +157,49 @@ export interface PilotFatigueResponse {
 }
 // 获取飞行员列表
 export const getPilots = async (data?: PilotListQueryDTO): Promise<PilotListResponse> => {
-    return request({ url: '/pilot/list', data });
+    return get({ url: '/pilots', data });
 };
 
 // 获取飞行员信息
 export const getPilotProfile = async (data: PilotProfileQueryDTO): Promise<PilotProfile> => {
-    return request({ url: '/pilot/profile', data });
+    return get({ url: '/pilots/profile', data });
 };
 
 // 获取飞行员值班信息
 export const getPilotDuty = async (data: UserIdOrCodeAndDateRangeQueryDTO): Promise<PilotDutyResponse> => {
-    return request({ url: '/pilot/duty', data });
+    return get({ url: '/pilots/duty', data });
 };
 
 // 获取飞行员缺勤信息
 export const getPilotAbsence = async (data: UserIdOrCodeAndDateRangeQueryDTO): Promise<any[]> => {
-    return request({ url: '/pilot/absence', data });
+    return get({ url: '/pilots/absence', data });
 };
 
 // 获取飞行员培训信息
 export const getPilotTraining = async (data: UserIdOrCodeAndDateRangeQueryDTO): Promise<any[]> => {
-    return request({ url: '/pilot/training', data });
+    return get({ url: '/pilots/training', data });
 };
 
 // 获取飞行员机搭子信息
 export const getPilotCrewMate = async (data: UserIdOrCodeAndDateRangeQueryDTO): Promise<CrewCrewMateStats[]> => {
-    return request({ url: '/stat/crew/mate', data });
+    return get({ url: '/pilots/crew/mates', data });
 };
 
 // 获取机组飞行小时统计
 export const getStatCrewFh = (data: DateRangeQueryDTO): Promise<CrewHourStats[]> => {
-    return request({ url: '/pilot/crew/fh', data });
+    return get({ url: '/pilots/crew/flight-hours', data });
 };
 // 获取机组同事统计
 export const getCrewMate = (data: CrewMateStats): Promise<CrewCrewMateStats[]> => {
-    return request({ url: '/pilot/crew/mate', data });
+    return get({ url: '/pilots/crew/mates', data });
 };
 
 // 获取机组疲劳统计
 // export const getCrewFatigue = (data: CrewFatigueStats): Promise<CrewFatigueStatsResponse[]> => {
-//     return request({ url: '/pilot/crew/fatigue', data });
+//     return get({ url: '/pilots/crew/fatigue', data });
 // };
 
 // 获取飞行员疲劳信息
 export const getPilotFatigue = async (data: UserIdOrCodeAndDateRangeQueryDTO): Promise<PilotFatigueResponse> => {
-    return request({ url: '/stat/crew/fatigue', data });
+    return get({ url: '/pilots/crew/fatigue', data });
 };

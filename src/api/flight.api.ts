@@ -1,4 +1,4 @@
-import { request } from '@/utils/request';
+import { request, get } from '@/utils/request';
 import type { DateRangeQueryDTO } from '@/types/common';
 
 // 航空相关接口定义 (从 flight.interface.ts 移动而来)
@@ -73,26 +73,27 @@ export interface FlightQueryDTO {
 export type FlightPlanStats = Record<string, Record<string, number>>;
 
 // 根据日期获取航班
-export const getFlightsByDate = async (data: DateRangeQueryDTO & { userId?: string, idType?: string }): Promise<FlightItem[]> => {
-    return request({ url: '/flight/date', data });
+export const getFlightsByDate = async (data: DateRangeQueryDTO & { userId?: string, idType?: string, dateKey?: string }): Promise<FlightItem[]> => {
+    const { dateKey = 'date', ...params } = data;
+    return get({ url: `/flights/${dateKey}`, data: params });
 };
 
 // 根据ATD获取航班
 export const getFlightsByATD = async (data: DateRangeQueryDTO): Promise<FlightItem[]> => {
-    return request({ url: '/flight/atd', data });
+    return get({ url: '/flights/atd', data });
 };
 
 // 获取航班计划
 export const getFlightPlan = async (data: DateRangeQueryDTO): Promise<FlightPlanStats> => {
-    return request({ url: '/flight/plan', data });
+    return get({ url: '/flights/plan', data });
 };
 
 // 获取最近执飞航班列表
 export const getRecentFlights = async (data: { acReg: string; startDate: string; endDate: string }): Promise<FlightItem[]> => {
-    return request({ url: '/flight/recent-flights', data });
+    return get({ url: '/flights/recent', data });
 };
 
 // 获取航班详细信息
-export const getFlightDetail = async (data: { flightId: number }): Promise<FlightItem> => {
-    return request({ url: '/flight/detail', data });
+export const getFlightDetail = async (flightId: number): Promise<FlightItem> => {
+    return get({ url: `/shuzi/flights/${flightId}` });
 };

@@ -172,7 +172,7 @@ const closeDetail = () => {
 
 onMounted(async () => {
     await airportStore.fetchAirports();
-    flights.value = await getFlightsByDate({ startDate: dayjs().startOf('day').toDate(), endDate: dayjs().endOf('day').toDate() }) as FlightItem[];
+    flights.value = await getFlightsByDate({ startDate: dayjs().startOf('day').toISOString(), endDate: dayjs().endOf('day').toISOString() }) as FlightItem[];
 });
 </script>
 

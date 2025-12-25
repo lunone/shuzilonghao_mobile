@@ -20,7 +20,8 @@ export class MelAPIService {
      */
     static async getMelList(params: MelQueryDto): Promise<MelPageResponse> {
         return request({
-            url: '/mel/list',
+            url: '/amro/mels',
+            method: 'GET',
             data: params,
             showLoading: true
         });
@@ -31,7 +32,8 @@ export class MelAPIService {
      */
     static async getMelStats(params: MelQueryDto): Promise<MelStatsResponse> {
         return request({
-            url: '/mel/stats',
+            url: '/amro/mels/stats',
+            method: 'GET',
             data: params,
             showLoading: true
         });
@@ -42,9 +44,11 @@ export class MelAPIService {
      */
     static async getMelDetail(params: MelDetailDto): Promise<MelDetailResponse> {
         console.log('调用MEL详情API，参数:', params);
+        const { id, source } = params;
         const result = await request({
-            url: '/mel/detail',
-            data: params,
+            url: `/amro/mels/${id}`,
+            method: 'GET',
+            data: source ? { source } : undefined,
             showLoading: true
         });
         console.log('MEL详情API返回结果:', result);
@@ -55,9 +59,11 @@ export class MelAPIService {
      * 根据飞机号查询
      */
     static async getMelByAircraft(params: MelByAircraftDto): Promise<MelPageResponse> {
+        const { acReg, page, size } = params;
         return request({
-            url: '/mel/by/aircraft',
-            data: params,
+            url: `/amro/mels/aircraft/${acReg}`,
+            method: 'GET',
+            data: { page, size },
             showLoading: true
         });
     }
@@ -66,9 +72,11 @@ export class MelAPIService {
      * 根据用户查询
      */
     static async getMelByUser(params: MelByUserDto): Promise<MelPageResponse> {
+        const { userId, userIdType, page, size } = params;
         return request({
-            url: '/mel/by/user',
-            data: params,
+            url: `/amro/mels/user/${userId}`,
+            method: 'GET',
+            data: { userIdType, page, size },
             showLoading: true
         });
     }
@@ -78,7 +86,8 @@ export class MelAPIService {
      */
     static async getMelByDateRange(params: MelByDateRangeDto): Promise<MelPageResponse> {
         return request({
-            url: '/mel/by/date-range',
+            url: '/amro/mels/date-range',
+            method: 'GET',
             data: params,
             showLoading: true
         });
@@ -89,7 +98,8 @@ export class MelAPIService {
      */
     static async getMelByATA(params: MelByATADto): Promise<MelPageResponse> {
         return request({
-            url: '/mel/by/ata',
+            url: '/amro/mels/ata',
+            method: 'GET',
             data: params,
             showLoading: true
         });
@@ -100,7 +110,8 @@ export class MelAPIService {
      */
     static async getStatusStats(params: MelQueryDto): Promise<MelStatsResponse> {
         return request({
-            url: '/mel/stats/status',
+            url: '/amro/mels/stats/status',
+            method: 'GET',
             data: params,
             showLoading: true
         });
@@ -111,7 +122,8 @@ export class MelAPIService {
      */
     static async getATAStats(params: MelQueryDto): Promise<MelStatsResponse> {
         return request({
-            url: '/mel/stats/ata',
+            url: '/amro/mels/stats/ata',
+            method: 'GET',
             data: params,
             showLoading: true
         });
@@ -122,7 +134,8 @@ export class MelAPIService {
      */
     static async getMonthlyStats(params: MelQueryDto): Promise<MelStatsResponse> {
         return request({
-            url: '/mel/stats/monthly',
+            url: '/amro/mels/stats/monthly',
+            method: 'GET',
             data: params,
             showLoading: true
         });
