@@ -75,5 +75,5 @@ export const getDepartments = (): Promise<DepartmenItem[]> => {
 
 // 获取今日值班信息
 export const getDutyToday = (): Promise<DutyTodayResponse[]> => {
-    return get({ url: '/admin/duties/data', data: { startDate: 'today', endDate: 'today' }, defaultValue: [] });
+    return get({ url: '/duties/data', data: { startDate: 'today', endDate: 'today' }, defaultValue: [] });
 };

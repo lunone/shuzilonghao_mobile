@@ -169,17 +169,17 @@ export const getAirports = async (): Promise<AirportCode4Response> => {
 
 | 函数名 | 旧URL | 新URL | 方法 | 参数处理 |
 |--------|-------|-------|------|----------|
-| `getDutyAll()` | `/duty/all` | `/admin/duties/all` | GET | Query参数 |
+| `getDutyAll()` | `/duty/all` | `/duties/all` | GET | Query参数 |
 | `getDutyGroups()` | `/duty/group/list` | `/system/duty-groups` | GET | Query参数 |
-| `getDutyNotes()` | `/duty/note/list` | `/admin/duties/notes` | GET | Query参数 |
-| `getUserPermittedDutyGroups()` | `/duty/groups` | `/admin/duties/groups/all` | GET | 无参数 |
-| `createDutyNote()` | `/duty/note/create` | `/admin/duties/notes` | POST | Body参数 |
-| `deleteDutyNote()` | `/duty/note/delete` | `/admin/duties/notes/:id` | DELETE | 路径参数 |
+| `getDutyNotes()` | `/duty/note/list` | `/duties/notes` | GET | Query参数 |
+| `getUserPermittedDutyGroups()` | `/duty/groups` | `/duties/groups/all` | GET | 无参数 |
+| `createDutyNote()` | `/duty/note/create` | `/duties/notes` | POST | Body参数 |
+| `deleteDutyNote()` | `/duty/note/delete` | `/duties/notes/:id` | DELETE | 路径参数 |
 
 ```typescript
 export const getDutyAll = (data: { startDate: string; endDate: string }): Promise<DutyAllResponse> => {
     return request({
-        url: '/admin/duties/all',
+        url: '/duties/all',
         method: 'GET',
         data,
         defaultValue: {}
@@ -197,7 +197,7 @@ export const getDutyGroups = (data: { pageSize: number }): Promise<DutyGroup[]> 
 
 export const getDutyNotes = (data: { startDate: string; endDate: string; groupId: number }): Promise<DutyNote[]> => {
     return request({
-        url: '/admin/duties/notes',
+        url: '/duties/notes',
         method: 'GET',
         data,
         defaultValue: []
@@ -206,7 +206,7 @@ export const getDutyNotes = (data: { startDate: string; endDate: string; groupId
 
 export const getUserPermittedDutyGroups = (): Promise<UserDutyGroup[]> => {
     return request({
-        url: '/admin/duties/groups/all',
+        url: '/duties/groups/all',
         method: 'GET',
         defaultValue: []
     });
@@ -214,7 +214,7 @@ export const getUserPermittedDutyGroups = (): Promise<UserDutyGroup[]> => {
 
 export const createDutyNote = (data: CreateDutyNotePayload): Promise<DutyNote> => {
     return request({
-        url: '/admin/duties/notes',
+        url: '/duties/notes',
         method: 'POST',
         data
     });
@@ -222,7 +222,7 @@ export const createDutyNote = (data: CreateDutyNotePayload): Promise<DutyNote> =
 
 export const deleteDutyNote = (id: number): Promise<boolean> => {
     return request({
-        url: `/admin/duties/notes/${id}`,
+        url: `/duties/notes/${id}`,
         method: 'DELETE',
         defaultValue: false
     });
@@ -285,22 +285,22 @@ export const getFlightDetail = async (flightId: number): Promise<FlightItem> => 
 
 | 函数名 | 旧URL | 新URL | 方法 | 参数处理 |
 |--------|-------|-------|------|----------|
-| `getMelList()` | `/mel/list` | `/amro/mels` | GET | Query参数 |
-| `getMelStats()` | `/mel/stats` | `/amro/mels/stats` | GET | Query参数 |
-| `getMelDetail()` | `/mel/detail` | `/amro/mels/:id` | GET | 路径+Query参数 |
-| `getMelByAircraft()` | `/mel/by/aircraft` | `/amro/mels/aircraft/:acReg` | GET | 路径+Query参数 |
-| `getMelByUser()` | `/mel/by/user` | `/amro/mels/user/:userId` | GET | 路径+Query参数 |
-| `getMelByDateRange()` | `/mel/by/date-range` | `/amro/mels/date-range` | GET | Query参数 |
-| `getMelByATA()` | `/mel/by/ata` | `/amro/mels/ata` | GET | Query参数 |
-| `getStatusStats()` | `/mel/stats/status` | `/amro/mels/stats/status` | GET | Query参数 |
-| `getATAStats()` | `/mel/stats/ata` | `/amro/mels/stats/ata` | GET | Query参数 |
-| `getMonthlyStats()` | `/mel/stats/monthly` | `/amro/mels/stats/monthly` | GET | Query参数 |
+| `getMelList()` | `/mel/list` | `/mels` | GET | Query参数 |
+| `getMelStats()` | `/mel/stats` | `/mels/stats` | GET | Query参数 |
+| `getMelDetail()` | `/mel/detail` | `/mels/:id` | GET | 路径+Query参数 |
+| `getMelByAircraft()` | `/mel/by/aircraft` | `/mels/aircraft/:acReg` | GET | 路径+Query参数 |
+| `getMelByUser()` | `/mel/by/user` | `/mels/user/:userId` | GET | 路径+Query参数 |
+| `getMelByDateRange()` | `/mel/by/date-range` | `/mels/date-range` | GET | Query参数 |
+| `getMelByATA()` | `/mel/by/ata` | `/mels/ata` | GET | Query参数 |
+| `getStatusStats()` | `/mel/stats/status` | `/mels/stats/status` | GET | Query参数 |
+| `getATAStats()` | `/mel/stats/ata` | `/mels/stats/ata` | GET | Query参数 |
+| `getMonthlyStats()` | `/mel/stats/monthly` | `/mels/stats/monthly` | GET | Query参数 |
 
 ```typescript
 export class MelAPIService {
     static async getMelList(params: MelQueryDto): Promise<MelPageResponse> {
         return request({
-            url: '/amro/mels',
+            url: '/mels',
             method: 'GET',
             data: params,
             showLoading: true
@@ -309,7 +309,7 @@ export class MelAPIService {
 
     static async getMelStats(params: MelQueryDto): Promise<MelStatsResponse> {
         return request({
-            url: '/amro/mels/stats',
+            url: '/mels/stats',
             method: 'GET',
             data: params,
             showLoading: true
@@ -319,7 +319,7 @@ export class MelAPIService {
     static async getMelDetail(params: MelDetailDto): Promise<MelDetailResponse> {
         const { id, source } = params;
         return request({
-            url: `/amro/mels/${id}`,
+            url: `/mels/${id}`,
             method: 'GET',
             data: source ? { source } : undefined,
             showLoading: true
@@ -329,7 +329,7 @@ export class MelAPIService {
     static async getMelByAircraft(params: MelByAircraftDto): Promise<MelPageResponse> {
         const { acReg, page, size } = params;
         return request({
-            url: `/amro/mels/aircraft/${acReg}`,
+            url: `/mels/aircraft/${acReg}`,
             method: 'GET',
             data: { page, size },
             showLoading: true
@@ -339,7 +339,7 @@ export class MelAPIService {
     static async getMelByUser(params: MelByUserDto): Promise<MelPageResponse> {
         const { userId, userIdType, page, size } = params;
         return request({
-            url: `/amro/mels/user/${userId}`,
+            url: `/mels/user/${userId}`,
             method: 'GET',
             data: { userIdType, page, size },
             showLoading: true
@@ -348,7 +348,7 @@ export class MelAPIService {
 
     static async getMelByDateRange(params: MelByDateRangeDto): Promise<MelPageResponse> {
         return request({
-            url: '/amro/mels/date-range',
+            url: '/mels/date-range',
             method: 'GET',
             data: params,
             showLoading: true
@@ -357,7 +357,7 @@ export class MelAPIService {
 
     static async getMelByATA(params: MelByATADto): Promise<MelPageResponse> {
         return request({
-            url: '/amro/mels/ata',
+            url: '/mels/ata',
             method: 'GET',
             data: params,
             showLoading: true
@@ -366,7 +366,7 @@ export class MelAPIService {
 
     static async getStatusStats(params: MelQueryDto): Promise<MelStatsResponse> {
         return request({
-            url: '/amro/mels/stats/status',
+            url: '/mels/stats/status',
             method: 'GET',
             data: params,
             showLoading: true
@@ -375,7 +375,7 @@ export class MelAPIService {
 
     static async getATAStats(params: MelQueryDto): Promise<MelStatsResponse> {
         return request({
-            url: '/amro/mels/stats/ata',
+            url: '/mels/stats/ata',
             method: 'GET',
             data: params,
             showLoading: true
@@ -384,7 +384,7 @@ export class MelAPIService {
 
     static async getMonthlyStats(params: MelQueryDto): Promise<MelStatsResponse> {
         return request({
-            url: '/amro/mels/stats/monthly',
+            url: '/mels/stats/monthly',
             method: 'GET',
             data: params,
             showLoading: true
@@ -791,7 +791,7 @@ export const getSmsVoluntarys = async (data: DateRangeQueryDTO): Promise<SmsVolu
 |--------|-------|-------|------|----------|
 | `getStaff()` | `/staff/list` | `/system/staffs` | GET | Query参数 |
 | `getDepartments()` | `/department/list` | `/system/departments` | GET | 无参数 |
-| `getDutyToday()` | `/duty/today` | `/admin/duties/data` | GET | Query参数 |
+| `getDutyToday()` | `/duty/today` | `/duties/data` | GET | Query参数 |
 
 ```typescript
 export const getStaff = (data?: StaffListQueryDTO): Promise<StaffProfile[]> => {
@@ -813,7 +813,7 @@ export const getDepartments = (): Promise<DepartmenItem[]> => {
 
 export const getDutyToday = (): Promise<DutyTodayResponse[]> => {
     return request({
-        url: '/admin/duties/data',
+        url: '/duties/data',
         method: 'GET',
         data: { startDate: 'today', endDate: 'today' },
         defaultValue: []

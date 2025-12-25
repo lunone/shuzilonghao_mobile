@@ -9,7 +9,7 @@ import type { DutyAllResponse, DutyGroup, DutyNote, UserDutyGroup, CreateDutyNot
  * @returns {Promise<DutyAllResponse>}
  */
 export const getDutyAll = (data: { startDate: string; endDate: string }): Promise<DutyAllResponse> => {
-    return get({ url: '/admin/duties/all', data, defaultValue: {} });
+    return get({ url: '/duties/all', data, defaultValue: {} });
 };
 
 /**
@@ -31,7 +31,7 @@ export const getDutyGroups = (data: { pageSize: number }): Promise<DutyGroup[]> 
  * @returns {Promise<DutyNote[]>}
  */
 export const getDutyNotes = (data: { startDate: string; endDate: string; groupId: number }): Promise<DutyNote[]> => {
-    return get({ url: '/admin/duties/notes', data, defaultValue: [] });
+    return get({ url: '/duties/notes', data, defaultValue: [] });
 };
 
 /**
@@ -39,7 +39,7 @@ export const getDutyNotes = (data: { startDate: string; endDate: string; groupId
  * @returns {Promise<UserDutyGroup[]>}
  */
 export const getUserPermittedDutyGroups = (): Promise<UserDutyGroup[]> => {
-    return get({ url: '/admin/duties/groups/all', defaultValue: [] });
+    return get({ url: '/duties/groups/all', defaultValue: [] });
 };
 
 /**
@@ -50,7 +50,7 @@ export const getUserPermittedDutyGroups = (): Promise<UserDutyGroup[]> => {
  * @returns {Promise<DutyNote[]>}
  */
 export const getMyDutyNotes = (data: { startDate: string; endDate: string }): Promise<DutyNote[]> => {
-    return get({ url: '/admin/duties/notes', data, defaultValue: [] });
+    return get({ url: '/duties/notes', data, defaultValue: [] });
 };
 
 /**
@@ -59,7 +59,7 @@ export const getMyDutyNotes = (data: { startDate: string; endDate: string }): Pr
  * @returns {Promise<DutyNote>}
  */
 export const createDutyNote = (data: CreateDutyNotePayload): Promise<DutyNote> => {
-    return post({ url: '/admin/duties/notes', data });
+    return post({ url: '/duties/notes', data });
 };
 
 /**
@@ -68,5 +68,5 @@ export const createDutyNote = (data: CreateDutyNotePayload): Promise<DutyNote> =
  * @returns {Promise<boolean>}
  */
 export const deleteDutyNote = (id: number): Promise<boolean> => {
-    return del({ url: `/admin/duties/notes/${id}`, defaultValue: false });
+    return del({ url: `/duties/notes/${id}`, defaultValue: false });
 };

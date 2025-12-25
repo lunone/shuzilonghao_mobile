@@ -82,12 +82,12 @@ GET /shuzi/airports/code4
 
 | 旧API | 新API | HTTP方法 | 传参方式 |
 |-------|-------|----------|----------|
-| `/duty/all` | `/admin/duties/all` | GET | Query参数 |
+| `/duty/all` | `/duties/all` | GET | Query参数 |
 | `/duty/group/list` | `/system/duty-groups` | GET | Query参数 |
-| `/duty/note/list` | `/admin/duties/notes` | GET | Query参数 |
-| `/duty/groups` | `/admin/duties/groups/all` | GET | 无参数 |
-| `/duty/note/create` | `/admin/duties/notes` | POST | Body参数 |
-| `/duty/note/delete` | `/admin/duties/notes/:id` | DEL | 路径参数 |
+| `/duty/note/list` | `/duties/notes` | GET | Query参数 |
+| `/duty/groups` | `/duties/groups/all` | GET | 无参数 |
+| `/duty/note/create` | `/duties/notes` | POST | Body参数 |
+| `/duty/note/delete` | `/duties/notes/:id` | DEL | 路径参数 |
 
 ### 详细说明
 
@@ -98,7 +98,7 @@ POST /duty/all
 Body: { startDate, endDate }
 
 // 新方式
-GET /admin/duties/all?startDate=xxx&endDate=xxx
+GET /duties/all?startDate=xxx&endDate=xxx
 ```
 
 #### 2. 获取排班组列表
@@ -117,7 +117,7 @@ POST /duty/note/list
 Body: { groupId, startDate, endDate }
 
 // 新方式
-GET /admin/duties/notes?groupId=xxx&startDate=xxx&endDate=xxx
+GET /duties/notes?groupId=xxx&startDate=xxx&endDate=xxx
 ```
 
 #### 4. 获取当前用户有权限的排班组
@@ -126,7 +126,7 @@ GET /admin/duties/notes?groupId=xxx&startDate=xxx&endDate=xxx
 POST /duty/groups
 
 // 新方式
-GET /admin/duties/groups/all
+GET /duties/groups/all
 ```
 
 #### 5. 创建新的交接日志
@@ -136,7 +136,7 @@ POST /duty/note/create
 Body: { scheduleDate, content, level, groupId }
 
 // 新方式
-POST /admin/duties/notes
+POST /duties/notes
 Body: { scheduleDate, content, level, groupId }
 ```
 
@@ -147,7 +147,7 @@ POST /duty/note/delete
 Body: { id }
 
 // 新方式
-DEL /admin/duties/notes/:id
+DEL /duties/notes/:id
 ```
 
 ---
@@ -221,16 +221,16 @@ GET /shuzi/flights/:flightId
 
 | 旧API | 新API | HTTP方法 | 传参方式 |
 |-------|-------|----------|----------|
-| `/mel/list` | `/amro/mels` | GET | Query参数 |
-| `/mel/stats` | `/amro/mels/stats` | GET | Query参数 |
-| `/mel/detail` | `/amro/mels/:id` | GET | 路径+Query参数 |
-| `/mel/by/aircraft` | `/amro/mels/aircraft/:acReg` | GET | 路径+Query参数 |
-| `/mel/by/user` | `/amro/mels/user/:userId` | GET | 路径+Query参数 |
-| `/mel/by/date-range` | `/amro/mels/date-range` | GET | Query参数 |
-| `/mel/by/ata` | `/amro/mels/ata` | GET | Query参数 |
-| `/mel/stats/status` | `/amro/mels/stats/status` | GET | Query参数 |
-| `/mel/stats/ata` | `/amro/mels/stats/ata` | GET | Query参数 |
-| `/mel/stats/monthly` | `/amro/mels/stats/monthly` | GET | Query参数 |
+| `/mel/list` | `/mels` | GET | Query参数 |
+| `/mel/stats` | `/mels/stats` | GET | Query参数 |
+| `/mel/detail` | `/mels/:id` | GET | 路径+Query参数 |
+| `/mel/by/aircraft` | `/mels/aircraft/:acReg` | GET | 路径+Query参数 |
+| `/mel/by/user` | `/mels/user/:userId` | GET | 路径+Query参数 |
+| `/mel/by/date-range` | `/mels/date-range` | GET | Query参数 |
+| `/mel/by/ata` | `/mels/ata` | GET | Query参数 |
+| `/mel/stats/status` | `/mels/stats/status` | GET | Query参数 |
+| `/mel/stats/ata` | `/mels/stats/ata` | GET | Query参数 |
+| `/mel/stats/monthly` | `/mels/stats/monthly` | GET | Query参数 |
 
 ### 详细说明
 
@@ -241,7 +241,7 @@ POST /mel/list
 Body: { acReg?, startDate?, endDate?, dateType?, userId?, userIdType?, melNo?, ddfNo?, ata1?, ata2?, acType?, deffer?, type?, status?, page?, size? }
 
 // 新方式
-GET /amro/mels?acReg=xxx&startDate=xxx&endDate=xxx&dateType=xxx&userId=xxx&userIdType=xxx&melNo=xxx&ddfNo=xxx&ata1=xxx&ata2=xxx&acType=xxx&deffer=xxx&type=xxx&status=xxx&page=1&size=10
+GET /mels?acReg=xxx&startDate=xxx&endDate=xxx&dateType=xxx&userId=xxx&userIdType=xxx&melNo=xxx&ddfNo=xxx&ata1=xxx&ata2=xxx&acType=xxx&deffer=xxx&type=xxx&status=xxx&page=1&size=10
 ```
 
 #### 2. 获取MEL统计数据
@@ -251,7 +251,7 @@ POST /mel/stats
 Body: { ...查询参数 }
 
 // 新方式
-GET /amro/mels/stats?acReg=xxx&startDate=xxx&endDate=xxx...
+GET /mels/stats?acReg=xxx&startDate=xxx&endDate=xxx...
 ```
 
 #### 3. 获取单个MEL记录详情
@@ -261,7 +261,7 @@ POST /mel/detail
 Body: { id, source? }
 
 // 新方式
-GET /amro/mels/:id?source=xxx
+GET /mels/:id?source=xxx
 ```
 
 #### 4. 根据飞机号查询
@@ -271,7 +271,7 @@ POST /mel/by/aircraft
 Body: { acReg, page?, size? }
 
 // 新方式
-GET /amro/mels/aircraft/:acReg?page=1&size=10
+GET /mels/aircraft/:acReg?page=1&size=10
 ```
 
 #### 5. 根据用户查询
@@ -281,7 +281,7 @@ POST /mel/by/user
 Body: { userId, userIdType?, page?, size? }
 
 // 新方式
-GET /amro/mels/user/:userId?userIdType=xxx&page=1&size=10
+GET /mels/user/:userId?userIdType=xxx&page=1&size=10
 ```
 
 #### 6. 根据日期范围查询
@@ -291,7 +291,7 @@ POST /mel/by/date-range
 Body: { startDate, endDate, dateType?, page?, size? }
 
 // 新方式
-GET /amro/mels/date-range?startDate=xxx&endDate=xxx&dateType=xxx&page=1&size=10
+GET /mels/date-range?startDate=xxx&endDate=xxx&dateType=xxx&page=1&size=10
 ```
 
 #### 7. 根据ATA章节查询
@@ -301,7 +301,7 @@ POST /mel/by/ata
 Body: { ata1?, ata2?, page?, size? }
 
 // 新方式
-GET /amro/mels/ata?ata1=xxx&ata2=xxx&page=1&size=10
+GET /mels/ata?ata1=xxx&ata2=xxx&page=1&size=10
 ```
 
 #### 8. 获取状态分布统计
@@ -311,7 +311,7 @@ POST /mel/stats/status
 Body: { ...查询参数 }
 
 // 新方式
-GET /amro/mels/stats/status?acReg=xxx&startDate=xxx...
+GET /mels/stats/status?acReg=xxx&startDate=xxx...
 ```
 
 #### 9. 获取ATA章节分布统计
@@ -321,7 +321,7 @@ POST /mel/stats/ata
 Body: { ...查询参数 }
 
 // 新方式
-GET /amro/mels/stats/ata?acReg=xxx&startDate=xxx...
+GET /mels/stats/ata?acReg=xxx&startDate=xxx...
 ```
 
 #### 10. 获取月度统计
@@ -331,7 +331,7 @@ POST /mel/stats/monthly
 Body: { ...查询参数 }
 
 // 新方式
-GET /amro/mels/stats/monthly?acReg=xxx&startDate=xxx...
+GET /mels/stats/monthly?acReg=xxx&startDate=xxx...
 ```
 
 ---
@@ -852,7 +852,7 @@ GET /shuzi/sms/voluntary?startDate=xxx&endDate=xxx
 |-------|-------|----------|----------|
 | `/staff/list` | `/system/staffs` | GET | Query参数 |
 | `/department/list` | `/system/departments` | GET | 无参数 |
-| `/duty/today` | `/admin/duties/data` | GET | Query参数 |
+| `/duty/today` | `/duties/data` | GET | Query参数 |
 
 ### 详细说明
 
@@ -881,7 +881,7 @@ GET /system/departments
 POST /duty/today
 
 // 新方式
-GET /admin/duties/data?startDate=today&endDate=today
+GET /duties/data?startDate=today&endDate=today
 ```
 
 ---

@@ -4,10 +4,10 @@
 根据VMel实体创建的MEL数据查询接口，支持多维度查询和分页功能。采用分层架构设计，实现松耦合。
 
 ## 基础配置
-- **实体类**: `src/entity/amro/VMel.entity.ts`
+- **实体类**: `src/entity/VMel.entity.ts`
 - **DTO层**: `src/dto/mel.rule.ts` - 专注于参数验证
-- **Service层**: `src/service/amro/mel.service.ts` - 业务逻辑实现
-- **Controller层**: `src/controller/amro/mel.controller.ts` - API接口定义
+- **Service层**: `src/service/mel.service.ts` - 业务逻辑实现
+- **Controller层**: `src/controller/mel.controller.ts` - API接口定义
 
 ## 架构设计
 
