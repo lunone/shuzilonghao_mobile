@@ -21,7 +21,6 @@ import { onMounted, computed } from 'vue';
 import { useUserStore } from '@/store/user.store';
 import { useDutyStore } from '@/store/duty.store';
 import { call } from '@/utils/tools';
-import dayjs from 'dayjs';
 
 // 初始化 store
 const userStore = useUserStore();
@@ -29,25 +28,24 @@ const dutyStore = useDutyStore();
 
 // 计算属性：处理今日值班数据
 const processedData = computed(() => {
-    // 确保 userStore.staff 和 dutyStore.dutyGroups 已经被访问，建立响应式依赖
+    // 确保 userStore.staff 和 dutyStore.dutyToday 已经被访问，建立响应式依赖
     const staffLoaded = Object.keys(userStore.staffObj).length > 0;
-    const groupsLoaded = Object.keys(dutyStore.dutyGroups).length > 0;
-    if (!staffLoaded || !groupsLoaded) {
+    const todayLoaded = dutyStore.dutyToday.length > 0;
+    if (!staffLoaded || !todayLoaded) {
         return [];
     }
 
-    const today = dayjs().format('YYYY-MM-DD');
-    const todayDuty = dutyStore.dutySchedule[today] || [];
-    
-    return todayDuty.map(duty => {
-        const user = userStore.getStaff(duty.userId);
-        const group = dutyStore.dutyGroups[duty.groupId];
-        return {
-            userId: duty.userId,
-            name: user?.name || '未知',
-            groupAbbr: group?.abbr || '未知',
-        };
-    });
+    // 过滤出有值班人员的排班组
+    return dutyStore.dutyToday
+        .filter(item => item.currentDutyUserId !== null)
+        .map(item => {
+            const user = userStore.getStaff(item.currentDutyUserId!);
+            return {
+                userId: item.currentDutyUserId!,
+                name: user?.name || '未知',
+                groupAbbr: item.abbr || '未知',
+            };
+        });
 });
 
 // 拨打电话函数
@@ -70,12 +68,10 @@ const navigateToDutyWatch = () => {
 
 // 页面加载时初始化
 onMounted(async () => {
-    const today = new Date();
     // 并行获取所有依赖数据，确保全部完成后再渲染
     await Promise.all([
         userStore.fetchStaff(),
-        dutyStore.fetchDutyGroups(),
-        dutyStore.fetchDutySchedule(today, today)
+        dutyStore.fetchDutyToday()
     ]);
 });
 </script>

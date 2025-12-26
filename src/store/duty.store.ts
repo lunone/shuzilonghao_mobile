@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { getDutyAll, getDutyGroups, getDutyNotes, getUserPermittedDutyGroups, getMyDutyNotes, createDutyNote, deleteDutyNote } from '@/api/duty.api';
-import type { DutyAllResponse, DutyGroup, DutyNote, UserDutyGroup, CreateDutyNotePayload } from '@/types/duty';
+import { getDutyAll, getDutyGroups, getDutyNotes, getUserPermittedDutyGroups, getMyDutyNotes, createDutyNote, deleteDutyNote, getDutyToday } from '@/api/duty.api';
+import type { DutyAllResponse, DutyGroup, DutyNote, UserDutyGroup, CreateDutyNotePayload, DutyTodayResponse } from '@/types/duty';
 import dayjs from 'dayjs';
 
 export const useDutyStore = defineStore('duty', () => {
@@ -10,11 +10,13 @@ export const useDutyStore = defineStore('duty', () => {
     const dutySchedule = ref<DutyAllResponse>({});
     const dutyNotes = ref<DutyNote[]>([]);
     const userDutyGroups = ref<UserDutyGroup[]>([]);
+    const dutyToday = ref<DutyTodayResponse>([]);
     const isLoading = ref({
         groups: false,
         schedule: false,
         notes: false,
         userGroups: false,
+        today: false,
     });
 
     // --- GETTERS ---
@@ -126,6 +128,25 @@ export const useDutyStore = defineStore('duty', () => {
         }
     };
 
+    /**
+     * @description 获取今日值班信息
+     */
+    const fetchDutyToday = async (forceRefresh = false) => {
+        if (isLoading.value.today) return;
+        if (!forceRefresh && dutyToday.value.length > 0) return;
+
+        isLoading.value.today = true;
+        try {
+            const response = await getDutyToday();
+            dutyToday.value = response || [];
+        } catch (error) {
+            console.error('Failed to fetch duty today:', error);
+            dutyToday.value = [];
+        } finally {
+            isLoading.value.today = false;
+        }
+    };
+
 
     /**
      * @description 创建交接日志
@@ -151,7 +172,7 @@ export const useDutyStore = defineStore('duty', () => {
      */
     const removeDutyNote = async (noteId: number) => {
         try {
-            const success = await deleteDutyNote({ id: noteId });
+            const success = await deleteDutyNote(noteId);
             if (success) {
                 // 从列表中移除对应的日志
                 const index = dutyNotes.value.findIndex(note => note.id === noteId);
@@ -172,6 +193,7 @@ export const useDutyStore = defineStore('duty', () => {
         dutySchedule,
         dutyNotes,
         userDutyGroups,
+        dutyToday,
         isLoading,
 
         // Getters
@@ -183,6 +205,7 @@ export const useDutyStore = defineStore('duty', () => {
         fetchDutyNotes,
         fetchMyDutyNotes,
         fetchUserDutyGroups,
+        fetchDutyToday,
         addDutyNote,
         removeDutyNote,
     };

@@ -50,3 +50,13 @@ export interface CreateDutyNotePayload {
   level: number;
   groupId: number;
 }
+
+// 新增: GET /duties/today 接口响应类型
+export interface DutyTodayItem {
+  id: number;
+  name: string;
+  abbr: string;
+  currentDutyUserId: string | null;
+}
+
+export type DutyTodayResponse = DutyTodayItem[];
