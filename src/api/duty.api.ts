@@ -47,7 +47,7 @@ export const getDutyNotes = (data: { startDate: string; endDate: string; groupId
  * @returns {Promise<UserDutyGroup[]>}
  */
 export const getUserPermittedDutyGroups = (): Promise<UserDutyGroup[]> => {
-    return get({ url: '/duties/groups/all', defaultValue: [] });
+    return get({ url: '/duties/groups', defaultValue: [] });
 };
 
 /**
