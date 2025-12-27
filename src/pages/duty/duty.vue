@@ -519,16 +519,17 @@ onMounted(async () => {
     await Promise.all([
         userStore.fetchStaff(),
         userStore.fetchMe(), // 确保获取用户信息
-        dutyStore.fetchDutyGroups()
+        dutyStore.fetchDutyGroups(),
+        dutyStore.fetchUserDutyGroups() // 获取用户有权限的值班组
     ]);
-    
+
     // 设置当前用户ID
     currentUserId.value = getCurrentUserId();
-    
+
     if (dutyStore.userDutyGroups.length > 0) {
         userGroupId.value = dutyStore.userDutyGroups[0].id;
     }
-    
+
     fetchDataForCurrentView();
 });
 </script>
