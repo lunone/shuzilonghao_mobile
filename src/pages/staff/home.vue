@@ -8,7 +8,14 @@
         <!-- <zl-shortcut class="shortcut" :links="links" /> -->
 
         <div v-if="userStore.hasPermission('page:duty:list')" class="section duty">
-            <Duty />
+            <div class="duty-header">
+                <h3 class="title">今日值班</h3>
+                <div class="more-button" @click="navigateToDutyWatch">更多</div>
+            </div>
+            <DutyStaffList
+                layoutMode="horizontal"
+                :showEmptyGroups="true"
+            />
         </div>
         <!-- <Meals class="meals" /> -->
 
@@ -22,7 +29,7 @@
 import { onMounted } from 'vue'
 import { useUserStore } from '@/store/user.store'
 import StatVue from '@/pages/staff/stat.vue';
-import Duty from '@/pages/duty/dutyWidget.vue';
+import DutyStaffList from '@/components/DutyStaffList.vue';
 // import Meals from '@/pages/staff/meals.vue';
 
 import Flight from '@/pages/flight/flight.vue';
@@ -45,6 +52,11 @@ const links = [
         { size: 8, link: '/pages/maintenance/maintenance', class: 'maintenance', text: '维修', error: '敬请期待' },
     ],
 ];
+// 跳转到值班总览页面
+const navigateToDutyWatch = () => {
+    uni.navigateTo({ url: '/pages/duty/duty' });
+};
+
 // 输出当前用户权限信息到控制台
 onMounted(async () => {
     // 等待用户信息加载完
@@ -97,6 +109,25 @@ onMounted(async () => {
         }
     }
 
-    &>.duty {}
+    &>.duty {
+        .duty-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+
+            .title {
+                font-size: 16px;
+                font-weight: bold;
+                color: #333;
+            }
+
+            .more-button {
+                font-size: 14px;
+                color: #999;
+                cursor: pointer;
+            }
+        }
+    }
 }
 </style>

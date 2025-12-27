@@ -52,29 +52,12 @@
                     <view class="loading-spinner"></view>
                     <p class="loading-text">加载中...</p>
                 </view>
-                <view v-else-if="selectedDayDuties && selectedDayDuties.length > 0" class="duty-content">
-                    <view v-for="group in selectedDayDuties" :key="group.groupId" class="duty-group">
-                        <view v-if="group.users.length > 0" v-for="user in group.users" :key="user.userId" class="user-info" @click="handleUserClick(user)">
-                            <view class="zl-icon-user user-avatar"></view>
-                            <view class="user-details">
-                                <p class="user-name">{{ user.name }}</p>
-                                <p class="user-department">{{ group.groupName }}</p>
-                            </view>
-                        </view>
-                        <view v-else class="user-info no-duty">
-                            <view class="zl-icon-user user-avatar"></view>
-                            <view class="user-details">
-                                <p class="user-name">未排班</p>
-                                <p class="user-department">{{ group.groupName }}</p>
-                            </view>
-                        </view>
-                        <hr class="divider" v-if="selectedDayDuties.length > 1"/>
-                    </view>
-                </view>
-                <view v-else class="empty-placeholder">
-                    <view class="empty-icon zl-icon-calendar"></view>
-                    <p class="empty-text">该日无值班安排</p>
-                </view>
+                <DutyStaffList
+                    v-else
+                    :dutyData="selectedDayDuties"
+                    layoutMode="vertical"
+                    :showEmptyGroups="true"
+                />
             </view>
 
             <!-- 交接日志区域 - 只在有权限时显示 -->
@@ -154,7 +137,7 @@ import isoWeek from 'dayjs/plugin/isoWeek';
 import weekday from 'dayjs/plugin/weekday';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
-import { call } from '@/utils/tools';
+import DutyStaffList from '@/components/DutyStaffList.vue';
 
 dayjs.extend(isoWeek);
 dayjs.extend(weekday);
@@ -290,33 +273,7 @@ const monthCalendar = computed(() => {
 // --- 值班信息 ---
 const selectedDayDuties = computed(() => {
     const dateStr = selectedDate.value.format('YYYY-MM-DD');
-    const duties = dutyStore.dutySchedule[dateStr] || [];
-
-    const grouped: Record<string, { groupId: string; groupName: string; users: any[] }> = {};
-
-    // 初始化所有值班组
-    Object.values(dutyStore.dutyGroups).forEach((group: any) => {
-        grouped[group.id] = {
-            groupId: String(group.id),
-            groupName: group.name || '未知部门',
-            users: [],
-        };
-    });
-
-    // 填充值班人员
-    duties.forEach(duty => {
-        if (grouped[duty.groupId]) {
-            const staffInfo = userStore.getStaff(duty.userId);
-            grouped[duty.groupId].users.push({
-                userId: duty.userId,
-                name: staffInfo?.name || '未知',
-                avatar: staffInfo?.avatar,
-                phone: staffInfo?.phone,
-            });
-        }
-    });
-
-    return Object.values(grouped);
+    return dutyStore.dutySchedule[dateStr] || [];
 });
 
 const notesForSelectedDate = computed(() => {
@@ -397,16 +354,6 @@ const goToday = () => {
 
 const selectDay = (day: { date: string }) => {
     selectedDate.value = dayjs(day.date);
-};
-
-const handleUserClick = (user: { phone?: string }) => {
-    if (user.phone) {
-        call(user.phone);
-    }
-};
-
-const navigateToDutyUser = () => {
-    uni.navigateTo({ url: '/pages/staff/dutyUser' });
 };
 
 // 对话框相关方法
@@ -726,44 +673,6 @@ onMounted(async () => {
     padding: 16px;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     margin-bottom: 16px;
-    
-    .duty-group {
-        margin-bottom: 12px;
-    }
-    
-    .user-info {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-
-        &.no-duty {
-            .user-name, .user-department {
-                color: @text-slate-400;
-            }
-        }
-    }
-    .user-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 9999px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        background-color: #e5e7eb;
-        color: @text-slate-600;
-    }
-    .user-details {
-        .user-name {
-            font-size: 16px;
-            font-weight: 500;
-            color: @text-slate-900;
-        }
-        .user-department {
-            font-size: 14px;
-            color: @text-slate-500;
-        }
-    }
 
     .note-item {
         background-color: @white-color;
@@ -841,12 +750,6 @@ onMounted(async () => {
             }
         }
     }
-    .divider {
-        border: none;
-        border-top: 1px solid #f1f5f9;
-        margin: 12px 0;
-    }
-    
     .empty-placeholder {
         display: flex;
         flex-direction: column;
@@ -868,35 +771,6 @@ onMounted(async () => {
         }
     }
     
-    .loading-placeholder {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 32px 16px;
-        text-align: center;
-        
-        .loading-spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid @primary-color;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 12px;
-        }
-        
-        .loading-text {
-            font-size: 14px;
-            color: @text-slate-500;
-            margin: 0;
-        }
-    }
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
 }
 
 .fab {

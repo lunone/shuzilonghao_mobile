@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { getDutyAll, getDutyGroups, getDutyNotes, getUserPermittedDutyGroups, getAccessibleDutyGroups, getMyDutyNotes, createDutyNote, deleteDutyNote, getDutyToday } from '@/api/duty.api';
-import type { DutyAllResponse, DutyGroup, DutyNote, CreateDutyNotePayload, DutyTodayResponse } from '@/types/duty';
+import { getDutyAll, getDutyGroups, getDutyNotes, getUserPermittedDutyGroups, getAccessibleDutyGroups, getMyDutyNotes, createDutyNote, deleteDutyNote } from '@/api/duty.api';
+import type { DutyAllResponse, DutyGroup, DutyNote, CreateDutyNotePayload } from '@/types/duty';
 import dayjs from 'dayjs';
 
 export const useDutyStore = defineStore('duty', () => {
@@ -10,13 +10,11 @@ export const useDutyStore = defineStore('duty', () => {
     const dutySchedule = ref<DutyAllResponse>({});
     const dutyNotes = ref<DutyNote[]>([]);
     const userDutyGroups = ref<DutyGroup[]>([]);
-    const dutyToday = ref<DutyTodayResponse>([]);
     const isLoading = ref({
         groups: false,
         schedule: false,
         notes: false,
         userGroups: false,
-        today: false,
     });
 
     // --- GETTERS ---
@@ -129,26 +127,6 @@ export const useDutyStore = defineStore('duty', () => {
     };
 
     /**
-     * @description 获取今日值班信息
-     */
-    const fetchDutyToday = async (forceRefresh = false) => {
-        if (isLoading.value.today) return;
-        if (!forceRefresh && dutyToday.value.length > 0) return;
-
-        isLoading.value.today = true;
-        try {
-            const response = await getDutyToday();
-            dutyToday.value = response || [];
-        } catch (error) {
-            console.error('Failed to fetch duty today:', error);
-            dutyToday.value = [];
-        } finally {
-            isLoading.value.today = false;
-        }
-    };
-
-
-    /**
      * @description 创建交接日志
      */
     const addDutyNote = async (payload: CreateDutyNotePayload) => {
@@ -193,7 +171,6 @@ export const useDutyStore = defineStore('duty', () => {
         dutySchedule,
         dutyNotes,
         userDutyGroups,
-        dutyToday,
         isLoading,
 
         // Getters
@@ -205,7 +182,6 @@ export const useDutyStore = defineStore('duty', () => {
         fetchDutyNotes,
         fetchMyDutyNotes,
         fetchUserDutyGroups,
-        fetchDutyToday,
         addDutyNote,
         removeDutyNote,
     };

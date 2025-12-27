@@ -22,12 +22,12 @@ export interface DutyGroup {
   id: number;
   name: string;
   abbr: string;
+  handoverTime: string;
+  meta: Record<string, any>;
   userIds?: string[];
   members?: string[];
   rangeDepartmentIds?: number[];
   rangeUserIds?: string[];
-  handoverTime?: string;
-  meta?: Record<string, any>;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -51,12 +51,3 @@ export interface CreateDutyNotePayload {
   groupId: number;
 }
 
-// 新增: GET /duties/today 接口响应类型
-export interface DutyTodayItem {
-  id: number;
-  name: string;
-  abbr: string;
-  currentDutyUserId: string | null;
-}
-
-export type DutyTodayResponse = DutyTodayItem[];

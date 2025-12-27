@@ -1,5 +1,5 @@
 import { request, get, post, del } from '@/utils/request';
-import type { DutyAllResponse, DutyGroup, DutyNote, CreateDutyNotePayload, DutyTodayResponse } from '@/types/duty';
+import type { DutyAllResponse, DutyGroup, DutyNote, CreateDutyNotePayload } from '@/types/duty';
 
 /**
  * @description 获取一段时间内所有人的排班情况
@@ -10,14 +10,6 @@ import type { DutyAllResponse, DutyGroup, DutyNote, CreateDutyNotePayload, DutyT
  */
 export const getDutyAll = (data: { startDate: string; endDate: string }): Promise<DutyAllResponse> => {
     return get({ url: '/duties/schedules', data, defaultValue: {} });
-};
-
-/**
- * @description 获取今日值班信息
- * @returns {Promise<DutyTodayResponse>}
- */
-export const getDutyToday = (): Promise<DutyTodayResponse> => {
-    return get({ url: '/duties/today', defaultValue: [] });
 };
 
 /**
