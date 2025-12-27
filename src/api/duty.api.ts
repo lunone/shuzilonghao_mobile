@@ -9,7 +9,7 @@ import type { DutyAllResponse, DutyGroup, DutyNote, UserDutyGroup, CreateDutyNot
  * @returns {Promise<DutyAllResponse>}
  */
 export const getDutyAll = (data: { startDate: string; endDate: string }): Promise<DutyAllResponse> => {
-    return get({ url: '/duties/all', data, defaultValue: {} });
+    return get({ url: '/duties/schedules', data, defaultValue: {} });
 };
 
 /**
@@ -27,7 +27,7 @@ export const getDutyToday = (): Promise<DutyTodayResponse> => {
  * @returns {Promise<DutyGroup[]>}
  */
 export const getDutyGroups = (data: { pageSize: number }): Promise<DutyGroup[]> => {
-    return get({ url: '/system/duty-groups', data, defaultValue: [] });
+    return get({ url: '/duties/groups'});
 };
 
 /**

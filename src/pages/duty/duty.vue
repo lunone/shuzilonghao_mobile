@@ -506,7 +506,6 @@ onMounted(async () => {
     await Promise.all([
         userStore.fetchStaff(),
         userStore.fetchMe(), // 确保获取用户信息
-        dutyStore.fetchDutyGroups(),
         dutyStore.fetchUserDutyGroups()
     ]);
     
