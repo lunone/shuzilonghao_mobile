@@ -17,11 +17,19 @@ export interface DutySchedule {
 
 export type DutyAllResponse = Record<string, DutySchedule[]>;
 
-// Based on /duty/group/list response
+// Based on /duties/groups and /duties/accessible-groups response
 export interface DutyGroup {
   id: number;
   name: string;
   abbr: string;
+  userIds?: string[];
+  members?: string[];
+  rangeDepartmentIds?: number[];
+  rangeUserIds?: string[];
+  handoverTime?: string;
+  meta?: Record<string, any>;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // Based on /duty/note/list response
@@ -34,14 +42,6 @@ export interface DutyNote {
   userId: string;
   groupId: number; // Add groupId to align with data structure
 }
-
-// Based on /duty/groups response
-export interface UserDutyGroup {
-    id: number;
-    name: string;
-    members: string[];
-}
-
 
 // 新增: 用于创建交接日志的请求体类型
 export interface CreateDutyNotePayload {

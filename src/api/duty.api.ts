@@ -1,5 +1,5 @@
 import { request, get, post, del } from '@/utils/request';
-import type { DutyAllResponse, DutyGroup, DutyNote, UserDutyGroup, CreateDutyNotePayload, DutyTodayResponse } from '@/types/duty';
+import type { DutyAllResponse, DutyGroup, DutyNote, CreateDutyNotePayload, DutyTodayResponse } from '@/types/duty';
 
 /**
  * @description 获取一段时间内所有人的排班情况
@@ -43,10 +43,18 @@ export const getDutyNotes = (data: { startDate: string; endDate: string; groupId
 };
 
 /**
- * @description 获取当前用户有权限的排班组
- * @returns {Promise<UserDutyGroup[]>}
+ * @description 获取当前用户有权限的排班组（详细信息）
+ * @returns {Promise<DutyGroup[]>}
  */
-export const getUserPermittedDutyGroups = (): Promise<UserDutyGroup[]> => {
+export const getAccessibleDutyGroups = (): Promise<DutyGroup[]> => {
+    return get({ url: '/duties/accessible-groups', defaultValue: [] });
+};
+
+/**
+ * @description 获取当前用户有权限的排班组（简单信息）
+ * @returns {Promise<DutyGroup[]>}
+ */
+export const getUserPermittedDutyGroups = (): Promise<DutyGroup[]> => {
     return get({ url: '/duties/groups', defaultValue: [] });
 };
 

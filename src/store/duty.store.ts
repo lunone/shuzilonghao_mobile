@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { getDutyAll, getDutyGroups, getDutyNotes, getUserPermittedDutyGroups, getMyDutyNotes, createDutyNote, deleteDutyNote, getDutyToday } from '@/api/duty.api';
-import type { DutyAllResponse, DutyGroup, DutyNote, UserDutyGroup, CreateDutyNotePayload, DutyTodayResponse } from '@/types/duty';
+import { getDutyAll, getDutyGroups, getDutyNotes, getUserPermittedDutyGroups, getAccessibleDutyGroups, getMyDutyNotes, createDutyNote, deleteDutyNote, getDutyToday } from '@/api/duty.api';
+import type { DutyAllResponse, DutyGroup, DutyNote, CreateDutyNotePayload, DutyTodayResponse } from '@/types/duty';
 import dayjs from 'dayjs';
 
 export const useDutyStore = defineStore('duty', () => {
@@ -9,7 +9,7 @@ export const useDutyStore = defineStore('duty', () => {
     const dutyGroups = ref<Record<string, DutyGroup>>({});
     const dutySchedule = ref<DutyAllResponse>({});
     const dutyNotes = ref<DutyNote[]>([]);
-    const userDutyGroups = ref<UserDutyGroup[]>([]);
+    const userDutyGroups = ref<DutyGroup[]>([]);
     const dutyToday = ref<DutyTodayResponse>([]);
     const isLoading = ref({
         groups: false,
@@ -111,7 +111,7 @@ export const useDutyStore = defineStore('duty', () => {
     };
     
     /**
-     * @description 获取当前用户有权限的值班组
+     * @description 获取当前用户有权限的值班组（详细信息）
      */
     const fetchUserDutyGroups = async (forceRefresh = false) => {
         if (isLoading.value.userGroups) return;
@@ -119,7 +119,7 @@ export const useDutyStore = defineStore('duty', () => {
 
         isLoading.value.userGroups = true;
         try {
-            const response = await getUserPermittedDutyGroups();
+            const response = await getAccessibleDutyGroups();
             userDutyGroups.value = response || [];
         } catch (error) {
             console.error('Failed to fetch user duty groups:', error);

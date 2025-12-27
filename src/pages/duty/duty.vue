@@ -506,7 +506,7 @@ onMounted(async () => {
     await Promise.all([
         userStore.fetchStaff(),
         userStore.fetchMe(), // 确保获取用户信息
-        dutyStore.fetchUserDutyGroups()
+        dutyStore.fetchDutyGroups()
     ]);
     
     // 设置当前用户ID
