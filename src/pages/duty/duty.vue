@@ -54,10 +54,17 @@
                 </view>
                 <view v-else-if="selectedDayDuties && selectedDayDuties.length > 0" class="duty-content">
                     <view v-for="group in selectedDayDuties" :key="group.groupId" class="duty-group">
-                        <view v-for="user in group.users" :key="user.userId" class="user-info" @click="handleUserClick(user)">
+                        <view v-if="group.users.length > 0" v-for="user in group.users" :key="user.userId" class="user-info" @click="handleUserClick(user)">
                             <view class="zl-icon-user user-avatar"></view>
                             <view class="user-details">
                                 <p class="user-name">{{ user.name }}</p>
+                                <p class="user-department">{{ group.groupName }}</p>
+                            </view>
+                        </view>
+                        <view v-else class="user-info no-duty">
+                            <view class="zl-icon-user user-avatar"></view>
+                            <view class="user-details">
+                                <p class="user-name">未排班</p>
                                 <p class="user-department">{{ group.groupName }}</p>
                             </view>
                         </view>
@@ -283,26 +290,32 @@ const monthCalendar = computed(() => {
 // --- 值班信息 ---
 const selectedDayDuties = computed(() => {
     const dateStr = selectedDate.value.format('YYYY-MM-DD');
-    const duties = dutyStore.dutySchedule[dateStr];
-    if (!duties) return null;
+    const duties = dutyStore.dutySchedule[dateStr] || [];
 
     const grouped: Record<string, { groupId: string; groupName: string; users: any[] }> = {};
-    duties.forEach(duty => {
-        if (!grouped[duty.groupId]) {
-            grouped[duty.groupId] = {
-                groupId: String(duty.groupId),
-                groupName: dutyStore.dutyGroups[duty.groupId]?.name || '未知部门',
-                users: [],
-            };
-        }
-        const staffInfo = userStore.getStaff(duty.userId);
-        grouped[duty.groupId].users.push({
-            userId: duty.userId,
-            name: staffInfo?.name || '未知',
-            avatar: staffInfo?.avatar,
-            phone: staffInfo?.phone,
-        });
+
+    // 初始化所有值班组
+    Object.values(dutyStore.dutyGroups).forEach((group: any) => {
+        grouped[group.id] = {
+            groupId: String(group.id),
+            groupName: group.name || '未知部门',
+            users: [],
+        };
     });
+
+    // 填充值班人员
+    duties.forEach(duty => {
+        if (grouped[duty.groupId]) {
+            const staffInfo = userStore.getStaff(duty.userId);
+            grouped[duty.groupId].users.push({
+                userId: duty.userId,
+                name: staffInfo?.name || '未知',
+                avatar: staffInfo?.avatar,
+                phone: staffInfo?.phone,
+            });
+        }
+    });
+
     return Object.values(grouped);
 });
 
@@ -721,6 +734,12 @@ onMounted(async () => {
         display: flex;
         align-items: center;
         gap: 12px;
+
+        &.no-duty {
+            .user-name, .user-department {
+                color: @text-slate-400;
+            }
+        }
     }
     .user-avatar {
         width: 40px;
@@ -744,6 +763,7 @@ onMounted(async () => {
             color: @text-slate-500;
         }
     }
+
     .note-item {
         background-color: @white-color;
         border-radius: 8px;
