@@ -14,19 +14,34 @@
             </view>
         </view>
         <view v-else class="vertical-list">
-            <view v-for="group in processedGroups" :key="group.groupId" class="duty-group">
-                <view v-if="group.users.length > 0" v-for="user in group.users" :key="user.userId" class="user-info" @click="handleUserClick(user)">
-                    <view class="zl-icon-user user-avatar"></view>
-                    <view class="user-details">
-                        <p class="user-name">{{ user.name }}</p>
-                        <p class="user-department">{{ group.groupName }}</p>
+            <view v-for="group in processedDutyPairs" :key="group.groupId" class="duty-group">
+                <view class="duty-pair-row">
+                    <!-- 第一人 -->
+                    <view class="staff-item" @click="handleUserClick(group.currentUser)">
+                        <view class="zl-icon-user user-avatar"></view>
+                        <view class="user-details">
+                            <p class="user-name">{{ group.currentUser?.name || '未排班' }}</p>
+                            <p class="user-department">{{ group.groupName }}</p>
+                        </view>
+                    </view>
+                    <!-- 第二人 -->
+                    <view class="staff-item" @click="handleUserClick(group.nextUser)">
+                        <view class="zl-icon-user user-avatar"></view>
+                        <view class="user-details">
+                            <p class="user-name">{{ group.nextUser?.name || '未排班' }}</p>
+                            <p class="user-department">{{ group.groupName }}</p>
+                        </view>
                     </view>
                 </view>
-                <view v-else class="user-info no-duty">
-                    <view class="zl-icon-user user-avatar"></view>
-                    <view class="user-details">
-                        <p class="user-name">未排班</p>
-                        <p class="user-department">{{ group.groupName }}</p>
+                <!-- 时间段条 -->
+                <view class="time-bar-container">
+                    <view class="time-bar">
+                        <view class="time-segment current-segment" :style="{ width: group.currentRatio + '%' }">
+                            <text class="time-text">{{ group.currentTimeRange }}</text>
+                        </view>
+                        <view class="time-segment next-segment" :style="{ width: group.nextRatio + '%' }">
+                            <text class="time-text">{{ group.nextTimeRange }}</text>
+                        </view>
                     </view>
                 </view>
                 <hr class="divider" v-if="showDivider(group)" />
@@ -48,6 +63,7 @@ interface Props {
     layoutMode?: 'horizontal' | 'vertical';
     showEmptyGroups?: boolean;
     displayDate?: Date;
+    selectedDate?: string; // 新增：当前选中的日期字符串 YYYY-MM-DD
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -215,12 +231,116 @@ const processedGroups = computed(() => {
     return result;
 });
 
+// 处理后的值班对数据（新的布局）
+const processedDutyPairs = computed(() => {
+    const result: any[] = [];
+
+    // 初始化所有值班组
+    const grouped: Record<string, {
+        groupId: string;
+        groupName: string;
+        handoverTime?: string;
+        currentUser?: any;
+        nextUser?: any;
+        currentTimeRange: string;
+        nextTimeRange: string;
+        currentRatio: number;
+        nextRatio: number;
+    }> = {};
+
+    Object.values(dutyStore.dutyGroups).forEach((group: any) => {
+        grouped[group.id] = {
+            groupId: String(group.id),
+            groupName: group.name || '未知部门',
+            handoverTime: group.handoverTime,
+            currentUser: undefined,
+            nextUser: undefined,
+            currentTimeRange: '',
+            nextTimeRange: '',
+            currentRatio: 0,
+            nextRatio: 0,
+        };
+    });
+
+    // 根据传入的 selectedDate 或当前日期计算
+    const selectedDate = props.selectedDate ? dayjs(props.selectedDate) : dayjs();
+    const selectedDateStr = selectedDate.format('YYYY-MM-DD');
+    const previousDateStr = selectedDate.subtract(1, 'day').format('YYYY-MM-DD');
+
+    // 使用传入的 dutyData 作为选中日期的duties，前一天从store获取
+    const selectedDateDuties = props.dutyData && props.dutyData.length > 0 ? props.dutyData : dutyStore.dutySchedule[selectedDateStr] || [];
+    const previousDateDuties = dutyStore.dutySchedule[previousDateStr] || [];
+
+    // 为每个组分配用户
+    Object.values(grouped).forEach(group => {
+        const groupId = parseInt(group.groupId);
+
+        // 前一班次用户（前一天的值班人员）
+        const previousUser = previousDateDuties.find((d: any) => d.groupId === groupId);
+        if (previousUser) {
+            group.currentUser = {
+                userId: previousUser.userId,
+                name: userStore.getStaff(previousUser.userId)?.name || '未知',
+                avatar: userStore.getStaff(previousUser.userId)?.avatar,
+                phone: userStore.getStaff(previousUser.userId)?.phone,
+            };
+        }
+
+        // 当前班次用户（选中日期的值班人员）
+        const selectedUser = selectedDateDuties.find((d: any) => d.groupId === groupId);
+        if (selectedUser) {
+            group.nextUser = {
+                userId: selectedUser.userId,
+                name: userStore.getStaff(selectedUser.userId)?.name || '未知',
+                avatar: userStore.getStaff(selectedUser.userId)?.avatar,
+                phone: userStore.getStaff(selectedUser.userId)?.phone,
+            };
+        }
+
+        // 计算时间段和比例（基于24小时）
+        const handoverTime = group.handoverTime;
+        if (handoverTime) {
+            // 有交接时间的情况
+            const [hours, minutes] = handoverTime.split(':').map(Number);
+            const handoverHour = hours;
+            const handoverMinute = minutes;
+            const handoverTotalMinutes = handoverHour * 60 + handoverMinute;
+
+            // 当前班次：00:00 到 handoverTime
+            const currentHours = handoverTotalMinutes / 60;
+            group.currentTimeRange = `00:00-${String(handoverHour).padStart(2, '0')}:${String(handoverMinute).padStart(2, '0')}`;
+            group.currentRatio = (currentHours / 24) * 100;
+
+            // 下一班次：handoverTime 到 24:00
+            const nextHours = 24 - currentHours;
+            group.nextTimeRange = `${String(handoverHour).padStart(2, '0')}:${String(handoverMinute).padStart(2, '0')}-24:00`;
+            group.nextRatio = (nextHours / 24) * 100;
+        } else {
+            // 无交接时间，默认12小时一班
+            group.currentTimeRange = '00:00-12:00';
+            group.nextTimeRange = '12:00-24:00';
+            group.currentRatio = 50;
+            group.nextRatio = 50;
+        }
+    });
+
+    // 根据 showEmptyGroups 过滤
+    const filteredGroups = Object.values(grouped).filter(group => {
+        if (props.showEmptyGroups) {
+            return true;
+        }
+        return group.currentUser;
+    });
+
+    return filteredGroups;
+});
+
 // 是否显示分隔线
 const showDivider = (group: any) => {
     if (props.layoutMode === 'horizontal') {
         return false;
     }
-    const groups = processedGroups.value;
+    const groups = processedDutyPairs.value;
     const index = groups.indexOf(group);
     return index < groups.length - 1;
 };
@@ -361,6 +481,69 @@ const handleUserClick = (user: { phone?: string }) => {
     .vertical-list {
         .duty-group {
             margin-bottom: 12px;
+        }
+
+        .duty-pair-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 8px;
+        }
+
+        .staff-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background-color: #f8fafc;
+            min-height: 60px;
+
+            &.no-duty {
+                .user-name, .user-department {
+                    color: @text-slate-400;
+                }
+            }
+        }
+
+        .time-bar-container {
+            margin-top: 8px;
+        }
+
+        .time-bar {
+            width: 100%;
+            height: 32px;
+            display: flex;
+            border-radius: 4px;
+            overflow: hidden;
+            background-color: #e5e7eb;
+        }
+
+        .time-segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            transition: width 0.3s ease;
+
+            .time-text {
+                font-size: 11px;
+                font-weight: 500;
+                color: @text-slate-900;
+                text-align: center;
+                line-height: 1;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            &.current-segment {
+                background-color: #d1d5db; // 浅灰色
+            }
+
+            &.next-segment {
+                background-color: #f3f4f6; // 更浅的灰色，接近白色
+            }
         }
     }
 

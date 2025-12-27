@@ -55,6 +55,7 @@
                 <DutyStaffList
                     v-else
                     :dutyData="selectedDayDuties"
+                    :selectedDate="selectedDate.format('YYYY-MM-DD')"
                     layoutMode="vertical"
                     :showEmptyGroups="true"
                 />
@@ -198,7 +199,8 @@ const fetchDataForCurrentView = async () => {
     isLoading.value = true;
     try {
         const unit = viewMode.value === 'week' ? 'isoWeek' : 'month';
-        const startDate = currentDate.value.startOf(unit).toDate();
+        // 为了显示handoverTime之前的排班数据，需要多获取一天
+        const startDate = currentDate.value.startOf(unit).subtract(1, 'day').toDate();
         const endDate = currentDate.value.endOf(unit).toDate();
         await dutyStore.fetchDutySchedule(startDate, endDate);
         if (userGroupId.value) {
