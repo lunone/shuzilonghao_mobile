@@ -365,10 +365,6 @@ const showDivider = (group: any) => {
 
 // 点击用户处理
 const handleUserClick = (user: { phone?: string; mobile?: string; name?: string } | undefined) => {
-    console.log('handleUserClick called with:', user);
-    console.log('user.phone:', user?.phone);
-    console.log('user.mobile:', user?.mobile);
-    console.log('user.name:', user?.name);
     if (!user) {
         return;
     }
