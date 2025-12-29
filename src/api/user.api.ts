@@ -2,6 +2,16 @@ import { request, get, post, put, del } from '@/utils/request';
 import type { UserIdDTO, WxActivateDTO } from '@/types/common';
 import { PermissionTree } from './permission.api'; // <--- ADD THIS IMPORT
 
+/**
+ * 带第三方凭证登录
+ * @param code 微信登录code
+ * @param oauthticket 第三方凭证
+ * @returns Promise<{ token: string, isFirstBind: boolean }>
+ */
+export const loginWithOAuthTicket = (code: string, oauthticket: string): Promise<{ token: string, isFirstBind: boolean }> => {
+    return post({ url: '/login/oauth', data: { code, oauthticket } });
+};
+
 // 用户相关接口定义 (从 user.interface.ts 移动而来)
 
 export type PilotItem = {

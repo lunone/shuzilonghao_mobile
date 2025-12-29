@@ -44,6 +44,12 @@
             }
         },
         {
+            "path": "pages/auth/bind",
+            "style": {
+                "navigationBarTitleText": "身份绑定"
+            }
+        },
+        {
             "path": "pages/analysis/analysis",
             "style": {
                 "navigationBarTitleText": "运行分析"

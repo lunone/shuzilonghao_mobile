@@ -5,6 +5,15 @@ let refreshTokenPromise: Promise<any> | null = null; // 管理Token刷新的Prom
 let isShowNetworkErrorModal = false; // 确保对话框弹出一个的标志
 let networkErrorQueue: Record<string, any> = {}; // 网络错误请求队列
 
+/**
+ * 获取微信登录code
+ * @returns Promise<string> 微信登录code
+ */
+export const getWxCode = async (): Promise<string> => {
+    const loginRes = await uni.login({ provider: 'weixin' });
+    return (loginRes as any).code;
+};
+
 const option: AxiosRequestConfig = {
     baseURL: CONFIG.url.api, method: 'POST', timeout: CONFIG.url.timeout,
     headers: { 'Content-Type': 'application/json;charset=UTF-8', },
@@ -123,9 +132,8 @@ instance.interceptors.response.use(
             // 发起第一次刷新token的请求
             refreshTokenPromise = new Promise(async (resolve, reject) => {
                 try {
-                    // 1. 调用 uni.login 获取 code
-                    const loginRes = await uni.login({ provider: 'weixin' });
-                    const code = (loginRes as any).code;
+                    // 1. 调用 getWxCode 获取 code
+                    const code = await getWxCode();
 
                     // 2. 用 code 请求新 token
                     const tokenResponse = await instance({ url: CONFIG.url.login, data: { code } });
