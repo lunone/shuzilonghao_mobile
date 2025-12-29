@@ -14,37 +14,32 @@
             </view>
         </view>
         <view v-else class="vertical-list">
-            <view v-for="group in processedDutyPairs" :key="group.groupId" class="duty-group">
-                <view class="duty-pair-row">
-                    <!-- 第一人 -->
-                    <view class="staff-item" @click="handleUserClick(group.currentUser)">
-                        <view class="zl-icon-user user-avatar"></view>
-                        <view class="user-details">
-                            <p class="user-name">{{ group.currentUser?.name || '未排班' }}</p>
-                            <p class="user-department">{{ group.groupName }}</p>
+            <!-- 时间段条 -->
+            <view class="time-bar-container" v-for="group in processedDutyPairs" :key="group.groupId">
+                <view class="time-bar">
+                    <view class="time-segment current-segment" :style="{ width: group.currentRatio + '%' }"
+                        @click="handleUserClick(group.currentUser)">
+                        <view class="staff-item">
+                            <view class="zl-icon-user user-avatar"></view>
+                            <view class="user-details">
+                                <p class="user-name">{{ group.currentUser?.name || '未排班' }}</p>
+                                <p class="user-department">{{ group.currentTimeRange }}</p>
+                            </view>
                         </view>
                     </view>
-                    <!-- 第二人 -->
-                    <view class="staff-item" @click="handleUserClick(group.nextUser)">
-                        <view class="zl-icon-user user-avatar"></view>
-                        <view class="user-details">
-                            <p class="user-name">{{ group.nextUser?.name || '未排班' }}</p>
-                            <p class="user-department">{{ group.groupName }}</p>
+                    <view class="time-segment next-segment" :style="{ width: group.nextRatio + '%' }"
+                        @click="handleUserClick(group.nextUser)">
+                        <view class="staff-item">
+                            <view class="zl-icon-user user-avatar"></view>
+                            <view class="user-details">
+                                <p class="user-name">{{ group.nextUser?.name || '未排班' }}</p>
+                                <p class="user-department">{{ group.nextTimeRange }}</p>
+                            </view>
                         </view>
-                    </view>
-                </view>
-                <!-- 时间段条 -->
-                <view class="time-bar-container">
-                    <view class="time-bar">
-                        <view class="time-segment current-segment" :style="{ width: group.currentRatio + '%' }">
-                            <text class="time-text">{{ group.currentTimeRange }}</text>
-                        </view>
-                        <view class="time-segment next-segment" :style="{ width: group.nextRatio + '%' }">
-                            <text class="time-text">{{ group.nextTimeRange }}</text>
-                        </view>
+                        <!--  -->
                     </view>
                 </view>
-                <hr class="divider" v-if="showDivider(group)" />
+                <text class="time-text">{{ group.groupName }}</text>
             </view>
         </view>
     </view>
@@ -80,14 +75,14 @@ const getEffectiveDate = (referenceDate: dayjs.Dayjs) => {
     // 获取第一个值班组的交接时间作为参考
     const groups = Object.values(dutyStore.dutyGroups);
     if (groups.length === 0) return referenceDate;
-    
+
     const firstGroup = groups[0];
     if (!firstGroup.handoverTime) return referenceDate;
-    
+
     const [hours, minutes] = firstGroup.handoverTime.split(':').map(Number);
     const handoverTime = referenceDate.hour(hours).minute(minutes);
     const now = dayjs();
-    
+
     // 如果当前时间早于交接时间，显示昨天的排班
     return now.isBefore(handoverTime)
         ? referenceDate.subtract(1, 'day')
@@ -102,7 +97,7 @@ const effectiveDutyData = computed(() => {
     if (props.dutyData && props.dutyData.length > 0) {
         return props.dutyData;
     }
-    
+
     // 否则根据 displayDate 或今天计算
     const displayDate = props.displayDate ? dayjs(props.displayDate) : dayjs();
     const effectiveDate = props.displayDate ? displayDate : getEffectiveDate(displayDate);
@@ -116,7 +111,7 @@ onMounted(async () => {
     if (props.dutyData && props.dutyData.length > 0) {
         return;
     }
-    
+
     isLoading.value = true;
     try {
         await Promise.all([
@@ -137,7 +132,7 @@ onMounted(async () => {
 // 横向布局的扁平化数据
 const horizontalItems = computed(() => {
     const items: any[] = [];
-    
+
     // 初始化所有值班组
     const grouped: Record<string, { groupId: string; groupName: string; groupAbbr: string; users: any[] }> = {};
     Object.values(dutyStore.dutyGroups).forEach((group: any) => {
@@ -197,7 +192,7 @@ const horizontalItems = computed(() => {
 // 处理后的值班组数据（纵向布局）
 const processedGroups = computed(() => {
     const grouped: Record<string, { groupId: string; groupName: string; users: any[] }> = {};
-    
+
     // 初始化所有值班组
     Object.values(dutyStore.dutyGroups).forEach((group: any) => {
         grouped[group.id] = {
@@ -379,9 +374,7 @@ const handleUserClick = (user: { phone?: string }) => {
 @white-color: #fff;
 
 .duty-staff-list {
-    .duty-group {
-        margin-bottom: 12px;
-    }
+
 
     .user-info {
         display: flex;
@@ -389,7 +382,9 @@ const handleUserClick = (user: { phone?: string }) => {
         gap: 12px;
 
         &.no-duty {
-            .user-name, .user-department {
+
+            .user-name,
+            .user-department {
                 color: @text-slate-400;
             }
         }
@@ -420,12 +415,6 @@ const handleUserClick = (user: { phone?: string }) => {
             color: @text-slate-500;
             margin: 0;
         }
-    }
-
-    .divider {
-        border: none;
-        border-top: 1px solid #f1f5f9;
-        margin: 12px 0;
     }
 
     .horizontal-list {
@@ -499,66 +488,97 @@ const handleUserClick = (user: { phone?: string }) => {
             margin-bottom: 12px;
         }
 
-        .duty-pair-row {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 8px;
-        }
-
-        .staff-item {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 12px;
+        .time-bar-container {
+            width: 100%;
             border-radius: 8px;
-            background-color: #f8fafc;
-            min-height: 60px;
+            overflow: hidden;
+            margin-bottom: 10px;
 
-            &.no-duty {
-                .user-name, .user-department {
-                    color: @text-slate-400;
+            .time-bar {
+                width: 100%;
+                height: 44px;
+                display: flex;
+                // border-radius: 4px;
+                overflow: hidden;
+                background-color: #e5e7eb;
+
+
+                .time-segment {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100%;
+                    transition: width 0.3s ease;
+                    position: relative;
+
+                    .staff-item {
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                        padding: 0;
+                        margin: 0;
+                        border: none;
+                        border-radius: 0;
+                        background: transparent;
+                        min-height: auto;
+                    }
+
+                    &.current-segment {
+                        background-color: #d1d5db; // 浅灰色
+                    }
+
+                    &.next-segment {
+                        background-color: #f3f4f6; // 更浅的灰色，接近白色
+                    }
                 }
             }
+
+            .time-text {
+                display: block;
+                text-align: center;
+                font-size: 12px;
+                font-weight: 500;
+                color: @text-slate-500;
+                // margin-top: 6px;
+                line-height: 1.2;
+                background-color: #ddd;
+            }
+
         }
 
-        .time-bar-container {
-            margin-top: 8px;
-        }
-
-        .time-bar {
-            width: 100%;
-            height: 32px;
-            display: flex;
-            border-radius: 4px;
-            overflow: hidden;
-            background-color: #e5e7eb;
-        }
-
-        .time-segment {
+        .user-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 9999px;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100%;
-            transition: width 0.3s ease;
+            font-size: 14px;
+            background-color: rgba(255, 255, 255, 0.5);
+            color: @text-slate-500;
+        }
 
-            .time-text {
+        .user-details {
+            .user-name {
                 font-size: 11px;
                 font-weight: 500;
                 color: @text-slate-900;
-                text-align: center;
-                line-height: 1;
+                margin: 0;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
+                max-width: 70px;
             }
 
-            &.current-segment {
-                background-color: #d1d5db; // 浅灰色
-            }
-
-            &.next-segment {
-                background-color: #f3f4f6; // 更浅的灰色，接近白色
+            .user-department {
+                font-size: 9px;
+                color: @text-slate-500;
+                margin: 0;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 70px;
             }
         }
     }
@@ -591,7 +611,12 @@ const handleUserClick = (user: { phone?: string }) => {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 </style>

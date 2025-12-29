@@ -670,9 +670,9 @@ onMounted(async () => {
 }
 
 .duty-info-card, .notes-card {
-    background-color: @white-color;
+    // background-color: @white-color;
     border-radius: 12px;
-    padding: 16px;
+    // padding: 16px;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     margin-bottom: 16px;
 
