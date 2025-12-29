@@ -369,9 +369,10 @@ const handleUserClick = (user: { phone?: string }) => {
 
 @primary-color: #137fec;
 @text-slate-900: #1E293B;
-@text-slate-500: #64748B;
+@text-slate-500: #bdbdbd;
 @text-slate-400: #94a3b8;
 @white-color: #fff;
+@time-text-height: 20px;
 
 .duty-staff-list {
 
@@ -498,10 +499,10 @@ const handleUserClick = (user: { phone?: string }) => {
                 width: 100%;
                 height: 44px;
                 display: flex;
-                // border-radius: 4px;
-                overflow: hidden;
-                background-color: #e5e7eb;
-
+                border-radius: 4px;
+                overflow: visible;
+                // background-color: #e5e7eb;
+                padding-bottom: @time-text-height;
 
                 .time-segment {
                     display: flex;
@@ -511,6 +512,7 @@ const handleUserClick = (user: { phone?: string }) => {
                     height: 100%;
                     transition: width 0.3s ease;
                     position: relative;
+                    padding-bottom: @time-text-height;
 
                     .staff-item {
                         display: flex;
@@ -540,9 +542,13 @@ const handleUserClick = (user: { phone?: string }) => {
                 font-size: 12px;
                 font-weight: 500;
                 color: @text-slate-500;
-                // margin-top: 6px;
+                margin-top: -@time-text-height;
                 line-height: 1.2;
-                background-color: #ddd;
+                // background: transparent;
+                position: relative;
+                z-index: 1;
+                border-top: solid 1rpx #ddd;
+                background-color: rgba(190, 190, 190, 0.1);
             }
 
         }
