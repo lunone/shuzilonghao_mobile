@@ -18,7 +18,7 @@
             <view class="time-bar-container" v-for="group in processedDutyPairs" :key="group.groupId">
                 <view class="time-bar">
                     <view class="time-segment current-segment" :style="{ width: group.currentRatio + '%' }"
-                        @click="handleUserClick(group.currentUser)">
+                        @click="group.currentUser && handleUserClick(group.currentUser)">
                         <view class="staff-item">
                             <view class="zl-icon-user user-avatar"></view>
                             <view class="user-details">
@@ -28,7 +28,7 @@
                         </view>
                     </view>
                     <view class="time-segment next-segment" :style="{ width: group.nextRatio + '%' }"
-                        @click="handleUserClick(group.nextUser)">
+                        @click="group.nextUser && handleUserClick(group.nextUser)">
                         <view class="staff-item">
                             <view class="zl-icon-user user-avatar"></view>
                             <view class="user-details">
@@ -153,6 +153,7 @@ const horizontalItems = computed(() => {
                 name: staffInfo?.name || '未知',
                 avatar: staffInfo?.avatar,
                 phone: staffInfo?.phone,
+                mobile: staffInfo?.mobile,
             });
         }
     });
@@ -174,6 +175,7 @@ const horizontalItems = computed(() => {
                     name: user.name,
                     groupAbbr: group.groupAbbr,
                     phone: user.phone,
+                    mobile: user.mobile,
                 });
             });
         } else {
@@ -182,6 +184,7 @@ const horizontalItems = computed(() => {
                 name: '未排班',
                 groupAbbr: group.groupAbbr,
                 phone: null,
+                mobile: null,
             });
         }
     });
@@ -273,22 +276,26 @@ const processedDutyPairs = computed(() => {
         // 前一班次用户（前一天的值班人员）
         const previousUser = previousDateDuties.find((d: any) => d.groupId === groupId);
         if (previousUser) {
+            const staffInfo = userStore.getStaff(previousUser.userId);
             group.currentUser = {
                 userId: previousUser.userId,
-                name: userStore.getStaff(previousUser.userId)?.name || '未知',
-                avatar: userStore.getStaff(previousUser.userId)?.avatar,
-                phone: userStore.getStaff(previousUser.userId)?.phone,
+                name: staffInfo?.name || '未知',
+                avatar: staffInfo?.avatar,
+                phone: staffInfo?.phone,
+                mobile: staffInfo?.mobile,
             };
         }
 
         // 当前班次用户（选中日期的值班人员）
         const selectedUser = selectedDateDuties.find((d: any) => d.groupId === groupId);
         if (selectedUser) {
+            const staffInfo = userStore.getStaff(selectedUser.userId);
             group.nextUser = {
                 userId: selectedUser.userId,
-                name: userStore.getStaff(selectedUser.userId)?.name || '未知',
-                avatar: userStore.getStaff(selectedUser.userId)?.avatar,
-                phone: userStore.getStaff(selectedUser.userId)?.phone,
+                name: staffInfo?.name || '未知',
+                avatar: staffInfo?.avatar,
+                phone: staffInfo?.phone,
+                mobile: staffInfo?.mobile,
             };
         }
 
@@ -357,10 +364,28 @@ const showDivider = (group: any) => {
 };
 
 // 点击用户处理
-const handleUserClick = (user: { phone?: string }) => {
-    if (user.phone) {
-        call(user.phone);
+const handleUserClick = (user: { phone?: string; mobile?: string; name?: string } | undefined) => {
+    console.log('handleUserClick called with:', user);
+    console.log('user.phone:', user?.phone);
+    console.log('user.mobile:', user?.mobile);
+    console.log('user.name:', user?.name);
+    if (!user) {
+        return;
     }
+    // 优先使用 mobile，如果没有则使用 phone
+    const phoneNumber = user.mobile || user.phone;
+    if (!phoneNumber) {
+        return;
+    }
+    uni.showModal({
+        title: '确认拨打电话',
+        content: `确定要拨打 ${user.name || '员工'} 的电话 ${phoneNumber} 吗？`,
+        success: (res) => {
+            if (res.confirm) {
+                call(phoneNumber);
+            }
+        }
+    });
 };
 </script>
 
