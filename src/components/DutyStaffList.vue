@@ -309,12 +309,28 @@ const processedDutyPairs = computed(() => {
             // 当前班次：00:00 到 handoverTime
             const currentHours = handoverTotalMinutes / 60;
             group.currentTimeRange = `00:00-${String(handoverHour).padStart(2, '0')}:${String(handoverMinute).padStart(2, '0')}`;
-            group.currentRatio = (currentHours / 24) * 100;
 
             // 下一班次：handoverTime 到 24:00
             const nextHours = 24 - currentHours;
             group.nextTimeRange = `${String(handoverHour).padStart(2, '0')}:${String(handoverMinute).padStart(2, '0')}-24:00`;
-            group.nextRatio = (nextHours / 24) * 100;
+
+            // 根据交接时间使用近似比例，避免极端的宽度占比
+            // 1:1 是中午12点左右（11:00-13:00之间）
+            // 早于11点的是 1:2（currentRatio: 33.33%, nextRatio: 66.67%）
+            // 晚于13点的是 2:1（currentRatio: 66.67%, nextRatio: 33.33%）
+            if (handoverHour >= 11 && handoverHour < 13) {
+                // 1:1 比例
+                group.currentRatio = 50;
+                group.nextRatio = 50;
+            } else if (handoverHour < 11) {
+                // 1:2 比例
+                group.currentRatio = 33.33;
+                group.nextRatio = 66.67;
+            } else {
+                // 2:1 比例（handoverHour >= 13）
+                group.currentRatio = 66.67;
+                group.nextRatio = 33.33;
+            }
         } else {
             // 无交接时间，默认12小时一班
             group.currentTimeRange = '00:00-12:00';
