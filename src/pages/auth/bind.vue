@@ -19,7 +19,7 @@
 import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { getWxCode } from '@/utils/request';
-import { loginWithOAuthTicket } from '@/api/user.api';
+import {  OAuthReg } from '@/api/user.api';
 import { CONFIG } from '@/config';
 
 const loading = ref(true);
@@ -51,7 +51,7 @@ const handleBind = async () => {
     const code = await getWxCode();
 
     // 调用带凭证登录接口
-    const result = await loginWithOAuthTicket(code, oauthticket.value);
+    const result = await OAuthReg(code, oauthticket.value);
 
     // 设置token
     uni.setStorageSync(CONFIG.key.token, result.token);

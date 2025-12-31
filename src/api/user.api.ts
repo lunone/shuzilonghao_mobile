@@ -8,8 +8,8 @@ import { PermissionTree } from './permission.api'; // <--- ADD THIS IMPORT
  * @param oauthticket 第三方凭证
  * @returns Promise<{ token: string, isFirstBind: boolean }>
  */
-export const loginWithOAuthTicket = (code: string, oauthticket: string): Promise<{ token: string, isFirstBind: boolean }> => {
-    return post({ url: '/login/oauth', data: { code, oauthticket } });
+export const OAuthReg = (code: string, oauthticket: string): Promise<{ token: string, isFirstBind: boolean }> => {
+    return post({ url: '/user/oauthreg', data: { code, oauthticket } });
 };
 
 // 用户相关接口定义 (从 user.interface.ts 移动而来)
